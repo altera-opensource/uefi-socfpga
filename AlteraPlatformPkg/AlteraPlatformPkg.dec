@@ -1,0 +1,130 @@
+#/** @file
+#
+#  Portions of the code modified by Altera to support SoC devices are licensed as follows:
+#  Copyright (c) 2015, Altera Corporation. All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without modification,
+#  are permitted provided that the following conditions are met:
+#
+#  1. Redistributions of source code must retain the above copyright notice, this
+#  list of conditions and the following disclaimer.
+#
+#  2. Redistributions in binary form must reproduce the above copyright notice, this
+#  list of conditions and the following disclaimer in the documentation and/or other
+#  materials provided with the distribution.
+#
+#  3. Neither the name of the copyright holder nor the names of its contributors may
+#  be used to endorse or promote products derived from this software without specific
+#  prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+#  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+#  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+#  SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+#  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+#  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+#  DAMAGE.
+#
+#  The original software modules are licensed as follows:
+#
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD 3 CLAUSE LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = AlteraPlatformPkg
+  PACKAGE_GUID                   = 25AFEF2D-B441-46a2-AF56-53205B0EDACC
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[Guids.common]
+  #
+  # Altera Platform TokenSpaceGuid {C6AF545B-DD3A-410a-A0EC-5594BD2C1E62}
+  #
+  gAlteraHpsTokenSpaceGuid    =  { 0xc6af545b, 0xdd3a, 0x410a, { 0xa0, 0xec, 0x55, 0x94, 0xbd, 0x2c, 0x1e, 0x62 } }
+
+  #
+  # Following Guid must match FILE_GUID in MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  #
+  gVariableRuntimeDxeFileGuid = { 0xcbd2e4d5, 0x7068, 0x4ff5, { 0xb4, 0x62, 0x98, 0x22, 0xb4, 0xad, 0x8d, 0x60 } }
+
+[PcdsFeatureFlag.common]
+
+[PcdsFixedAtBuild.common]
+
+  ## Platform Name in Null-terminated Unicode string
+  # @Prompt Platform Name string.
+  gAlteraHpsTokenSpaceGuid.PcdPlatformNameString|L"Altera(R) SoC Development Board"|VOID*|0xABCD0000
+
+  ## GUID of Device Tree Blob (DTB) to be consumed by UEFI, not for OS
+  # @Prompt GUID of .dtb file
+  gAlteraHpsTokenSpaceGuid.PcdDtbFileGuid|{ 0x66,0x0f,0xe1,0x96,0xa5,0x0f,0x43,0x8c,0xa9,0x50,0xbe,0x6a,0x58,0xb9,0x12,0x1b }|VOID*|0xABCDEF01
+  gAlteraHpsTokenSpaceGuid.PcdFvDtbBaseAddress|0x0|UINT32|0xABCDEF02
+  gAlteraHpsTokenSpaceGuid.PcdDtbFvSize|0x0|UINT32|0xABCDEF03
+
+  ## GUID of the optional 2nd stage DXE FV which will be loaded into DRAM
+  # @Prompt GUID of DXE FV file
+  gAlteraHpsTokenSpaceGuid.PcdFvDxeBaseAddress|0x0|UINT32|0xABCDEF04
+  gAlteraHpsTokenSpaceGuid.PcdDxeFvSize|0x0|UINT32|0xABCDEF05
+
+  ## Base address of Osc1Timer0 used by AlteraHpsTimerLib
+  #  Will be configure in free running mode as MetronomeDelay and PerformanceCounter
+  # @Prompt Base address of Osc1Timer0
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_Base|0xFFD00000|UINT32|0xABCD0001
+
+  ## Osc1Timer0 reference clock frequency in Hz
+  # @Prompt Osc1Timer0 clockk frequency in Hz
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_ClkFreqInHz|100000000|UINT32|0xABCD0002
+
+  ## Base address of Osc1Timer1 used by AlteraHpsTimerDxe
+  # Will be used by AlteraHpsTimerDxe as periodic interrupt generator
+  # @Prompt Base address of Osc1Timer1
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_Base|0xFFD00100|UINT32|0xABCD0003
+
+  ## Osc1Timer1 reference clock frequency in Hz
+  # @Prompt Osc1Timer1 clockk frequency in Hz
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_ClkFreqInHz|100000000|UINT32|0xABCD0004
+
+  ## GIC Interrupt Number of Osc1Timer1
+  # @Prompt GIC Interrupt Number of Osc1Timer1
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_InterruptNum|150|UINT32|0xABCD0005
+
+  ## Base address of Memory Buffer used by SerialPortPrintLib.c
+  # Will be used dump serial log useful for debug when UART fail
+  # Set Base address to 0 to disable this feature
+  # @Prompt Base address of MemorySerialLog
+  gAlteraHpsTokenSpaceGuid.PcdMemorySerialLogBase|0xFFE31000|UINT64|0xABCD0006
+  gAlteraHpsTokenSpaceGuid.PcdMemorySerialLogSize|0x1000|UINT64|0xABCD0007
+
+  ## Platform Init code Assertion setting
+  # @Prompt Enable Platform Init Assertion check
+  gAlteraHpsTokenSpaceGuid.PcdPlatformInitAllowAssertion|1|UINT32|0xABCD0008
+  gAlteraHpsTokenSpaceGuid.PcdPlatformInitStopWhenAssert|1|UINT32|0xABCD0009
+
+  ## Semihosting setting
+  # @Prompt Enable Semihosting
+  gAlteraHpsTokenSpaceGuid.PcdEnableSemihosting|0|UINT32|0xABCD000A
+
