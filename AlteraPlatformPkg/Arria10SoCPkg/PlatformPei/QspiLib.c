@@ -1377,7 +1377,7 @@ QspiIndirectPageBoundWrite (
   WriteCapacity = (UINT32) ALT_QSPI_SRAM_FIFO_ENTRY_COUNT - SramPartition;
   while (WriteCount < Length) {
     WriteFillLever = ALT_QSPI_SRAMFILL_INDWRPART_GET(MmioRead32(ALT_QSPI_OFST + ALT_QSPI_SRAMFILL_OFST));
-	Space = WriteCapacity - WriteFillLever;
+    Space = MIN(WriteCapacity - WriteFillLever, (Length - WriteCount) / sizeof(UINT32));
     WriteData = (UINT32 *)(Buffer + WriteCount);
     for (i= 0; i < Space; ++i) {
       MmioWrite32(ALT_QSPIDATA_OFST, *WriteData++);
