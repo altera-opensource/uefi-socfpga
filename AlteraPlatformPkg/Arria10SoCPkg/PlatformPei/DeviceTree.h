@@ -89,5 +89,10 @@ GetClockManagerCfg (
   OUT       CLOCK_MANAGER_CONFIG*  Cfg
   );
 
+BOOLEAN
+EFIAPI
+IsSkipFpgaConfig (
+  IN  CONST VOID*   Fdt
+  );
 #endif
 

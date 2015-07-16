@@ -152,7 +152,7 @@ PeiStagePlatformInit (
   }
 
   // Still program FPGA using RBF file from Flash device even if it is already programmed?
-  ReProgramFpgaEvenIfFpgaIsAlreadyInUserMode = TRUE;
+  ReProgramFpgaEvenIfFpgaIsAlreadyInUserMode = IsSkipFpgaConfig (Fdt)? FALSE : TRUE;
 
   // Configure the FPGA before Memory Init ?
   if ( FpgaIsInUserMode() == FALSE )
