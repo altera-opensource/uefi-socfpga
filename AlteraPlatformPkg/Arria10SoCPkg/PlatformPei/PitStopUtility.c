@@ -204,7 +204,7 @@ PitStopCmdLine (
     ArgCnt = 0;
 
     // get command
-    SerialPortPrint("SOCFPGA_ARRIA10 # ");
+    SerialPortPrint("SOCFPGA_ARRIA10 #");
     GetInputString((CHAR8*)Input);
 
     // get input argument
@@ -213,13 +213,12 @@ PitStopCmdLine (
       StrSplit(NULL, ' ',  (CHAR8*)Argument[++ArgCnt]);
     }
 
-	//INTN i = 0;
-    //SerialPortPrint("Number of argument is %d\r\n", ArgCnt);
+    //SerialPortPrint("Number of argument is %d \r", ArgCnt);
     //for (i = 0; i <= ArgCnt; i++)
-    //SerialPortPrint("%a\r\n", (CHAR16*)Argument[i]);
+    //  SerialPortPrint("%a\n", (CHAR16*)Argument[i]);
     //SerialPortPrint("Strlen of 1st argument is %d\r\n", AsciiStrLen(Argument[0]));
     //for (i = 0; i <= AsciiStrLen(Argument[0]); i++)
-    //SerialPortPrint("%c", Argument[0][i]);
+    //  SerialPortPrint("%c", Argument[0][i]);
     //SerialPortPrint("\r\n");
 
     //memory display
@@ -386,16 +385,16 @@ PitStopCmdLine (
         ToAddr   = AsciiStrHexToUintn((CHAR8*)Argument[3]);
         Offset = AsciiStrHexToUintn((CHAR8*)Argument[4]);
         Len    = AsciiStrHexToUintn((CHAR8*)Argument[5]);
-		MmioHexDump(FromAddr, Len/4);
+        MmioHexDump(FromAddr, Len/4);
         Status = NandUpdate((VOID *)FromAddr, Offset, Len);
         ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
 
-				Status = NandRead((VOID *)ToAddr, Offset, Len);
+        Status = NandRead((VOID *)ToAddr, Offset, Len);
         ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
-				MmioHexDump(ToAddr, Len/4);
+        MmioHexDump(ToAddr, Len/4);
 
       }
-		} else if (AsciiStrCmp((CHAR8*)Argument[0], "ls") == 0) {
+        } else if (AsciiStrCmp((CHAR8*)Argument[0], "ls") == 0) {
       if(ArgCnt != 0){
         SerialPortPrint ("Error: Invalid Arguments\r\n");
         return;
@@ -457,7 +456,6 @@ PitStopCmdLine (
       SerialPortPrint ("nand write addr offset len\r\n");
       SerialPortPrint ("nand erase offset len\r\n");
       SerialPortPrint ("nand update addr offset len\r\n");
-      SerialPortPrint ("nand test from_addr to_addr offset len\r\n");
 
       SerialPortPrint ("ls\r\n");
       SerialPortPrint ("hexdump file \r\n");
