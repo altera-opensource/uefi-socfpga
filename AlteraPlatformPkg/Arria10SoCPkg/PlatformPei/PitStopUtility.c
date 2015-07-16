@@ -433,15 +433,7 @@ PitStopCmdLine (
 
       JumpToEntry (Addr, R0, R1, R2 );
 
-     // bootlinux
-    }  else if (AsciiStrCmp((CHAR8*)Argument[0], "mmcboot") == 0) {
-      if(ArgCnt != 0){
-        SerialPortPrint ("Error: Invalid Arguments\r\n");
-        return;
-      }
-      //SdmmcLoadLinuxZImageAndLinuxDtbToRamAndBoot();
-
-    // help
+     // help
     }  else if (AsciiStrCmp((CHAR8*)Argument[0], "help") == 0) {
       if(ArgCnt != 0){
         SerialPortPrint ("Error: Invalid Arguments\r\n");
@@ -472,7 +464,6 @@ PitStopCmdLine (
       SerialPortPrint ("fatload mmc addr file\r\n");
 
       SerialPortPrint ("jump addr [r0] [r1] [r2]\r\n");
-      SerialPortPrint ("mmcboot\r\n");
       SerialPortPrint ("\r\n");
 
     } else {
