@@ -193,6 +193,7 @@ PitStopCmdLine (
   CHAR8 Argument[100][100];
   INTN ArgCnt = 0;
   UINTN  Data, Addr, FromAddr, ToAddr;
+  UINTN Addr1, Addr2;
   CHAR8  TextFileName[100];
   UINTN  Len, Offset;
   UINTN  R0, R1, R2;
@@ -244,6 +245,24 @@ PitStopCmdLine (
       }
       for (i = 0; i < Len; i++)
         MmioWrite32(Addr + i*4, Data);
+
+    // memory compare
+    } else if (AsciiStrCmp((CHAR8*)Argument[0], "mcmp") == 0) {
+      Addr1 = AsciiStrHexToUintn((CHAR8*)Argument[1]);
+      Addr2    = AsciiStrHexToUintn((CHAR8*)Argument[2]);
+      Len  = (ArgCnt < 3)? 1: AsciiStrHexToUintn((CHAR8*)Argument[3]);
+
+      if ((Addr1 & 0x3) || (Addr2 & 0x3)) {
+        SerialPortPrint ("Error: Unaligned address\r\n");
+        return;
+      }
+      for (i = 0; i < Len; i++) {
+        if (MmioRead32(Addr1 + i*4) != MmioRead32(Addr2 + i*4)) {
+          SerialPortPrint ("Different\r\n");
+          return;
+        }
+      }
+      SerialPortPrint ("Same\r\n");
 
     // SPI flash access
     } else if (AsciiStrCmp((CHAR8*)Argument[0], "qspi") == 0) {
@@ -433,6 +452,7 @@ PitStopCmdLine (
       SerialPortPrint ("------\r\n");
       SerialPortPrint ("mr addr [count]\r\n");
       SerialPortPrint ("mw addr data [count]\r\n");
+      SerialPortPrint ("mcmp addr1 addr2 [count]\r\n");
 
       SerialPortPrint ("qspi probe\r\n");
       SerialPortPrint ("qspi read addr offset len\r\n");
