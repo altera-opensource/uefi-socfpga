@@ -317,7 +317,7 @@ PitStopCmdLine (
         Offset = AsciiStrHexToUintn((CHAR8*)Argument[3]);
         Len    = AsciiStrHexToUintn((CHAR8*)Argument[4]);
 
-        Status = QspiWrite((VOID *)Addr, Offset, Len);
+        Status = QspiUpdate((VOID *)Addr, Offset, Len);
         ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
 
       }
