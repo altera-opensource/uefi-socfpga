@@ -406,9 +406,29 @@ GetRbfFileCfg (
 
 }
 
+BOOLEAN
+EFIAPI
+IsSkipFpgaConfig (
+  IN  CONST VOID*   Fdt
+  )
+{
+  INT32        Node;
 
+  // Point to "Chosen"
+  Node = fdt_subnode_offset(Fdt, 0, NODE_chosen);
+  if (Node == -FDT_ERR_NOTFOUND) {
+    InfoPrint ("FDT: %a not found\r\n", NODE_chosen);
+    ASSERT_PLATFORM_INIT(Node >= 0);
+    return FALSE;
+  }
 
+  if (fdt_getprop(Fdt, Node, NODE_ext_fpga_config, NULL) != NULL) {
+    InfoPrint ("FDT: external fpga configuration is enabled\r\n");
+	return TRUE;
+  }
 
+  return FALSE;
 
+}
 
 
