@@ -49,6 +49,7 @@
 #include "SdMmc.h"
 
 #define CARRIAGE_RERTURN 13
+#define NEWLINE_FEED     10
 #define ESCAPE           27
 #define DELETE           127
 #define BACKSPACE           127
@@ -78,7 +79,7 @@ GetInputString (
       else
         i = 0;
     }
-  } while (Char != CARRIAGE_RERTURN);
+  } while (Char != CARRIAGE_RERTURN && Char != NEWLINE_FEED );
   CopyMem(ReadBuffer, ReadData, i-1);
   *(ReadBuffer + i-1) = '\0';
   SerialPortPrint("\r\n");
