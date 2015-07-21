@@ -138,7 +138,7 @@
 #define ALT_QSPI_STIG_SR_BUSY_GET(value)                 ((value >> 0) & 0x1)
 #define ALT_QSPI_BANK_ADDR_GET(value)					((value) >> 24)
 
-#define ALT_QSPI_COMMAND_TIMEOUT (0x10000)
+#define ALT_QSPI_COMMAND_TIMEOUT (0x1000000)
 
 #define ALT_QSPI_DEVSZ_4BYTE_ADDR 0x3
 #define ALT_QSPI_DEVSZ_3BYTE_ADDR 0x2
