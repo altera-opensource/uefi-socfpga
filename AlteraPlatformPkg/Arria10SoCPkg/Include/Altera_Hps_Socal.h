@@ -197,5 +197,12 @@
 #define ALT_SEC_MGR_SEC_FPGACHK_OFST                                       0x8c
 #define ALT_SEC_MGR_SEC_HPSCHK_OFST                                        0x90
 
+//
+// Clock Manager
+//
+#define ALT_CLKMGR_MPUCLK_OFST        0x0
+#define ALT_CLKMGR_MPUCLK_PERICNT_GET(value) (((value) & 0x07ff0000) >> 16)
+#define ALT_CLKMGR_MPUCLK_MAINCNT_GET(value) (((value) & 0x000007ff) >> 0)
+
 #endif
 

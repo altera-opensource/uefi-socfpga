@@ -498,9 +498,11 @@ DisplayClockManagerInfo (
   Char8Ptr += AsciiSPrint (Char8Ptr, 1024,
     "\t perpll.emacctl   :\t0x%08x\r\n"
     "\t perpll.gpiodiv   :\t0x%08x\r\n"
+    "\t alteragrp.mpuclk :\t0x%08x\r\n"
     "\t alteragrp.nocclk :\t0x%08x\r\n",
      MmioRead32 (ALT_CLKMGR_PERPLL_OFST + ALT_CLKMGR_PERPLL_EMACCTL_OFST),
      MmioRead32 (ALT_CLKMGR_PERPLL_OFST + ALT_CLKMGR_PERPLL_GPIODIV_OFST),
+     MmioRead32 (ALT_CLKMGR_ALTERA_OFST + ALT_CLKMGR_MPUCLK_OFST),
      MmioRead32 (ALT_CLKMGR_ALTERA_OFST + ALT_CLKMGR_NOCCLK_OFST));
 
   InfoPrint ("%a", Char8Str); Char8Ptr = &Char8Str[0];
@@ -531,6 +533,7 @@ DisplayClockFrequencyInfo (
   UINT32  PLL0_mpu_base_clk_InMhz;
   UINT32  PLL0_noc_base_clk_InMhz;
   UINT32  mpu_free_clk_InMhz;
+  UINT32  mpu_clk_InMhz;
   UINT32  cs_at_clk_InMhz;
   UINT32  l3_main_free_clk_InMhz;
   UINT32  l4_sys_free_clk_InMhz;
@@ -663,8 +666,10 @@ DisplayClockFrequencyInfo (
   PLL1VcoFreqInMhz = PLL1VcoFreqInMhz / (Cfg->perpll.vco1_denom + 1);
   PLL1VcoFreqInMhz = PLL1VcoFreqInMhz * (Cfg->perpll.vco1_numer + 1);
   PLL1VcoFreqInMhz = PLL1VcoFreqInMhz / (1000000);
-  PLL0_mpu_base_clk_InMhz = (PLL0VcoFreqInMhz/2)/(Cfg->mainpll.mpuclk_cnt   + 1);
-  PLL0_noc_base_clk_InMhz = (PLL0VcoFreqInMhz/2)/(Cfg->mainpll.mpuclk_cnt   + 1)/3;
+  Data32 = MmioRead32 (ALT_CLKMGR_ALTERA_OFST + ALT_CLKMGR_MPUCLK_OFST);
+  PLL0_mpu_base_clk_InMhz = (PLL0VcoFreqInMhz / (ALT_CLKMGR_MPUCLK_MAINCNT_GET(Data32)+1));
+  Data32 = MmioRead32 (ALT_CLKMGR_ALTERA_OFST + ALT_CLKMGR_NOCCLK_OFST);
+  PLL0_noc_base_clk_InMhz = (PLL0VcoFreqInMhz / (ALT_CLKMGR_NOCCLK_MAINCNT_GET(Data32)+1));
 
   Char8Ptr += AsciiSPrint (Char8Ptr, 1024, "\t PLL 0 Output Clock Frequency: \r\n");
   Char8Ptr += AsciiSPrint (Char8Ptr, 1024, "\t\t pll%d_mpu_base_clk    (C0): %d MHz\r\n", 0, PLL0_mpu_base_clk_InMhz);
@@ -835,20 +840,21 @@ DisplayClockFrequencyInfo (
       break;
   }
 
-  l3_main_free_clk_InMhz = PLL0_noc_base_clk_InMhz;
+  mpu_clk_InMhz = PLL0_mpu_base_clk_InMhz / (Cfg->mainpll.mpuclk_cnt + 1);
+  l3_main_free_clk_InMhz = PLL0_noc_base_clk_InMhz / (Cfg->mainpll.nocclk_cnt + 1);
   l4_sys_free_clk_InMhz = l3_main_free_clk_InMhz / 4;
   l4_main_clk_InMhz = l3_main_free_clk_InMhz / Div1248[Cfg->mainpll.nocdiv_l4mainclk];
   l4_mp_clk_InMhz = l3_main_free_clk_InMhz / Div1248[Cfg->mainpll.nocdiv_l4mpclk];
   l4_sp_clk_InMhz = l3_main_free_clk_InMhz / Div1248[Cfg->mainpll.nocdiv_l4spclk];
-  cs_at_clk_InMhz = PLL0_noc_base_clk_InMhz / Div1248[Cfg->mainpll.nocdiv_csatclk];
+  cs_at_clk_InMhz = l3_main_free_clk_InMhz / Div1248[Cfg->mainpll.nocdiv_csatclk];
 
 
   InfoPrint ("\t\t mpu_clk               : %d MHz\r\n"
              "\t\t mpu_l2_ram_clk        : %d MHz\r\n"
              "\t\t mpu_periph_clk        : %d MHz\r\n",
-             mpu_free_clk_InMhz,
-             mpu_free_clk_InMhz/2,
-             mpu_free_clk_InMhz/4);
+             mpu_clk_InMhz,
+             mpu_clk_InMhz/2,
+             mpu_clk_InMhz/4);
 
   InfoPrint ("\t Interconnect Clock Group : \r\n"
              "\t\t noc_free_clk clock source is \r\n"
