@@ -329,10 +329,10 @@ GetBootSourceTypeViaDedicatedIoMuxSelects (
     case DCTD_IO_sdmmc:
       // Pinmux Consistency check
       // To boot SD/MMC:
-      //    mux[4 to 15, except 11] must be 8
+      //    mux[4 to 15, except 10 & 11] must be 8
       for (i = 0; i < 12; i++)
       {
-        if ((i + 4) != 11)
+        if (((i + 4) != 10) && ((i + 4) != 11))
         {
           Data32 = MmioRead32 (ALT_PINMUX_DCTD_IO_GRP_OFST +
                                ALT_PINMUX_DCTD_IO_4_OFST + (i * 4));
