@@ -43,6 +43,7 @@
 
 **/
 
+#include <AlteraPlatform.h>
 #include <Base.h>
 #include <Library/SerialPortLib.h>
 #include <Library/PcdLib.h>
@@ -204,13 +205,27 @@ SerialPortInitialize (
   UINT32         Divisor;
   UINT32         CurrentDivisor;
   BOOLEAN        Initialized;
+  UINT32         Data32;
+  UINT32         l4_sp_clk_InMhz;
+  UINT32         SerialClockRateInHz;
 
+  // ClockManager.c stored l4_sp clock frequency in MHz at the 8th register of isw_handoff[8]
+  // The SoCFPGA's HPS UART IP ref clock is from l4_sp clock
+  // Get the ref clock frequency to calculate the divisor for baud generator
+  Data32 = MmioRead32 (ALT_SYSMGR_ROM_OFST + ALT_SYSMGR_ROM_ISW_HANDOFF_OFST + ISW_HANDOFF_SLOT8_L4_SP_CLK_IN_MHZ_OFST);
+  if (Data32 != 0) {
+    l4_sp_clk_InMhz = ALT_SYSMGR_ROM_ISW_HANDOFF_ISW_HANDOFF_GET(Data32);
+    SerialClockRateInHz = l4_sp_clk_InMhz * 1000000;
+  } else {
+    // Fallback to PcdSerialClockRate when isw_handoff[8] does not contain valid data.
+    SerialClockRateInHz = PcdGet32 (PcdSerialClockRate);
+  }
   //
   // Calculate divisor for baud generator
   //    Ref_Clk_Rate / (Baud_Rate * 16)
   //
-  Divisor = PcdGet32 (PcdSerialClockRate) / (PcdGet32 (PcdSerialBaudRate) * 16);
-  if ((PcdGet32 (PcdSerialClockRate) % (PcdGet32 (PcdSerialBaudRate) * 16)) >= PcdGet32 (PcdSerialBaudRate) * 8) {
+  Divisor = SerialClockRateInHz / (PcdGet32 (PcdSerialBaudRate) * 16);
+  if ((SerialClockRateInHz % (PcdGet32 (PcdSerialBaudRate) * 16)) >= PcdGet32 (PcdSerialBaudRate) * 8) {
     Divisor++;
   }
 

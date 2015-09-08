@@ -79,6 +79,8 @@ ConfigureClockManager (
   ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
 
   SetClockManagerCfg (&mClkCfg);
+
+  SaveClockManagerCfg (&mClkCfg);
 }
 
 
@@ -953,5 +955,80 @@ DisplayClockFrequencyInfo (
 
 }
 
+UINT32
+EFIAPI
+Get_l4_sp_ClockFrequencyInMhz (
+  VOID
+  )
+{
+  // Note: ConfigureClockManager need to run first before calling this function
+  UINT32  Div1248[4] = {1, 2, 4, 8};
+  UINT32  Data32;
+  UINT32  PLL0InputClock;
+  UINT32  PLL0VcoFreqInMhz;
+  UINT32  PLL0_noc_base_clk_InMhz;
+  UINT32  l3_main_free_clk_InMhz;
+  UINT32  l4_sp_clk_InMhz;
 
+  CLOCK_MANAGER_CONFIG*  Cfg;
+  Cfg = &mClkCfg;
+
+  // Get PLL0InputClock frequency
+  Data32 = MmioRead32 (ALT_CLKMGR_MAINPLL_OFST + ALT_CLKMGR_MAINPLL_VCO0_OFST);
+  switch (ALT_CLKMGR_MAINPLL_VCO0_PSRC_GET(Data32))
+  {
+    case ALT_CLKMGR_MAINPLL_VCO0_PSRC_E_EOSC1:
+      PLL0InputClock = mClkSrc.clk_freq_of_eosc1;
+      break;
+    case ALT_CLKMGR_MAINPLL_VCO0_PSRC_E_INTOSC:
+      PLL0InputClock = mClkSrc.clk_freq_of_cb_intosc_ls;
+      break;
+    case ALT_CLKMGR_MAINPLL_VCO0_PSRC_E_F2S:
+      PLL0InputClock = mClkSrc.clk_freq_of_f2h_free;
+      break;
+    default:
+      // We should have covered all possible conditions above
+      PLL0InputClock = 0;
+      ASSERT_PLATFORM_INIT(0);
+      break;
+  }
+
+  // Calculate PLL's VCO frequency
+  PLL0VcoFreqInMhz = PLL0InputClock;
+  PLL0VcoFreqInMhz = PLL0VcoFreqInMhz / (Cfg->mainpll.vco1_denom + 1);
+  PLL0VcoFreqInMhz = PLL0VcoFreqInMhz * (Cfg->mainpll.vco1_numer + 1);
+  PLL0VcoFreqInMhz = PLL0VcoFreqInMhz / (1000000);
+
+  // Calculate pll0_noc_base_clk frequency
+  Data32 = MmioRead32 (ALT_CLKMGR_ALTERA_OFST + ALT_CLKMGR_NOCCLK_OFST);
+  PLL0_noc_base_clk_InMhz = (PLL0VcoFreqInMhz / (ALT_CLKMGR_NOCCLK_MAINCNT_GET(Data32)+1));
+
+  // Calculate l3_main_free_clk frequency
+  l3_main_free_clk_InMhz = PLL0_noc_base_clk_InMhz / (Cfg->mainpll.nocclk_cnt + 1);
+
+  // Calculate l4_sp_clk frequency
+  l4_sp_clk_InMhz = l3_main_free_clk_InMhz / Div1248[Cfg->mainpll.nocdiv_l4spclk];
+
+  // Return l4_sp_clk frequency in MHz
+  InfoPrint ("Get l4_sp_clk : %d MHz\r\n",  l4_sp_clk_InMhz);
+  return l4_sp_clk_InMhz;
+}
+
+
+VOID
+EFIAPI
+SaveClockManagerCfg (
+  IN  CONST VOID*  Fdt
+  )
+{
+  // FogBugz Case:322774
+  UINT32  l4_sp_clk_InMhz;
+  l4_sp_clk_InMhz = Get_l4_sp_ClockFrequencyInMhz();
+  // Store the l4_sp clock frequency in to the last register of isw_handoff[8]
+  // This value will be consume by Mmio16550SerialPortLib library shared between PEI and DXE pahse
+  // to calculate the divisor for baud generator
+  MmioWrite32 (ALT_SYSMGR_ROM_OFST +
+               ALT_SYSMGR_ROM_ISW_HANDOFF_OFST + ISW_HANDOFF_SLOT8_L4_SP_CLK_IN_MHZ_OFST,
+               ALT_SYSMGR_ROM_ISW_HANDOFF_ISW_HANDOFF_SET(l4_sp_clk_InMhz));
+}
 

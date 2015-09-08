@@ -69,4 +69,16 @@ SetClockManagerCfg (
   IN CLOCK_MANAGER_CONFIG*  Cfg
   );
 
+VOID
+EFIAPI
+SaveClockManagerCfg (
+  IN  CONST VOID*  Fdt
+  );
+
+UINT32
+EFIAPI
+Get_l4_sp_ClockFrequencyInMhz (
+  VOID
+  );
+
 #endif

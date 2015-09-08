@@ -203,6 +203,7 @@
 #define ALT_CLKMGR_MPUCLK_OFST        0x0
 #define ALT_CLKMGR_MPUCLK_PERICNT_GET(value) (((value) & 0x07ff0000) >> 16)
 #define ALT_CLKMGR_MPUCLK_MAINCNT_GET(value) (((value) & 0x000007ff) >> 0)
+#define ISW_HANDOFF_SLOT8_L4_SP_CLK_IN_MHZ_OFST  (sizeof(UINT32) * 7)
 
 #endif
 
