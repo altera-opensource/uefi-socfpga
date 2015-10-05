@@ -59,6 +59,8 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkg.fdf
   OUTPUT_DIRECTORY               = Build/Arria10SoCPkg
+  USE_ARM_BDS                    = FALSE
+  SECURE_BOOT_ENABLE             = FALSE
 
 ################################################################################
 #
@@ -194,6 +196,7 @@
   # If the image do not have an mkimage header, it will base on PCDs
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_BOOTIMAGE_MEM_LOAD_ADDR      |0x100000
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR      |0x100000
+  gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_UEFI_DXE_PHASE          |0
 
   ##------------------------------------------------------------------------------
   ## Pcd Settings - Timer Frequency
@@ -334,10 +337,10 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|20
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
 
-!ifdef EDK2_ENABLE_SMSC_91X
-  # Ethernet (SMSC 91C111)
-  gEmbeddedTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x1A000000
-!endif
+  # We want to use the Shell Libraries but don't want it to initialise
+  # automatically. We initialise the libraries when the command is called by the
+  # Shell.
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
 
   ##----------------------------------------
   ## Pcd Settings - UART Serial Terminal
@@ -377,17 +380,34 @@
   # Use the serial console (ConIn & ConOut) and the Graphic driver (ConOut)
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenVt100()"
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths|L"VenHw(D3987D4B-971A-435F-8CAF-4967EB627241)/Uart(115200,8,N,1)/VenVt100()"
-  gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut|10
 
   # Column/Row
   #gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"ConOutSetupVar"|gArmGlobalVariableGuid|0x0|132
   #gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"ConOutSetupVar"|gArmGlobalVariableGuid|0x4|43
 
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|10
+
+  # RunAxf support via Dynamic Shell Command protocol
+  # We want to use the Shell Libraries but don't want it to initialise
+  # automatically. We initialise the libraries when the command is called by the
+  # Shell.
+  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+
+!if $(USE_ARM_BDS) == FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
+!endif
+
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
+  gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x04
+  gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
+!endif
+
   ##----------------------------------------
   ## UEFI Boot Menu Default Selections
   ##----------------------------------------
-  # Versatile Express machine type (ARM VERSATILE EXPRESS = 2272) required for ARM Linux:
-  #gArmTokenSpaceGuid.PcdArmMachineType|2272
   #gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"zImage on SD card"
   #gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(7777515A-04D8-49E8-8426-EE80938DA484)/HD(1,MBR,0x000E779B,0x206000,0x199998)/zImage"
   #        gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(7777515A-04D8-49E8-8426-EE80938DA484)/HD(1,MBR,0x000E779B,0x206000,0x199998)/socfpga.dtb"
@@ -481,7 +501,6 @@
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   L2X0CacheLib|ArmPlatformPkg/Drivers/PL310L2Cache/PL310L2CacheSec.inf
-  PathLib|MdeModulePkg/Library/BasePathLib/BasePathLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
@@ -503,6 +522,38 @@
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
+  # RunAxf support via Dynamic Shell Command protocol
+  # It uses the Shell libraries.
+  ArmShellCmdRunAxfLib|ArmPlatformPkg/Library/ArmShellCmdRunAxf/ArmShellCmdRunAxf.inf
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+
+  #
+  # Secure Boot dependencies
+  #
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
+  AuthVariableLib|SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+
+  # re-use the UserPhysicalPresent() dummy implementation from the ovmf tree
+  PlatformSecureLib|OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
+!else
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
+!endif
+  VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
+
+!if $(USE_ARM_BDS) == FALSE
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
+  GenericBdsLib|IntelFrameworkModulePkg/Library/GenericBdsLib/GenericBdsLib.inf
+  PlatformBdsLib|ArmPlatformPkg/Library/PlatformIntelBdsLib/PlatformIntelBdsLib.inf
+  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+!endif
+
   #-------------------------------
   # Networking Requirements
   #-------------------------------
@@ -510,6 +561,13 @@
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
+
+  #-------------------------------
+  # These libraries are used by the dynamic EFI Shell commands
+  #-------------------------------
+  ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+  FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
 
   #-------------------------------
   # Build Debug / Release
@@ -538,11 +596,17 @@
   DebugAgentLib|ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
   DefaultExceptionHandlerLib|AlteraPlatformPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLibBase.inf
 
+[LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
+  ArmGicArchLib|AlteraPlatformPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
+
+[LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.UEFI_APPLICATION, LibraryClasses.common.UEFI_DRIVER]
+  ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
+
 [LibraryClasses.common.PEI_CORE]
   ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
-  LzmaDecompressLib|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+  LzmaDecompressLib|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
@@ -569,6 +633,9 @@
   PerformanceLib|MdeModulePkg/Library/PeiPerformanceLib/PeiPerformanceLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+
+[LibraryClasses.common.SEC, LibraryClasses.common.PEIM]
+  MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
@@ -603,10 +670,24 @@
   UefiDecompressLib|IntelFrameworkModulePkg/Library/BaseUefiTianoCustomDecompressLib/BaseUefiTianoCustomDecompressLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  ArmPlatformSysConfigLib|ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressSysConfigRuntimeLib/ArmVExpressSysConfigRuntimeLib.inf
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+!endif
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib|IntelFrameworkModulePkg/Library/DxeReportStatusCodeLibFramework/DxeReportStatusCodeLib.inf
+
+[LibraryClasses.AARCH64.DXE_RUNTIME_DRIVER]
+  #
+  # PSCI support in EL3 may not be available if we are not running under a PSCI
+  # compliant secure firmware, but since the default VExpress EfiResetSystemLib
+  # cannot be supported at runtime (due to the fact that the syscfg MMIO registers
+  # cannot be runtime remapped), it is our best bet to get ResetSystem functionality
+  # on these platforms.
+  #
+  EfiResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
@@ -625,6 +706,7 @@
 #
 ################################################################################
 [Components.common]
+  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
   #
   # SEC
@@ -649,7 +731,7 @@
   #MdeModulePkg/Core/Pei/PeiMain.inf
   AlteraPlatformPkg/Arria10SoCPkg/PlatformPei/AlteraSocFpgaPeiMain.inf {
     <LibraryClasses>
-      NULL|IntelFrameworkModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
 
   #MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
@@ -696,12 +778,15 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
-  MdeModulePkg/Universal/FvSimpleFilesystemDxe/FvSimpleFilesystemDxe.inf
+  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
-  #MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+  }
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 
   # Multimedia Card Interface
@@ -712,7 +797,6 @@
   MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
   MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
-  MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
   MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
   MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
   MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
@@ -721,13 +805,6 @@
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-
-  # SMSC LAN 9118
-  EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
-!ifdef EDK2_ENABLE_SMSC_91X
-  # SMSC LAN 91C111
-  EmbeddedPkg/Drivers/LAN91xDxe/LAN91xDxe.inf
-!endif
 
   # ISP1761 USB OTG Controller
   #EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf
@@ -738,6 +815,14 @@
   #EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
   #EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   #AlteraPlatformPkg/Arria10SoCPkg/ArmVExpressFastBootDxe/ArmVExpressFastBootDxe.inf
+
+  #
+  # FDT installation
+  #
+  EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
+
+  # Legacy Linux Loader
+  ArmPkg/Application/LinuxLoader/LinuxLoader.inf
 
 [BuildOptions]
   #-------------------------------
@@ -754,4 +839,6 @@
   GCC:RELEASE_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include
   XCODE:*_*_ARM_PLATFORM_FLAGS     == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include
 
+[BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
+  GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
 

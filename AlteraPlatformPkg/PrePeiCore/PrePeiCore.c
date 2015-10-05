@@ -51,19 +51,19 @@
 
 #include "PrePeiCore.h"
 
-EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mTemporaryRamSupportPpi = { PrePeiCoreTemporaryRamSupport };
-ARM_GLOBAL_VARIABLE_PPI             mGlobalVariablePpi = { PrePeiCoreGetGlobalVariableMemory };
+CONST EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI   mTemporaryRamSupportPpi = { PrePeiCoreTemporaryRamSupport };
+CONST ARM_GLOBAL_VARIABLE_PPI             mGlobalVariablePpi = { PrePeiCoreGetGlobalVariableMemory };
 
-EFI_PEI_PPI_DESCRIPTOR      gCommonPpiTable[] = {
+CONST EFI_PEI_PPI_DESCRIPTOR      gCommonPpiTable[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEfiTemporaryRamSupportPpiGuid,
-    &mTemporaryRamSupportPpi
+    (VOID *) &mTemporaryRamSupportPpi
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gArmGlobalVariablePpiGuid,
-    &mGlobalVariablePpi
+    (VOID *) &mGlobalVariablePpi
   }
 };
 
@@ -83,7 +83,7 @@ CreatePpiList (
   ArmPlatformGetPlatformPpiList (&PlatformPpiListSize, &PlatformPpiList);
 
   // Copy the Common and Platform PPis in Temporrary Memory
-  ListBase = PcdGet32 (PcdCPUCoresStackBase);
+  ListBase = PcdGet64 (PcdCPUCoresStackBase);
   CopyMem ((VOID*)ListBase, gCommonPpiTable, sizeof(gCommonPpiTable));
   CopyMem ((VOID*)(ListBase + sizeof(gCommonPpiTable)), PlatformPpiList, PlatformPpiListSize);
 
@@ -181,7 +181,7 @@ PrePeiCoreGetGlobalVariableMemory (
 {
   ASSERT (GlobalVariableBase != NULL);
 
-  *GlobalVariableBase = (UINTN)PcdGet32 (PcdCPUCoresStackBase) +
+  *GlobalVariableBase = (UINTN)PcdGet64 (PcdCPUCoresStackBase) +
                         (UINTN)PcdGet32 (PcdCPUCorePrimaryStackSize) -
                         (UINTN)PcdGet32 (PcdPeiGlobalVariableSize);
 

@@ -95,29 +95,11 @@ BootCompressedDxeFv (
   VOID
   );
 
-/*
-
-
-EFI_STATUS
-EFIAPI
-MemoryPeim (
-  IN EFI_PHYSICAL_ADDRESS       UefiMemoryBase,
-  IN UINT64                     UefiMemorySize
-  );
-
-EFI_STATUS
-EFIAPI
-PlatformPeim (
-  VOID
-  );
-
-// Either implemented by PrePiLib or by MemoryInitPei
 VOID
-BuildMemoryTypeInformationHob (
-  VOID
+EFIAPI
+EnterDxeCoreEntryPoint (
+  IN UINTN                    DxeFvBase
   );
-
-*/
 
 // List of Library Constructor in use
 // This is declare here to workaround linker issue

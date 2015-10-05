@@ -187,8 +187,8 @@ InitializeConsolePipe (
       *Handle = Buffer[0];
       Status = gBS->HandleProtocol (*Handle, Protocol, Interface);
       ASSERT_EFI_ERROR(Status);
+      FreePool (Buffer);
     }
-    FreePool (Buffer);
   } else {
     Status = EFI_SUCCESS;
   }
@@ -252,12 +252,6 @@ DefineDefaultBootEntries (
   EFI_STATUS                          Status;
   EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL* EfiDevicePathFromTextProtocol;
   EFI_DEVICE_PATH*                    BootDevicePath;
-  UINT8*                              OptionalData;
-  UINTN                               OptionalDataSize;
-  ARM_BDS_LOADER_ARGUMENTS*           BootArguments;
-  ARM_BDS_LOADER_TYPE                 BootType;
-  EFI_DEVICE_PATH*                    InitrdPath;
-  UINTN                               InitrdSize;
   UINTN                               CmdLineSize;
   UINTN                               CmdLineAsciiSize;
   CHAR16*                             DefaultBootArgument;
@@ -291,7 +285,11 @@ DefineDefaultBootEntries (
       ASSERT_EFI_ERROR(Status);
       DevicePathTxt = DevicePathToTextProtocol->ConvertDevicePathToText (BootDevicePath, TRUE, TRUE);
 
-      ASSERT (StrCmp ((CHAR16*)PcdGetPtr(PcdDefaultBootDevicePath), DevicePathTxt) == 0);
+      if (StrCmp ((CHAR16*)PcdGetPtr (PcdDefaultBootDevicePath), DevicePathTxt) != 0) {
+        DEBUG ((EFI_D_ERROR, "Device Path given: '%s' Device Path expected: '%s'\n",
+            (CHAR16*)PcdGetPtr (PcdDefaultBootDevicePath), DevicePathTxt));
+        ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+      }
 
       FreePool (DevicePathTxt);
     DEBUG_CODE_END();
@@ -299,8 +297,6 @@ DefineDefaultBootEntries (
 
     // Create the entry is the Default values are correct
     if (BootDevicePath != NULL) {
-      BootType = (ARM_BDS_LOADER_TYPE)PcdGet32 (PcdDefaultBootType);
-
       // We do not support NULL pointer
       ASSERT (PcdGetPtr (PcdDefaultBootArgument) != NULL);
 
@@ -338,33 +334,11 @@ DefineDefaultBootEntries (
         AsciiStrToUnicodeStr (AsciiDefaultBootArgument, DefaultBootArgument);
       }
 
-      if ((BootType == BDS_LOADER_KERNEL_LINUX_ATAG) || (BootType == BDS_LOADER_KERNEL_LINUX_FDT)) {
-        InitrdPath = EfiDevicePathFromTextProtocol->ConvertTextToDevicePath ((CHAR16*)PcdGetPtr(PcdDefaultBootInitrdPath));
-        InitrdSize = GetDevicePathSize (InitrdPath);
-
-        OptionalDataSize = sizeof(ARM_BDS_LOADER_ARGUMENTS) + CmdLineAsciiSize + InitrdSize;
-        BootArguments = (ARM_BDS_LOADER_ARGUMENTS*)AllocatePool (OptionalDataSize);
-        if (BootArguments == NULL) {
-          return EFI_OUT_OF_RESOURCES;
-        }
-        BootArguments->LinuxArguments.CmdLineSize = CmdLineAsciiSize;
-        BootArguments->LinuxArguments.InitrdSize = InitrdSize;
-
-        CopyMem ((VOID*)(BootArguments + 1), AsciiDefaultBootArgument, CmdLineAsciiSize);
-        CopyMem ((VOID*)((UINTN)(BootArguments + 1) + CmdLineAsciiSize), InitrdPath, InitrdSize);
-
-        OptionalData = (UINT8*)BootArguments;
-      } else {
-        OptionalData = (UINT8*)DefaultBootArgument;
-        OptionalDataSize = CmdLineSize;
-      }
-
       BootOptionCreate (LOAD_OPTION_ACTIVE | LOAD_OPTION_CATEGORY_BOOT,
-        (CHAR16*)PcdGetPtr(PcdDefaultBootDescription),
+        (CHAR16*)PcdGetPtr (PcdDefaultBootDescription),
         BootDevicePath,
-        BootType,
-        OptionalData,
-        OptionalDataSize,
+        (UINT8 *)DefaultBootArgument, // OptionalData
+        CmdLineSize,                  // OptionalDataSize
         &BdsLoadOption
         );
       FreePool (BdsLoadOption);
@@ -430,7 +404,7 @@ StartDefaultBootOnTimeout (
         Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
       } while(!EFI_ERROR(Status));
       gBS->CloseEvent (WaitList[0]);
-      Print(L"\r\n");
+      Print(L"\n\r");
     }
 
     // In case of Timeout we start the default boot selection
@@ -461,7 +435,6 @@ StartDefaultBootOnTimeout (
                                 which is implementation-dependent.
 
 **/
-STATIC
 VOID
 EFIAPI
 EmptyCallbackFunction (
@@ -577,7 +550,7 @@ BdsEntry (
   }
 
   // If Boot Order does not exist then create a default entry
-  // DefineDefaultBootEntries ();
+  DefineDefaultBootEntries ();
 
   // Now we need to setup the EFI System Table with information about the console devices.
   InitializeConsole ();

@@ -64,9 +64,22 @@ typedef struct {
 } SEMIHOST_FILE_SEEK_BLOCK;
 
 typedef struct {
+  VOID    *Buffer;
+  UINTN    Identifier;
+  UINTN    Length;
+} SEMIHOST_FILE_TMPNAME_BLOCK;
+
+typedef struct {
   CHAR8   *FileName;
   UINTN    NameLength;
 } SEMIHOST_FILE_REMOVE_BLOCK;
+
+typedef struct {
+  CHAR8   *FileName;
+  UINTN    FileNameLength;
+  CHAR8   *NewFileName;
+  UINTN    NewFileNameLength;
+} SEMIHOST_FILE_RENAME_BLOCK;
 
 typedef struct {
   CHAR8   *CommandLine;
@@ -99,7 +112,9 @@ ArmccSemihostCall (
 #define Semihost_SYS_READC()                ArmccSemihostCall(0x07, (UINTN)(0))
 #define Semihost_SYS_SEEK(SeekBlock)        ArmccSemihostCall(0x0A, (UINTN)(SeekBlock))
 #define Semihost_SYS_FLEN(Handle)           ArmccSemihostCall(0x0C, (UINTN)(Handle))
+#define Semihost_SYS_TMPNAME(TmpNameBlock)  ArmccSemihostCall(0x0D, TmpNameBlock)
 #define Semihost_SYS_REMOVE(RemoveBlock)    ArmccSemihostCall(0x0E, (UINTN)(RemoveBlock))
+#define Semihost_SYS_RENAME(RenameBlock)    ArmccSemihostCall(0x0F, RenameBlock)
 #define Semihost_SYS_SYSTEM(SystemBlock)    ArmccSemihostCall(0x12, (UINTN)(SystemBlock))
 
 #elif defined(__GNUC__) // __CC_ARM
@@ -121,7 +136,9 @@ GccSemihostCall (
 #define Semihost_SYS_READC()                GccSemihostCall(0x07, (UINTN)(0))
 #define Semihost_SYS_SEEK(SeekBlock)        GccSemihostCall(0x0A, (UINTN)(SeekBlock))
 #define Semihost_SYS_FLEN(Handle)           GccSemihostCall(0x0C, (UINTN)(Handle))
+#define Semihost_SYS_TMPNAME(TmpNameBlock)  GccSemihostCall(0x0D, (UINTN)(TmpNameBlock))
 #define Semihost_SYS_REMOVE(RemoveBlock)    GccSemihostCall(0x0E, (UINTN)(RemoveBlock))
+#define Semihost_SYS_RENAME(RenameBlock)    GccSemihostCall(0x0F, (UINTN)(RenameBlock))
 #define Semihost_SYS_SYSTEM(SystemBlock)    GccSemihostCall(0x12, (UINTN)(SystemBlock))
 
 #else // __CC_ARM
@@ -137,7 +154,9 @@ GccSemihostCall (
 #define Semihost_SYS_READC()                ('x')
 #define Semihost_SYS_SEEK(SeekBlock)        (-1)
 #define Semihost_SYS_FLEN(Handle)           (-1)
+#define Semihost_SYS_TMPNAME(TmpNameBlock)  (-1)
 #define Semihost_SYS_REMOVE(RemoveBlock)    (-1)
+#define Semihost_SYS_RENAME(RenameBlock)    (-1)
 #define Semihost_SYS_SYSTEM(SystemBlock)    (-1)
 
 #endif // __CC_ARM

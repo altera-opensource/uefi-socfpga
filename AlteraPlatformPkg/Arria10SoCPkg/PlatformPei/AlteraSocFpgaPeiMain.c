@@ -113,6 +113,7 @@ AlteraSocFpgaPeiMainEntry (
   ASSERT_PLATFORM_INIT(0);
 }
 
+
 VOID
 EFIAPI
 MemorySerialLogInit (
@@ -171,9 +172,9 @@ PrintModuleEntryPointAndMemoryMapInfoToMemorySerialLogOrSemihostingConsoleIfEnab
   // Use OCRAM base as SEC entry
   ArmPlatformSecEntry = ALT_OCRAM_OFST;
   // Decode the entry offset from BL jump opcode
-  ArmPlatformPrePeiCoreEntry = PcdGet32(PcdFvBaseAddress) + (((*((UINT32 *)PcdGet32(PcdFvBaseAddress)) & 0x00FFFFFF) + 2) * 4);
+  ArmPlatformPrePeiCoreEntry = (UINTN)PcdGet64(PcdFvBaseAddress) + (((*((UINT32 *)(UINTN)PcdGet64(PcdFvBaseAddress)) & 0x00FFFFFF) + 2) * 4);
   // Decode the PEI MAIN entry value patched into this location by GenFv tool's UpdateArmResetVectorIfNeeded function
-  AlteraSocFpgaPeiMainEntry = (*((UINT32 *)(PcdGet32(PcdFvBaseAddress) + 4)) & 0xFFFFFFFE);
+  AlteraSocFpgaPeiMainEntry = (*((UINT32 *)(UINTN)(PcdGet64(PcdFvBaseAddress) + 4)) & 0xFFFFFFFE);
 
   SecFvBegin = ALT_OCRAM_OFST;
   SecFvEnd = (UINT32)SecCoreData->BootFirmwareVolumeBase - 1;
@@ -186,16 +187,16 @@ PrintModuleEntryPointAndMemoryMapInfoToMemorySerialLogOrSemihostingConsoleIfEnab
   MemLogBegin = (UINT32)PcdGet64 (PcdMemorySerialLogBase);
   MemLogEnd = (UINT32)PcdGet64 (PcdMemorySerialLogBase) + (UINT32)PcdGet64 (PcdMemorySerialLogSize) - 1;
 
-  TotalPeiMemBegin = PcdGet32 (PcdCPUCoresStackBase);
-  TotalPeiMemEnd = PcdGet32 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - 1;
-  PpiListBegin = PcdGet32 (PcdCPUCoresStackBase);
-  PpiListEnd = PcdGet32 (PcdCPUCoresStackBase) + (UINT32)SecCoreData->TemporaryRamBase - PcdGet32 (PcdCPUCoresStackBase) - 1;
+  TotalPeiMemBegin = (UINTN)PcdGet64 (PcdCPUCoresStackBase);
+  TotalPeiMemEnd = (UINTN)PcdGet64 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - 1;
+  PpiListBegin = (UINTN)PcdGet64 (PcdCPUCoresStackBase);
+  PpiListEnd = (UINTN)PcdGet64 (PcdCPUCoresStackBase) + (UINT32)SecCoreData->TemporaryRamBase - (UINTN)PcdGet64 (PcdCPUCoresStackBase) - 1;
   PeiHeapBegin = (UINT32)SecCoreData->PeiTemporaryRamBase;
   PeiHeapEnd = (UINT32)SecCoreData->PeiTemporaryRamBase + (UINT32)SecCoreData->PeiTemporaryRamSize - 1;
   PeiStackBegin = (UINT32)SecCoreData->StackBase;
   PeiStackEnd = (UINT32)SecCoreData->StackBase + (UINT32)SecCoreData->StackSize - 1;
-  GlobalVariablePtrBegin = PcdGet32 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize);
-  GlobalVariablePtrEnd = PcdGet32 (PcdCPUCoresStackBase) +  PcdGet32 (PcdCPUCorePrimaryStackSize) - 1;
+  GlobalVariablePtrBegin = (UINTN)PcdGet64 (PcdCPUCoresStackBase) + PcdGet32 (PcdCPUCorePrimaryStackSize) - PcdGet32 (PcdPeiGlobalVariableSize);
+  GlobalVariablePtrEnd = (UINTN)PcdGet64 (PcdCPUCoresStackBase) +  PcdGet32 (PcdCPUCorePrimaryStackSize) - 1;
   SecStackBegin = PcdGet32 (PcdCPUCoresSecStackBase);
   SecStackEnd = PcdGet32 (PcdCPUCoresSecStackBase) + PcdGet32 (PcdCPUCoreSecPrimaryStackSize) - 1;
   MonModeStackBegin = PcdGet32 (PcdCPUCoresSecMonStackBase);
@@ -276,7 +277,7 @@ InitializeHOBs (
   BuildStackHob ((UINTN)SecCoreData->StackBase, SecCoreData->StackSize);
 
   // Put PeiGlobalVariable pointer base and size information into Hob
-  BuildGlobalVariableHob (PcdGet32 (PcdCPUCoresStackBase) +
+  BuildGlobalVariableHob ((UINTN)PcdGet64 (PcdCPUCoresStackBase) +
                           PcdGet32 (PcdCPUCorePrimaryStackSize) -
                           PcdGet32 (PcdPeiGlobalVariableSize),
                           PcdGet32 (PcdPeiGlobalVariableSize));
@@ -328,7 +329,7 @@ IN CONST EFI_SEC_PEI_HAND_OFF      *SecCoreData,
   UINTN                   PpiListCount;
   UINTN                   Index;
 
-  PpiListSize = (UINT32)SecCoreData->TemporaryRamBase -  PcdGet32 (PcdCPUCoresStackBase);
+  PpiListSize = (UINT32)SecCoreData->TemporaryRamBase -  (UINTN)PcdGet64 (PcdCPUCoresStackBase);
   PpiListCount = PpiListSize / sizeof(EFI_PEI_PPI_DESCRIPTOR);
   for (Index = 0; Index < PpiListCount; Index++, PpiList++) {
     if (CompareGuid (PpiList->Guid, PpiGuid) == TRUE) {
@@ -339,6 +340,7 @@ IN CONST EFI_SEC_PEI_HAND_OFF      *SecCoreData,
 
   return EFI_NOT_FOUND;
 }
+
 
 VOID
 EFIAPI
@@ -395,6 +397,7 @@ BuildSystemMemoryHOBs (
   return EFI_SUCCESS;
 }
 
+
 VOID
 EFIAPI
 BootUnCompressedDxeFv (
@@ -403,13 +406,9 @@ BootUnCompressedDxeFv (
 {
   UINT32                DxeFileSize;
   UINTN                 DxeFvBase;
-  EFI_FV_FILE_INFO      DxeCoreFileInfo;
-  EFI_PHYSICAL_ADDRESS  DxeCoreAddress;
-  UINT32                PECoffBase;
-  EFI_PHYSICAL_ADDRESS  DxeCoreEntryPoint;
 
   // Load DXE FV to DRAM
-  DxeFvBase = PcdGet32(PcdFdBaseAddress); // Defined in .FDF file
+  DxeFvBase = (UINTN)PcdGet64(PcdFdBaseAddress); // Defined in .FDF file
   LoadDxeImageToRam (DxeFvBase, &DxeFileSize);
   // Assert if this is not a DXE FV file matching this PEI
   ASSERT_PLATFORM_INIT(DxeFileSize == PcdGet32(PcdDxeFvSize));
@@ -417,34 +416,9 @@ BootUnCompressedDxeFv (
   // Put DXE FV base and size information into Hob
   BuildFvHob (DxeFvBase, DxeFileSize);
 
-  // Find the DXE Entry point
-  DxeCoreAddress = DxeFvBase + 0x64; // FVH header size (0x48) + FFS header size (0x18) + Section header (0x04) = 0x64
-  PECoffBase     = DxeFvBase + 0x64; // FVH header size (0x48) + FFS header size (0x18) + Section header (0x04) = 0x64
-  CopyGuid (&DxeCoreFileInfo.FileName, (EFI_GUID*)(DxeFvBase + 0x48)); // EFI_GUID offset
-  if ((*((UINT32*)(PECoffBase)) == 0x00005A4D) && (*((UINT32*)(PECoffBase + 0x80)) == 0x00004550))
-  {
-    // Found "MZ" and "PE" signature, prepare to boot DXE phase
-    DxeCoreEntryPoint = (*((UINT32*)(PECoffBase + 0x80 + 0x34)) + *((UINT32*)(PECoffBase + 0x80 + 0x28)));
-    SerialPortPrint ("DXE Core entry at 0x%08Lx\n", DxeCoreEntryPoint);
+  // Find and load main entry point of the DXE Core
+  EnterDxeCoreEntryPoint (DxeFvBase);
 
-    // Add HOB for the DXE Core
-    //
-    BuildModuleHob (
-      &DxeCoreFileInfo.FileName,
-      DxeCoreAddress,
-      ALIGN_VALUE (DxeFileSize, EFI_PAGE_SIZE),
-      DxeCoreEntryPoint
-      );
-
-    // Load the DXE Core and transfer control to it
-    ((DXE_CORE_ENTRY_POINT)(UINTN)DxeCoreEntryPoint) (PrePeiGetHobList());
-
-  }
-
-  // Should not reach here
-  ASSERT_PLATFORM_INIT(0);
-  // Dead loop
-  EFI_DEADLOOP();
 }
 
 
@@ -458,10 +432,6 @@ BootCompressedDxeFv (
   UINT32                      DxeFileSize;
   UINTN                       DxeDecompressedFvBase;
   UINTN                       DxeCompressedFvBase;
-  EFI_FV_FILE_INFO            DxeCoreFileInfo;
-  EFI_PHYSICAL_ADDRESS        DxeCoreAddress;
-  UINT32                      PECoffBase;
-  EFI_PHYSICAL_ADDRESS        DxeCoreEntryPoint;
   EFI_COMMON_SECTION_HEADER*  Section;
   VOID*                       OutputBuffer;
   UINT32                      OutputBufferSize;
@@ -472,7 +442,7 @@ BootCompressedDxeFv (
 
   // Load Compress DXE FV to DRAM
   // PcdFdBaseAddress is defined in .FDF file
-  DxeDecompressedFvBase = PcdGet32(PcdFdBaseAddress);
+  DxeDecompressedFvBase = (UINTN)PcdGet64(PcdFdBaseAddress);
   // Compressed FV is load 16 MB after decompression destination offset
   DxeCompressedFvBase = DxeDecompressedFvBase + 0x1000000;
   // LZMA Scratch Buffer
@@ -496,23 +466,84 @@ BootCompressedDxeFv (
   // Put decompressed DXE FV base and size information into Hob
   BuildFvHob (DxeDecompressedFvBase, OutputBufferSize);
 
+  // Find and load main entry point of the DXE Core
+  EnterDxeCoreEntryPoint (DxeDecompressedFvBase);
+
+}
+
+
+VOID
+EFIAPI
+EnterDxeCoreEntryPoint (
+  IN UINTN                    DxeFvBase
+  )
+{
+  EFI_PHYSICAL_ADDRESS              DxeCoreAddress;
+  UINT32                            PECoffBase;
+  EFI_FV_FILE_INFO                  DxeCoreFileInfo;
+  EFI_PHYSICAL_ADDRESS              DxeCoreEntryPoint;
+  EFI_FIRMWARE_VOLUME_HEADER       *FwVolHeader;
+  EFI_FIRMWARE_VOLUME_EXT_HEADER   *FwVolExtHeader;
+  EFI_FFS_FILE_HEADER              *FfsFileHeader;
+  EFI_COMMON_SECTION_HEADER        *Section;
+  UINT32                            FileSize;
+
+  //
   // Find the DXE Entry point
-  DxeCoreAddress = DxeDecompressedFvBase + 0x64; // FVH header size (0x48) + FFS header size (0x18) + Section header (0x04) = 0x64
-  PECoffBase     = DxeDecompressedFvBase + 0x64; // FVH header size (0x48) + FFS header size (0x18) + Section header (0x04) = 0x64
-  CopyGuid (&DxeCoreFileInfo.FileName, (EFI_GUID*)(DxeDecompressedFvBase + 0x48)); // EFI_GUID offset
+  //
+
+  // Convert the handle of FV to FV header for memory-mapped firmware volume
+  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) DxeFvBase;
+
+  // If FileHeader is not specified (NULL) or FileName is not NULL,
+  // start with the first file in the firmware volume.  Otherwise,
+  // start from the FileHeader.
+  if (FwVolHeader->ExtHeaderOffset != 0) {
+    // FFS is after FwVolHeader size (0x48) + FwVolExtHeader size + Padding size
+    // Searching for files starts on an 8 byte aligned boundary after the end of the Extended Header if it exists.
+    FwVolExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *) ((UINT8 *) FwVolHeader + FwVolHeader->ExtHeaderOffset);
+    FfsFileHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FwVolExtHeader + FwVolExtHeader->ExtHeaderSize);
+    FfsFileHeader = (EFI_FFS_FILE_HEADER *) ALIGN_POINTER (FfsFileHeader, 8);
+  } else {
+    // FFS is after FwVolHeader size (0x48)
+    FfsFileHeader = (EFI_FFS_FILE_HEADER *)((UINT8 *) FwVolHeader + FwVolHeader->HeaderLength);
+  }
+
+  if (IS_FFS_FILE2 (FfsFileHeader)) {
+    Section = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) FfsFileHeader + sizeof (EFI_FFS_FILE_HEADER2));
+    FileSize = FFS_FILE2_SIZE (FfsFileHeader) - sizeof (EFI_FFS_FILE_HEADER2);
+  } else {
+    Section = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) FfsFileHeader + sizeof (EFI_FFS_FILE_HEADER));
+    FileSize = FFS_FILE_SIZE (FfsFileHeader) - sizeof (EFI_FFS_FILE_HEADER);
+  }
+
+  // DxeCoreAddress start after FVH header size + FFS header size + Section header
+  DxeCoreAddress = (UINTN)((UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER));
+  PECoffBase = DxeCoreAddress;
+  CopyGuid (&DxeCoreFileInfo.FileName, (EFI_GUID*)&(FfsFileHeader->Name)); // EFI_GUID offset
+
+  //SerialPortPrint ("FwVolHeader     : %08x\r\n", FwVolHeader);
+  //SerialPortPrint ("FvLength        : %ld\r\n",  FwVolHeader->FvLength);
+  //SerialPortPrint ("FvSignature     : %08x\r\n", FwVolHeader->Signature);
+  //SerialPortPrint ("ExtHeaderOffset : %04x\r\n", FwVolHeader->ExtHeaderOffset);
+  //SerialPortPrint ("FfsFileHeader   : %08x\r\n", FfsFileHeader);
+  //SerialPortPrint ("DxeCoreFileSize : %d\r\n",   FileSize);
+  //SerialPortPrint ("Section         : %08x\r\n", Section);
+  //SerialPortPrint ("PECoffBase      : %08x\r\n", PECoffBase);
+  //SerialPortPrint ("DxeCore GUID    : %g\r\n", &DxeCoreFileInfo.FileName);
+
+  // Make sure it is really a EFI_SECTION_PE32 executable
   if ((*((UINT32*)(PECoffBase)) == 0x00005A4D) && (*((UINT32*)(PECoffBase + 0x80)) == 0x00004550))
   {
     // Found "MZ" and "PE" signature, prepare to boot DXE phase
     DxeCoreEntryPoint = (*((UINT32*)(PECoffBase + 0x80 + 0x34)) + *((UINT32*)(PECoffBase + 0x80 + 0x28)));
     SerialPortPrint ("DXE Core entry at 0x%08Lx\n", DxeCoreEntryPoint);
 
-    //
     // Add HOB for the DXE Core
-    //
     BuildModuleHob (
       &DxeCoreFileInfo.FileName,
       DxeCoreAddress,
-      ALIGN_VALUE (DxeFileSize, EFI_PAGE_SIZE),
+      ALIGN_VALUE (FileSize, EFI_PAGE_SIZE),
       DxeCoreEntryPoint
       );
 
@@ -526,3 +557,4 @@ BootCompressedDxeFv (
   // Dead loop
   EFI_DEADLOOP();
 }
+

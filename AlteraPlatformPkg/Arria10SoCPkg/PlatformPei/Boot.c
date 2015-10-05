@@ -89,7 +89,7 @@ PreparePlatformHardwareToBoot (
   // Disable all the interrupts
   MaxGicNumInterrupts = ArmGicGetMaxNumInterrupts (PcdGet32 (PcdGicDistributorBase));
   for (Index = 0; Index < MaxGicNumInterrupts; Index++) {
-    ArmGicDisableInterrupt (PcdGet32 (PcdGicDistributorBase), Index);
+    ArmGicDisableInterrupt (PcdGet32 (PcdGicDistributorBase), 0, Index);
   }
 
   // Acknowledge all pending interrupts

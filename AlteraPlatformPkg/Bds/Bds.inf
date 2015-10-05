@@ -2,7 +2,7 @@
 #
 #  Component description file for Bds module
 #
-#  Copyright (c) 2011-2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2011-2015, ARM Ltd. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -24,9 +24,10 @@
 
   ENTRY_POINT                    = BdsInitialize
 
-[Sources.common]
+[Sources]
   Bds.c
   BdsHelper.c
+  BootLinux.c
   BootMenu.c
   BootOption.c
   BootOptionSupport.c
@@ -36,23 +37,29 @@
   MdeModulePkg/MdeModulePkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+
+[Guids]
+  gFdtTableGuid
 
 [LibraryClasses]
   BdsLib
-  TimerLib
-  PerformanceLib
   UefiBootServicesTableLib
   DxeServicesTableLib
   UefiDriverEntryPoint
   DebugLib
+  PerformanceLib
   PrintLib
   BaseLib
+  FdtLib
   NetLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
   gEfiFileSystemInfoGuid
   gArmGlobalVariableGuid
+  gFdtVariableGuid
 
 [Protocols]
   gEfiBdsArchProtocolGuid
@@ -61,18 +68,24 @@
   gEfiPxeBaseCodeProtocolGuid
   gEfiSimpleNetworkProtocolGuid
   gEfiDevicePathToTextProtocolGuid
+  gEfiFirmwareVolumeBlockProtocolGuid
+  gEfiFirmwareVolumeBlock2ProtocolGuid
+  gEfiDhcp4ServiceBindingProtocolGuid
+  gEfiMtftp4ServiceBindingProtocolGuid
+
+[FeaturePcd]
+  gArmPlatformTokenSpaceGuid.PcdBdsLinuxSupport
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument
-  gArmPlatformTokenSpaceGuid.PcdDefaultBootType
-  gArmPlatformTokenSpaceGuid.PcdFdtDevicePath
-  gArmPlatformTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gArmPlatformTokenSpaceGuid.PcdDefaultConInPaths
   gArmPlatformTokenSpaceGuid.PcdDefaultConOutPaths
+
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile
 
 [Depex]
   TRUE
