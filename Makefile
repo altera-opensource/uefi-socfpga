@@ -35,6 +35,7 @@ SHELL := /bin/bash
 .SUFFIXES: # Delete the default suffixes
 
 mkfile_path := $(dir $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+export EDK_TOOLS_PATH?=$(mkfile_path)BaseTools
 
 #-----------------------------------------------------------------------------
 #                                  TOOLS
@@ -46,24 +47,39 @@ NEXT_CMD         :=&
 PATHSEP2         =\\
 PATHSEP          =$(strip $(PATHSEP2))
 ECHO_NEWLINE     := cmd /c echo.
-ECHO_START 	 := echo
-ECHO_END 	 :=
-DTC 	         := dtc
-CP	         := copy /y
-RM	         := del /f
+ECHO_START       := echo
+ECHO_END         :=
+SED_START        :=
+SED_END          :=
+SED_DEL_TMP_FILE := del sed*.
+DTC              := dtc
+CP               := copy /y
+RM               := del /f
 RMDIR            := rmdir /s /q
+MAKE_BUILD_TOOL  :=
 else
 # Linux
 NEXT_CMD         :=;
 PATHSEP2         =/
 PATHSEP          =$(strip $(PATHSEP2))
 ECHO_NEWLINE     := echo ""
-ECHO_START 	 := echo "
-ECHO_END 	 := "
-DTC 	         := dtc
-CP	         := cp -f
-RM	         := rm -f
+ECHO_START       := echo "
+ECHO_END         := "
+SED_START        := "
+SED_END          := "
+SED_DEL_TMP_FILE :=
+DTC              := dtc
+CP               := cp -f
+RM               := rm -f
 RMDIR            := rm -Rf
+MAKE_BUILD_TOOL  := $(MAKE) -C $(EDK_TOOLS_PATH)
+endif
+
+ifdef ComSpec
+# Windows
+else
+# Linux
+export GCC48_ARM_PREFIX=arm-linux-gnueabihf-
 endif
 
 #-----------------------------------------------------------------------------
@@ -83,9 +99,6 @@ export EDK2_BUILD=RELEASE
 # Additional build macros
 export EDK2_MACROS= -y report.log
 
-# BaseTools
-export EDK_TOOLS_PATH?=$(mkfile_path)BaseTools
-
 # DTB path as defined in .FDF
 # (do no change, it must match the on in .FDF file)
 export FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dtb
@@ -103,7 +116,6 @@ PEI_FLASH_ADDR := 0x00000000
 PEI_SMALLER_x1_ROM := Build$(PATHSEP)PEI.256
 PEI_FINAL_ROM := Build$(PATHSEP)PEI.ROM
 DXE_FINAL_ROM := Build$(PATHSEP)DXE.ROM
-BOTH_PEI_DXE_ROM := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)BOTH.ROM
 
 #-----------------------------------------------------------------------------
 # Default Behavior when just type "make"
@@ -191,7 +203,6 @@ export EDK2_TOOLCHAIN=RVCTLINUX
 #export RVCT_TOOLS_PATH=$(SOCEDS_DEST_ROOT)$(PATHSEP)ds-5$(PATHSEP)sw$(PATHSEP)ARMCompiler5.05u1$(PATHSEP)bin$(PATHSEP)
 else ifeq ("$(COMPILER)$(compiler)$(C)$(c)",$(filter "$(COMPILER)$(compiler)$(C)$(c)","gcc" "GCC"))
 export EDK2_TOOLCHAIN=GCC48
-export GCC48_ARM_PREFIX=arm-linux-gnueabihf-
 else
 $(error ERROR: Unsupported Compiler in command-line argument COMPILER=""$(COMPILER)$(compiler)$(C)$(c))
 endif
@@ -255,18 +266,21 @@ endif
 
 DS_SCRIPT := Build$(PATHSEP)load_uefi_fw.ds
 
-SNR_ENTRY_ArmPlatformSec        := "SEARCH_AND_REPLACE_ArmPlatformSec_entrypoint"
-SNR_ENTRY_ArmPlatformPrePeiCore := "SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_entrypoint"
-SNR_ENTRY_AlteraSocFpgaPeiMain  := "SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_entrypoint"
+SNR_BUILD_PEI  := $(SED_START)Build/PEI.256$(SED_END)
+FILE_BUILD_PEI := $(mkfile_path)$(PEI_SMALLER_x1_ROM)
 
-SNR_FILE_ArmPlatformSec        := "SEARCH_AND_REPLACE_ArmPlatformSec_dll"
-SNR_FILE_ArmPlatformPrePeiCore := "SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_dll"
-SNR_FILE_AlteraSocFpgaPeiMain  := "SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_dll"
+SNR_ENTRY_ArmPlatformSec        := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformSec_entrypoint$(SED_END)
+SNR_ENTRY_ArmPlatformPrePeiCore := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_entrypoint$(SED_END)
+SNR_ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_entrypoint$(SED_END)
+
+SNR_FILE_ArmPlatformSec        := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformSec_dll$(SED_END)
+SNR_FILE_ArmPlatformPrePeiCore := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_dll$(SED_END)
+SNR_FILE_AlteraSocFpgaPeiMain  := $(SED_START)SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_dll$(SED_END)
 
 
-ENTRY_ArmPlatformSec        := "0x00ffe00184"
-ENTRY_ArmPlatformPrePeiCore := "0x00ffe01184"
-ENTRY_AlteraSocFpgaPeiMain  := "0x00ffe0430c"
+ENTRY_ArmPlatformSec        := $(SED_START)0x00ffe00164$(SED_END)
+ENTRY_ArmPlatformPrePeiCore := $(SED_START)0x00ffe01164$(SED_END)
+ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)0x00ffe041ad$(SED_END)
 
 FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
 FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
@@ -367,7 +381,7 @@ build_setup:
 # Shell Scripts: build_tool
 #-----------------------------------------------------------------------------
 build_tool:
-	$(MAKE) -C $(EDK_TOOLS_PATH)
+	$(MAKE_BUILD_TOOL)
 
 
 #-----------------------------------------------------------------------------
@@ -387,7 +401,6 @@ build_mkpimage:
 	@mkpimage --header-version $(MKPIMAGE_HEADER_VERSION) -off $(ENTRY_MINUS_40HEX) -o $(PEI_FINAL_ROM) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FD_FILENAME_FULLPATH)
 	@mkpimage --header-version $(MKPIMAGE_HEADER_VERSION) -off $(ENTRY_MINUS_40HEX) -o $(PEI_SMALLER_x1_ROM) $(PEI_FD_FILENAME_FULLPATH)
 	@$(CP) $(DXE_FD_FILENAME_FULLPATH) $(DXE_FINAL_ROM)
-	@cat $(PEI_FINAL_ROM) $(DXE_FINAL_ROM) > $(BOTH_PEI_DXE_ROM)
 
 
 #-----------------------------------------------------------------------------
@@ -402,7 +415,8 @@ build_ds_script:
 	@sed -i "s%$(SNR_FILE_ArmPlatformSec)%$(FILE_ArmPlatformSec)%g" $(DS_SCRIPT)
 	@sed -i "s%$(SNR_FILE_ArmPlatformPrePeiCore)%$(FILE_ArmPlatformPrePeiCore)%g" $(DS_SCRIPT)
 	@sed -i "s%$(SNR_FILE_AlteraSocFpgaPeiMain)%$(FILE_AlteraSocFpgaPeiMain)%g" $(DS_SCRIPT)
-
+	@sed -i "s%$(SNR_BUILD_PEI)%$(FILE_BUILD_PEI)%g" $(DS_SCRIPT)
+	@$(SED_DEL_TMP_FILE)
 
 #-----------------------------------------------------------------------------
 # Shell Scripts: build_done

@@ -12,5 +12,4 @@ Source/C/VfrCompile/VfrSyntax.cpp
 Source/C/VfrCompile/VfrTokens.h
 Source/C/bin/
 Source/C/libs/
-Bin/Win32
 Lib
