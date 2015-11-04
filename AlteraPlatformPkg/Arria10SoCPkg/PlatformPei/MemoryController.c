@@ -51,6 +51,8 @@
   #define InfoPrint     SerialPortPrint
 #endif
 
+#define DDR_READ_LATENCY_DELAY 40
+
 //
 // Functions
 //
@@ -775,11 +777,12 @@ ConfigureDdrSchedulerControlRegisters (
   //
   // Step 4 - Init Read Latency between a read request and the first data response.
   //
+  // case 314587: Update DDR Scheduler ReadLatency calculation
   MmioAndThenOr32 (
     ALT_NOC_MPU_DDR_T_SCHED_OFST +
     ALT_NOC_MPU_DDR_T_SCHED_RDLATENCY_OFST,
     ALT_NOC_MPU_DDR_T_SCHED_RDLATENCY_RDLATENCY_CLR_MSK,
-    ALT_NOC_MPU_DDR_T_SCHED_RDLATENCY_RDLATENCY_SET(RdLatency)
+    ALT_NOC_MPU_DDR_T_SCHED_RDLATENCY_RDLATENCY_SET(RdLatency / 2 + DDR_READ_LATENCY_DELAY)
   );
 
   //
