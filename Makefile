@@ -57,6 +57,7 @@ CP               := copy /y
 RM               := del /f
 RMDIR            := rmdir /s /q
 MAKE_BUILD_TOOL  :=
+CAT_TYPE         := type
 else
 # Linux
 NEXT_CMD         :=;
@@ -73,6 +74,7 @@ CP               := cp -f
 RM               := rm -f
 RMDIR            := rm -Rf
 MAKE_BUILD_TOOL  := $(MAKE) -C $(EDK_TOOLS_PATH)
+CAT_TYPE         := cat
 endif
 
 ifdef ComSpec
@@ -172,6 +174,19 @@ program_qspi_256: program_flash_using_quartus_hps_256
 program_nand_256: program_flash_using_quartus_hps_256
 
 #-----------------------------------------------------------------------------
+# when user type "make app"
+#-----------------------------------------------------------------------------
+DEFAULT_MAKE_TARGET := bootloader
+# If the first argument is "app"...
+ifeq (app,$(firstword $(MAKECMDGOALS)))
+TARGET := app
+endif
+
+.PHONY: app
+app: build_setup_app build_tool build_firmware build_app_post build_done
+
+
+#-----------------------------------------------------------------------------
 # Process the Command-line Arguments
 #-----------------------------------------------------------------------------
 
@@ -181,13 +196,21 @@ ifeq ("$(device)$(D)$(d)","")
 # Set Default DEVICE when user do not specify via command-line argument
 DEVICE?=$(DEFAULT_MAKE_DEVICE)
 endif
+ifeq ("$(target)$(T)$(t)","")
+# Set Default DEVICE when user do not specify via command-line argument
+TARGET?=$(DEFAULT_MAKE_TARGET)
+endif
 # Override the default value based on command-line argument
-ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","ca9_rtsm" "CA9_RTSM"))
-  export EDK2_DSC=ArmPlatformPkg$(PATHSEP)ArmVExpressPkg$(PATHSEP)ArmVExpress-RTSM-A9x4.dsc
-else ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "A10"))
+ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "A10"))
+  ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","bootloader" "BOOTLOADER"))
   export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dsc
+  else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
+  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
+  else
+  $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
+  endif
 else
-$(error ERROR: No .DSC for unsupported device in command-line argument DEVICE=""$(DEVICE)$(device)$(D)$(d))
+$(error ERROR: No .DSC for unsupported device in command-line argument DEVICE="$(DEVICE)$(device)$(D)$(d))"
 endif
 
 
@@ -210,6 +233,7 @@ endif
 # Build full path of the .FD files
 PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
 DXE_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(DXE_FD_FILENAME)
+EFIAPP_FILENAME_FULLPATH := Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)*.efi
 
 # Update handoff DTB ?
 # Check error: Same file?
@@ -238,8 +262,8 @@ ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
     ifneq ("$(wildcard $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts))","")
     # FILE_EXISTS = 1
 	export CMD_ECHO_HANDOFF_DTS=$(ECHO_START) HANDOFF_DTS    : $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
-	export CMD_COMPILE_HANDOFF_DTS_1=cat $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)
-    export CMD_COMPILE_HANDOFF_DTS_2=$(CMD_COMPILE_HANDOFF_DTS_1) $(NEXT_CMD) $(DTC) --space 16384 -I dts $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) -O dtb -o $(FDF_LINK_DTB_PATH)
+	export CMD_COMPILE_HANDOFF_DTS_1=$(CAT_TYPE) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)
+	export CMD_COMPILE_HANDOFF_DTS_2=$(CMD_COMPILE_HANDOFF_DTS_1) $(NEXT_CMD) $(DTC) --space 16384 -I dts $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) -O dtb -o $(FDF_LINK_DTB_PATH)
 	export CMD_COMPILE_HANDOFF_DTS_3=$(CMD_COMPILE_HANDOFF_DTS_2) $(NEXT_CMD) $(CP) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) $(FDF_LINK_DTS_PATH)
 	export CMD_COMPILE_HANDOFF_DTS=$(CMD_COMPILE_HANDOFF_DTS_3)
 	# Make sure CMD_UPDATE_HANDOFF_DTB is clear to avoid dump DTC twice
@@ -313,6 +337,7 @@ help:
 	@$(ECHO_NEWLINE)
 	@$(ECHO_START) ADVANCED OPTIONS:$(ECHO_END)
 	@$(ECHO_NEWLINE)
+	@$(ECHO_START)     app         - build UEFI application for SocFpga$(ECHO_END)
 	@$(ECHO_START)     clean       - will delete the entire 'Build' folder and also clean the BaseTools$(ECHO_END)
 	@$(ECHO_START)     fast        - skip building BaseTools$(ECHO_END)
 	@$(ECHO_START)     HANDOFF_DTS = [file path]$(ECHO_END)
@@ -337,6 +362,7 @@ help:
 	@$(ECHO_START)     make fast DEVICE=a10 COMPILER=gcc HANDOFF_DTB=a10_soc_devkit_ghrd/software/bootloader/devicetree.dtb$(ECHO_END)
 	@$(ECHO_START)     make fast DEVICE=a10 COMPILER=gcc HANDOFF_DTS=a10_soc_devkit_ghrd/software/bootloader/devicetree.dts$(ECHO_END)
 	@$(ECHO_START)     make mkpimage COMPILER=gcc$(ECHO_END)
+	@$(ECHO_START)     make app$(ECHO_END)
 
 
 
@@ -376,6 +402,21 @@ build_setup:
 	$(CMD_COMPILE_HANDOFF_DTS)
 	$(CMD_UPDATE_HANDOFF_DTB)
 
+#-----------------------------------------------------------------------------
+# Shell Scripts: build_setup
+#-----------------------------------------------------------------------------
+build_setup_app:
+	@$(ECHO_START) -----------------------------$(ECHO_END)
+	@$(ECHO_START) Setting up build environemnt $(ECHO_END)
+	@$(ECHO_START) -----------------------------$(ECHO_END)
+	@$(ECHO_START) DEVICE         : $(DEVICE)$(device)$(D)$(d)$(ECHO_END)
+	@$(ECHO_START) COMPILER       : $(COMPILER)$(compiler)$(C)$(c)$(ECHO_END)
+	@$(ECHO_START) EDK2_ARCH      : $(EDK2_ARCH)$(ECHO_END)
+	@$(ECHO_START) EDK2_DSC       : $(EDK2_DSC)$(ECHO_END)
+	@$(ECHO_START) EDK2_BUILD     : $(EDK2_BUILD)$(ECHO_END)
+	@$(ECHO_START) EDK2_MACROS    : $(EDK2_MACROS)$(ECHO_END)
+	@$(ECHO_START) EDK2_TOOLCHAIN : $(EDK2_TOOLCHAIN)$(ECHO_END)
+
 
 #-----------------------------------------------------------------------------
 # Shell Scripts: build_tool
@@ -394,7 +435,7 @@ build_firmware:
 	$(MAKE) -f ArmPlatformPkg$(PATHSEP)Scripts$(PATHSEP)Makefile
 
 #-----------------------------------------------------------------------------
-# Shell Scripts: build_firmware
+# Shell Scripts: build_mkpimage
 #-----------------------------------------------------------------------------
 build_mkpimage:
 	@$(ECHO_START) mkpimage .FD to .ROM : $(PEI_FINAL_ROM)  $(DXE_FINAL_ROM)$(ECHO_END)
@@ -404,7 +445,7 @@ build_mkpimage:
 
 
 #-----------------------------------------------------------------------------
-# Shell Scripts: build_firmware
+# Shell Scripts: build_ds_script
 #-----------------------------------------------------------------------------
 build_ds_script:
 	@$(ECHO_START) Creating DS-5 script : $(DS_SCRIPT)$(ECHO_END)
@@ -417,6 +458,12 @@ build_ds_script:
 	@sed -i "s%$(SNR_FILE_AlteraSocFpgaPeiMain)%$(FILE_AlteraSocFpgaPeiMain)%g" $(DS_SCRIPT)
 	@sed -i "s%$(SNR_BUILD_PEI)%$(FILE_BUILD_PEI)%g" $(DS_SCRIPT)
 	@$(SED_DEL_TMP_FILE)
+
+#-----------------------------------------------------------------------------
+# Shell Scripts: build_app_post
+#-----------------------------------------------------------------------------
+build_app_post:
+	@$(CP) $(EFIAPP_FILENAME_FULLPATH) Build
 
 #-----------------------------------------------------------------------------
 # Shell Scripts: build_done
