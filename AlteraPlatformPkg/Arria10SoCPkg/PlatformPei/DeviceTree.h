@@ -94,5 +94,13 @@ EFIAPI
 IsSkipFpgaConfig (
   IN  CONST VOID*   Fdt
   );
+
+VOID
+EFIAPI
+GetRbfOffset (
+  IN  CONST VOID*                  Fdt,
+  OUT       UINT32*                RbfOffset
+  );
+
 #endif
 

@@ -432,3 +432,32 @@ IsSkipFpgaConfig (
 }
 
 
+VOID
+EFIAPI
+GetRbfOffset (
+  IN  CONST VOID*                  Fdt,
+  OUT       UINT32*                RbfOffset
+  )
+{
+  INT32                Node;
+  CONST UINT32*        Prop32Ptr;
+
+  // Point to "Chosen"
+  Node = fdt_subnode_offset(Fdt, 0, NODE_chosen);
+  if (Node == -FDT_ERR_NOTFOUND) {
+    InfoPrint ("FDT: %a not found\r\n", NODE_chosen);
+    ASSERT_PLATFORM_INIT(Node >= 0);
+    return;
+  }
+
+  // Point to the first filename
+  Prop32Ptr = fdt_getprop(Fdt, Node, NODE_cff_offset, NULL);
+  if (Prop32Ptr == NULL) {
+    InfoPrint ("\t FDT: %a not found\r\n", NODE_cff_offset);
+    return;
+  }
+  *RbfOffset  = fdt32_to_cpu (ReadUnaligned32(Prop32Ptr));
+
+}
+
+

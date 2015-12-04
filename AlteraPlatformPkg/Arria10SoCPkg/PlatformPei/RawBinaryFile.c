@@ -58,8 +58,6 @@
   #define MmioHexDumpEx SerialPortMmioHexDumpEx
 #endif
 
-#define  RBF_ADDR_IN_QSPI_OR_NAND    FixedPcdGet32(PcdQspiOrNand_RBF_ADDR)
-
 // ==================================================================
 // Module level variables:
 // ==================================================================
@@ -69,6 +67,7 @@ BOOT_SOURCE_TYPE  mBootSourceType = BOOT_SOURCE_RSVD;
 // SDMMC will store RBF files in FAT32 partition
 // (FDT->chosen->cff-file->"file1, file2, ...)
 RBF_FILE_CONFIG   mFdtRbfCfg;
+UINT32            mQspiNandRbfOffset;
 
 // ==================================================================
 // Functions Implementation:
@@ -156,13 +155,14 @@ OpenRawBinaryFile(
   {
     case BOOT_SOURCE_NAND:
     case BOOT_SOURCE_QSPI:
-      Status = FlashRead(RBF_ADDR_IN_QSPI_OR_NAND, &ImgHdr, sizeof(ImgHdr));
+      GetRbfOffset (Fdt, &mQspiNandRbfOffset);
+	  Status = FlashRead(mQspiNandRbfOffset, &ImgHdr, sizeof(ImgHdr));
       if (EFI_ERROR(Status)) return Status;
 
       Status = ValidateMkimageHeader(&ImgHdr);
       if (EFI_ERROR(Status)) {
         InfoPrint("mkimage header for RBF not found!\r\n");
-        MmioHexDumpEx((UINTN)(&ImgHdr), sizeof(ImgHdr)/4, RBF_ADDR_IN_QSPI_OR_NAND);
+        MmioHexDumpEx((UINTN)(&ImgHdr), sizeof(ImgHdr)/4, mQspiNandRbfOffset);
         return Status;
       }
       *RbfSize = ImgHdr.DataSize;
@@ -226,7 +226,7 @@ ReadRawBinaryFile(
   {
     case BOOT_SOURCE_NAND:
     case BOOT_SOURCE_QSPI:
-      Status = FlashRead (RBF_ADDR_IN_QSPI_OR_NAND + Offset + sizeof(MKIMG_HEADER), DestBuffer, ReadSize);
+	  Status = FlashRead (mQspiNandRbfOffset + Offset + sizeof(MKIMG_HEADER), DestBuffer, ReadSize);
       break;
 
     case BOOT_SOURCE_SDMMC:

@@ -154,7 +154,6 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdRemapOnChipRamTo1stOneMB
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_PEIROM_ADDR
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_DXEROM_ADDR
-  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_RBF_ADDR
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_DTB_ADDR
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_ADDR
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_DTB_SIZE

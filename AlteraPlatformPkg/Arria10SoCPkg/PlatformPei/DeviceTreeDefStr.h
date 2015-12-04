@@ -46,6 +46,8 @@
 #define NODE_chosen   "chosen"
 #define NODE_cff_file "cff-file"
 #define NODE_ext_fpga_config "external-fpga-config"
+#define NODE_cff_offset "cff-offset"
+
 // ------------------------------------------------------------------
 // clock source
 // ------------------------------------------------------------------

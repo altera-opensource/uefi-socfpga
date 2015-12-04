@@ -94,11 +94,6 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdEnableMemoryTest|1
   gAlteraSocFpgaTokenSpaceGuid.PcdRemapOnChipRamTo1stOneMB|0
 
-  # If RBF File Stored on QSPI or NAND Flash Memory
-  # Specify the location for the RBF data in flash.
-  # RBF data in flash = (MKIMAGE Header + file1 + file2 + ...)
-  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_RBF_ADDR|0x00720000
-
   # Maximum FAT32 Partition Volumn cluster size:
   # Valid value are:
   #     0x1000 (4KB/8GB), 0x2000 (8KB/16GB), 0x4000 (16KB/32GB), 0x8000 (32KB/Legacy FAT32x)
@@ -184,7 +179,6 @@
   ## QSPI/NAND Flash Offset
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_PEIROM_ADDR |0x00000000
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_DXEROM_ADDR |0x00680000
-  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_RBF_ADDR               |0x00720000
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_DTB_ADDR     |0x00100000
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_ADDR         |0x00120000
 
