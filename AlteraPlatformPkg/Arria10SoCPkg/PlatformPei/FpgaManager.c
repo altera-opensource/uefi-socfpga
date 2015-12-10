@@ -318,6 +318,7 @@ FpgaProgramWrite (
   UINT8       RbfData[RBF_BUFFER_SIZE];
   UINTN       Percentage;
   UINTN       BytesReadCounter;
+  UINT32      SyncData;
 
   BytesReadCounter = 0;
   Percentage = 0;
@@ -356,6 +357,14 @@ FpgaProgramWrite (
       ProgressPrint ("\r%2d%% ", Percentage);
     }
   }
+
+  // Send SYNC words to make sure that all data clock through the control block
+  SyncData = 0xffffffff;
+  for (i = 0; i < 10; i++)
+  {
+    *DstDataPtr = SyncData;
+  }
+
   ProgressPrint ("\rDone.\r\n");
   return EFI_SUCCESS;
 }
