@@ -62,11 +62,15 @@ DisplaySystemManagerInfo (
   )
 {
   UINT32          Data32;
+  // Display Silicon ID Register
+  Data32 = MmioRead32 (ALT_SYSMGR_OFST + ALT_SYSMGR_SILICONID1_OFST);
+  InfoPrint ( "Silicon ID 1: 0x%08x\r\n",  Data32);
+  Data32 = MmioRead32 (ALT_SYSMGR_OFST + ALT_SYSMGR_SILICONID2_OFST);
+  InfoPrint ( "Silicon ID 2: 0x%08x\r\n",  Data32);
 
   // Display bootinfo Register
   Data32 = MmioRead32 (ALT_SYSMGR_OFST + ALT_SYSMGR_BOOT_OFST);
-  InfoPrint ( "BootInfo reg: 0x%08x\r\n",
-              Data32);
+  InfoPrint ( "BootInfo reg: 0x%08x\r\n",  Data32);
   if (ALT_SYSMGR_BOOT_BSEL_GET(Data32) == ALT_SYSMGR_BOOT_BSEL_E_RSVDX)
     InfoPrint ("\t BSEL = RSVD \r\n");
   if (ALT_SYSMGR_BOOT_BSEL_GET(Data32) == ALT_SYSMGR_BOOT_BSEL_E_FPGA)

@@ -75,6 +75,8 @@ BoardSpecificInitialization (
   )
 {
 #if (FixedPcdGet32(PcdIsAlteraSoCFPGADevelopmentBoards) == 1)
+  UINT32  SiliconID1;
+  SiliconID1 = MmioRead32 (ALT_SYSMGR_OFST + ALT_SYSMGR_SILICONID1_OFST);
   InfoPrint ("\r\n"
              "User's Code: Board Init...\r\n"
              "\r\n"
@@ -117,38 +119,78 @@ BoardSpecificInitialization (
              "  2 - 1GB DDR3 (256Mb x 40 x 1 Rank)\r\n"
              "  3 - 2GB DDR3 (256Mb x 40 x 2 Ranks)\r\n"
              "\r\n");
-  InfoPrint ("SW1 DIP switch\r\n"
-             "  1 - I2C flag\r\n"
-             "  2 - FACTORY_LOAD\r\n"
-             "  3 - MSEL pins 1\r\n"
-             "  4 - MSEL pins 0\r\n"
-             "\r\n");
-  InfoPrint ("SW2 DIP switch\r\n"
-             "  1 - USER_DIPSW_HPS0\r\n"
-             "  2 - USER_DIPSW_HPS1\r\n"
-             "  3 - USER_DIPSW_HPS2\r\n"
-             "  4 - USER_DIPSW_HPS3\r\n"
-             "  5 - USER_DIPSW_FPGA0\r\n"
-             "  6 - USER_DIPSW_FPGA1\r\n"
-             "  7 - USER_DIPSW_FPGA2\r\n"
-             "  8 - USER_DIPSW_FPGA3\r\n"
-             "\r\n");
-  InfoPrint ("SW3 DIP switch\r\n"
-             "  1 - Board:\r\n"
-             "         REV A0 - MAXV-A System Controller JTAG by pass\r\n"
-             "         REV A1 - SOCHPS JTAG by pass\r\n"
-             "         REV A1 - MAXV-A System Controller = Short J58, set SW3 DIP switch (on on on on on off off on)\r\n"
-             "  2 - MAXV-B IO MUX Controller JTAG by pass\r\n"
-             "  3 - FMC-A JTAG by pass\r\n"
-             "  4 - FMC-B JTAG by pass\r\n"
-             "  5 - PCIe JTAG by pass\r\n"
-             "  6 - External JTAG by pass\r\n"
-             "  7 - CNTR0\r\n"
-             "  8 - CNTR1\r\n"
-             "  Default: \r\n"
-             "      USB Blaster: set SW3 DIP switch (off on on on on off off off)\r\n"
-             "      Use DSTREAM: set SW3 DIP switch (off on on on on on  on  on )\r\n"
-             "\r\n");
+  if (SiliconID1 == ALT_SYSMGR_SILICONID1_ES1) {
+    InfoPrint ("SW1 DIP switch\r\n"
+               "  1 - I2C flag\r\n"
+               "  2 - FACTORY_LOAD\r\n"
+               "  3 - MSEL pins 1\r\n"
+               "  4 - MSEL pins 0\r\n"
+               "\r\n");
+    InfoPrint ("SW2 DIP switch\r\n"
+               "  1 - USER_DIPSW_HPS0\r\n"
+               "  2 - USER_DIPSW_HPS1\r\n"
+               "  3 - USER_DIPSW_HPS2\r\n"
+               "  4 - USER_DIPSW_HPS3\r\n"
+               "  5 - USER_DIPSW_FPGA0\r\n"
+               "  6 - USER_DIPSW_FPGA1\r\n"
+               "  7 - USER_DIPSW_FPGA2\r\n"
+               "  8 - USER_DIPSW_FPGA3\r\n"
+               "\r\n");
+    InfoPrint ("SW3 DIP switch\r\n"
+               "  1 - Board:\r\n"
+               "         REV A0 - MAXV-A System Controller JTAG by pass\r\n"
+               "         REV A1 - SOCHPS JTAG by pass\r\n"
+               "         REV A1 - MAXV-A System Controller = Short J58, set SW3 DIP switch (on on on on on off off on)\r\n"
+               "  2 - MAXV-B IO MUX Controller JTAG by pass\r\n"
+               "  3 - FMC-A JTAG by pass\r\n"
+               "  4 - FMC-B JTAG by pass\r\n"
+               "  5 - PCIe JTAG by pass\r\n"
+               "  6 - External JTAG by pass\r\n"
+               "  7 - CNTR0\r\n"
+               "  8 - CNTR1\r\n"
+               "  Default: \r\n"
+               "      USB Blaster: set SW3 DIP switch (off on on on on off off off)\r\n"
+               "      Use DSTREAM: set SW3 DIP switch (off on on on on on  on  on )\r\n"
+               "\r\n");
+  } else {
+    InfoPrint ("SW1 DIP switch\r\n"
+               "  1 - I2C flag\r\n"
+               "  2 - DC_POWER_CTRL\r\n"
+               "  3 - FACTORY LOAD\r\n"
+               "  4 - RESERVED\r\n"
+               "\r\n");
+    InfoPrint ("SW2 DIP switch\r\n"
+               "  1 - USER_DIPSW_HPS0\r\n"
+               "  2 - USER_DIPSW_HPS1\r\n"
+               "  3 - USER_DIPSW_HPS2\r\n"
+               "  4 - USER_DIPSW_HPS3\r\n"
+               "  5 - USER_DIPSW_FPGA0\r\n"
+               "  6 - USER_DIPSW_FPGA1\r\n"
+               "  7 - USER_DIPSW_FPGA2\r\n"
+               "  8 - USER_DIPSW_FPGA3\r\n"
+               "\r\n");
+    InfoPrint ("SW3 DIP switch\r\n"
+               "  1 - SOCHPS JTAG by pass\r\n"
+               "      MAXV-A System Controller = Short J58, set SW3 DIP switch (on on on on on off off on)\r\n"
+               "  2 - MAXV-B IO MUX Controller JTAG by pass\r\n"
+               "  3 - FMC-A JTAG by pass\r\n"
+               "  4 - FMC-B JTAG by pass\r\n"
+               "  5 - PCIe JTAG by pass\r\n"
+               "  6 - External JTAG by pass\r\n"
+               "  7 - CNTR0\r\n"
+               "  8 - CNTR1\r\n"
+               "  Default: \r\n"
+               "      USB Blaster: set SW3 DIP switch (off on on on on off off off)\r\n"
+               "      Use DSTREAM: set SW3 DIP switch (off on on on on on  on  on )\r\n"
+               "\r\n");
+    InfoPrint ("SW4 DIP switch\r\n"
+               "  1 - RESERVED\r\n"
+               "  2 - MSEL pins 0\r\n"
+               "  3 - MSEL pins 1\r\n"
+               "  4 - MSEL pins 2\r\n"
+               "\r\n");
+  }
+
 #else
   InfoPrint ("User's Code: Board Init...\r\n");
 #endif

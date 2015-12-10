@@ -112,6 +112,10 @@
 #include "Socal/hps.h"
 #include "Socal/socal.h"
 
+/* The SILICONID1 register for different silicon. */
+#define ALT_SYSMGR_SILICONID1_ES1       0x00010001
+#define ALT_SYSMGR_SILICONID1_ES2       0x00010002
+
 // The base address byte offset for the start of the ARM'S MPU L2 component.
 // Ref: ARM's CoreLink L2C-310 Technical Reference Manual 3.3.12 Address filtering
 #define ARM_MPUL2_OFST                       0xfffff000
