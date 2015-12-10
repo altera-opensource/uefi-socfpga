@@ -101,6 +101,13 @@ GetRbfOffset (
   IN  CONST VOID*                  Fdt,
   OUT       UINT32*                RbfOffset
   );
+  
+VOID
+EFIAPI
+GetFpgaBridgeCfg (
+  IN  CONST VOID*                  Fdt,
+  OUT       FPGA_BRIDGE_CONFIG*    Cfg
+  );
 
 #endif
 

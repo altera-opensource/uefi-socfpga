@@ -424,7 +424,7 @@ IsSkipFpgaConfig (
 
   if (fdt_getprop(Fdt, Node, NODE_ext_fpga_config, NULL) != NULL) {
     InfoPrint ("FDT: external fpga configuration is enabled\r\n");
-	return TRUE;
+    return TRUE;
   }
 
   return FALSE;
@@ -460,4 +460,113 @@ GetRbfOffset (
 
 }
 
+
+VOID
+EFIAPI
+GetFpgaBridgeCfg (
+  IN  CONST VOID*                  Fdt,
+  OUT       FPGA_BRIDGE_CONFIG*    Cfg
+  )
+{
+  INT32                Node;
+  CONST UINT32*        Prop32Ptr;
+
+  ZeroMem (Cfg, sizeof *Cfg);
+
+  //
+  // H2F
+  //
+  Node = fdt_node_offset_by_compatible(Fdt, -1, COMP_fpgabridge_h2f);
+  if (Node == -FDT_ERR_NOTFOUND) {
+    InfoPrint ("FDT: %a not found\r\n", COMP_fpgabridge_h2f);
+    ASSERT_PLATFORM_INIT(Node >= 0);
+    return;
+  }
+  Prop32Ptr = fdt_getprop(Fdt, Node, FpgaBridgeCfgStr[0].PropName, NULL);
+  if (Prop32Ptr != NULL) {
+    Cfg->h2f.enable = fdt32_to_cpu (ReadUnaligned32(Prop32Ptr));
+  }
+
+
+  //
+  // LWH2F
+  //
+  Node = fdt_node_offset_by_compatible(Fdt, -1, COMP_fpgabridge_lwh2f);
+  if (Node == -FDT_ERR_NOTFOUND) {
+    InfoPrint ("FDT: %a not found\r\n", COMP_fpgabridge_lwh2f);
+    ASSERT_PLATFORM_INIT(Node >= 0);
+    return;
+  }
+  Prop32Ptr = fdt_getprop(Fdt, Node, FpgaBridgeCfgStr[0].PropName, NULL);
+  if (Prop32Ptr != NULL) {
+    Cfg->lwh2f.enable = fdt32_to_cpu (ReadUnaligned32(Prop32Ptr));
+  }
+
+  //
+  // F2H
+  //
+  Node = fdt_node_offset_by_compatible(Fdt, -1, COMP_fpgabridge_f2h);
+  if (Node == -FDT_ERR_NOTFOUND) {
+    InfoPrint ("FDT: %a not found\r\n", COMP_fpgabridge_f2h);
+    ASSERT_PLATFORM_INIT(Node >= 0);
+    return;
+  }
+  Prop32Ptr = fdt_getprop(Fdt, Node, FpgaBridgeCfgStr[0].PropName, NULL);
+  if (Prop32Ptr != NULL) {
+    Cfg->f2h.enable = fdt32_to_cpu (ReadUnaligned32(Prop32Ptr));
+  }
+
+  //
+  // F2SDR0
+  //
+  Node = fdt_node_offset_by_compatible(Fdt, -1, COMP_fpgabridge_f2sdr0);
+  if (Node == -FDT_ERR_NOTFOUND) {
+    InfoPrint ("FDT: %a not found\r\n", COMP_fpgabridge_f2sdr0);
+    return;
+  }
+  Prop32Ptr = fdt_getprop(Fdt, Node, FpgaBridgeCfgStr[0].PropName, NULL);
+  if (Prop32Ptr != NULL) {
+    Cfg->f2sdr0.enable = fdt32_to_cpu (ReadUnaligned32(Prop32Ptr));
+  }
+
+  //
+  // F2SDR1
+  //
+  Node = fdt_node_offset_by_compatible(Fdt, -1, COMP_fpgabridge_f2sdr1);
+  if (Node == -FDT_ERR_NOTFOUND) {
+    InfoPrint ("FDT: %a not found\r\n", COMP_fpgabridge_f2sdr1);
+    return;
+  }
+  Prop32Ptr = fdt_getprop(Fdt, Node, FpgaBridgeCfgStr[0].PropName, NULL);
+  if (Prop32Ptr != NULL) {
+    Cfg->f2sdr1.enable = fdt32_to_cpu (ReadUnaligned32(Prop32Ptr));
+  }
+
+  //
+  // F2SDR2
+  //
+  Node = fdt_node_offset_by_compatible(Fdt, -1, COMP_fpgabridge_f2sdr2);
+  if (Node == -FDT_ERR_NOTFOUND) {
+    InfoPrint ("FDT: %a not found\r\n", COMP_fpgabridge_f2sdr2);
+    return;
+  }
+  Prop32Ptr = fdt_getprop(Fdt, Node, FpgaBridgeCfgStr[0].PropName, NULL);
+  if (Prop32Ptr != NULL) {
+    Cfg->f2sdr2.enable = fdt32_to_cpu (ReadUnaligned32(Prop32Ptr));
+  }
+
+  InfoPrint ("\t FDT: Bridge: H2F    : %d\n"
+             "\t FDT: Bridge: LWH2F  : %d\n"
+             "\t FDT: Bridge: F2H    : %d\n"
+             "\t FDT: Bridge: F2SDR0 : %d\n"
+             "\t FDT: Bridge: F2SDR1 : %d\n"
+             "\t FDT: Bridge: F2SDR2 : %d\n",
+             Cfg->h2f.enable,
+             Cfg->lwh2f.enable,
+             Cfg->f2h.enable,
+             Cfg->f2sdr0.enable,
+             Cfg->f2sdr1.enable,
+             Cfg->f2sdr2.enable);
+
+}
 

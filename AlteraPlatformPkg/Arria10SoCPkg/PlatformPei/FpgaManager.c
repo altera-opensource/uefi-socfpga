@@ -660,9 +660,10 @@ FpgaFullConfiguration (
 VOID
 EFIAPI
 EnableHpsAndFpgaBridges (
-  VOID
+  IN  VOID*             Fdt
   )
 {
+  FPGA_BRIDGE_CONFIG Cfg;
   UINT32 NocMask;
   UINT32 AndMask;
   UINT32 Data32;
@@ -671,27 +672,42 @@ EnableHpsAndFpgaBridges (
 
   ProgressPrint ("Enable Hps And Fpga Bridges\r\n");
 
-  // Clear IDLE request to each NOC master.
+  // Get Device Tree Settings
+  GetFpgaBridgeCfg (Fdt, &Cfg);
+
   NocMask = 0;
-  NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_H2F_SET_MSK;
-  NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_LWH2F_SET_MSK;
-  NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_F2H_SET_MSK;
-  //TODO: Get from handoff in future
-  //NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_F2SDR0_SET_MSK;
-  //NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_F2SDR1_SET_MSK;
-  //NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_F2SDR2_SET_MSK;
+  AndMask = 0xFFFFFFFF;
+  if (Cfg.h2f.enable == 1) {
+    NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_H2F_SET_MSK;
+    AndMask &= ALT_RSTMGR_BRGMODRST_H2F_CLR_MSK;
+  }
+  if (Cfg.lwh2f.enable == 1) {
+    NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_LWH2F_SET_MSK;
+    AndMask &= ALT_RSTMGR_BRGMODRST_LWH2F_CLR_MSK;
+  }
+  if (Cfg.f2h.enable == 1) {
+    NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_F2H_SET_MSK;
+    AndMask &= ALT_RSTMGR_BRGMODRST_F2H_CLR_MSK;
+  }
+  if (Cfg.f2sdr0.enable == 1) {
+    NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_F2SDR0_SET_MSK;
+    AndMask &= ALT_RSTMGR_BRGMODRST_F2SSDRAM0_CLR_MSK;
+  }
+  if (Cfg.f2sdr1.enable == 1) {
+    NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_F2SDR1_SET_MSK;
+    AndMask &= ALT_RSTMGR_BRGMODRST_F2SSDRAM1_CLR_MSK;
+  }
+  if (Cfg.f2sdr2.enable == 1) {
+    NocMask |= ALT_SYSMGR_NOC_IDLEREQ_CLR_F2SDR2_SET_MSK;
+    AndMask &= ALT_RSTMGR_BRGMODRST_F2SSDRAM2_CLR_MSK;
+  }
+
+  // Clear IDLE request to each NOC master.
   MmioWrite32 (ALT_SYSMGR_OFST +
                ALT_SYSMGR_NOC_IDLEREQ_CLR_OFST,
                NocMask);
 
   // De-assert reset of Bridges
-  AndMask = 0xFFFFFFFF;
-  AndMask &= ALT_RSTMGR_BRGMODRST_H2F_CLR_MSK;
-  AndMask &= ALT_RSTMGR_BRGMODRST_LWH2F_CLR_MSK;
-  AndMask &= ALT_RSTMGR_BRGMODRST_F2H_CLR_MSK;
-  //AndMask &= ALT_RSTMGR_BRGMODRST_F2SSDRAM0_CLR_MSK;
-  //AndMask &= ALT_RSTMGR_BRGMODRST_F2SSDRAM1_CLR_MSK;
-  //AndMask &= ALT_RSTMGR_BRGMODRST_F2SSDRAM2_CLR_MSK;
   MmioAnd32 (ALT_RSTMGR_OFST +
              ALT_RSTMGR_BRGMODRST_OFST,
              AndMask);

@@ -167,4 +167,18 @@ PROPERTY_NAME FirewallCfgStr[] = {
   { "fpga2sdram2-3" },
   };
 
+// ------------------------------------------------------------------
+// FPGA Bridges
+// ------------------------------------------------------------------
+#define COMP_fpgabridge_h2f     "altr,socfpga-hps2fpga-bridge"
+#define COMP_fpgabridge_lwh2f   "altr,socfpga-lwhps2fpga-bridge"
+#define COMP_fpgabridge_f2h     "altr,socfpga-fpga2hps-bridge"
+#define COMP_fpgabridge_f2sdr0  "altr,socfpga-fpga2sdram0-bridge"
+#define COMP_fpgabridge_f2sdr1  "altr,socfpga-fpga2sdram1-bridge"
+#define COMP_fpgabridge_f2sdr2  "altr,socfpga-fpga2sdram2-bridge"
+
+PROPERTY_NAME FpgaBridgeCfgStr[] = {
+  { "init-val" }
+  };
+
 #endif

@@ -139,7 +139,7 @@ typedef struct {
   UINT32  base;
   UINT32  limit;
   UINT32  enable;
-} FIREWALL_PROP ;
+} FIREWALL_PROP;
 
 typedef struct {
   FIREWALL_PROP  mpu0;
@@ -167,5 +167,18 @@ typedef struct {
   FIREWALL_PROP  fpga2sdram2_2;
   FIREWALL_PROP  fpga2sdram2_3;
 } FIREWALL_CONFIG;
+
+typedef struct {
+  UINT32  enable;
+} FPGA_BRIDGE_PROP;
+
+typedef struct {
+  FPGA_BRIDGE_PROP  h2f;
+  FPGA_BRIDGE_PROP  lwh2f;
+  FPGA_BRIDGE_PROP  f2h;
+  FPGA_BRIDGE_PROP  f2sdr0;
+  FPGA_BRIDGE_PROP  f2sdr1;
+  FPGA_BRIDGE_PROP  f2sdr2;
+} FPGA_BRIDGE_CONFIG;
 
 #endif

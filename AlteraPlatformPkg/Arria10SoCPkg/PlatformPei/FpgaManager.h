@@ -125,7 +125,7 @@ FpgaFullConfiguration (
 VOID
 EFIAPI
 EnableHpsAndFpgaBridges (
-  VOID
+  IN  VOID*             Fdt
   );
 
 VOID

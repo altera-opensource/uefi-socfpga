@@ -217,7 +217,7 @@ PeiStagePlatformInit (
   // Enable Hps and Fpga Bridges
   if ( FpgaIsInUserMode() == TRUE )
   {
-    EnableHpsAndFpgaBridges();
+    EnableHpsAndFpgaBridges (Fdt);
   }
 
   //
