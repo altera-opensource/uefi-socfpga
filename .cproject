@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="com.arm.toolchain.baremetal.56105476">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.arm.toolchain.baremetal.56105476" moduleId="org.eclipse.cdt.core.settings" name="Default">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arm.eclipse.builder.armcc.error" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="uefi-socfpga" buildProperties="" description="Bootloader" id="com.arm.toolchain.baremetal.56105476" name="Default" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="com.arm.toolchain.baremetal.56105476.1467227855" name="/" resourcePath="">
+						<toolChain id="com.arm.toolchain.baremetal.2115789140" name="com.arm.toolchain.baremetal" superClass="com.arm.toolchain.baremetal">
+							<targetPlatform id="com.arm.toolchain.baremetal.56105476.1821301956" name=""/>
+							<builder command="makeboot.bat" id="com.arm.toolchain.baremetal.builder.1165948544" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="com.arm.toolchain.baremetal.builder"/>
+							<tool id="com.arm.tool.c.compiler.880629935" name="ARM C Compiler 5" superClass="com.arm.tool.c.compiler">
+								<inputType id="com.arm.tool.c.compiler.input.1657917016" superClass="com.arm.tool.c.compiler.input"/>
+								<inputType id="com.arm.tool.cpp.compiler.input.1892468355" superClass="com.arm.tool.cpp.compiler.input"/>
+							</tool>
+							<tool id="com.arm.tool.cpp.compiler.1408641183" name="ARM C++ Compiler 5" superClass="com.arm.tool.cpp.compiler"/>
+							<tool id="com.arm.tool.assembler.652079478" name="ARM Assembler 5" superClass="com.arm.tool.assembler"/>
+							<tool id="com.arm.tool.c.linker.635593507" name="ARM Linker 5" superClass="com.arm.tool.c.linker"/>
+							<tool id="com.arm.tool.librarian.75946777" name="ARM Librarian 5" superClass="com.arm.tool.librarian"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="com.arm.toolchain.baremetal.56105476.1024340608">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.arm.toolchain.baremetal.56105476.1024340608" moduleId="org.eclipse.cdt.core.settings" name="UEFI App">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="com.arm.eclipse.builder.armcc.error" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="uefi-socfpga" buildProperties="" description="Uefi Application" id="com.arm.toolchain.baremetal.56105476.1024340608" name="UEFI App" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="com.arm.toolchain.baremetal.56105476.1024340608." name="/" resourcePath="">
+						<toolChain id="com.arm.toolchain.baremetal.1999150854" name="com.arm.toolchain.baremetal" superClass="com.arm.toolchain.baremetal">
+							<targetPlatform id="com.arm.toolchain.baremetal.1999150854.1903967007" name=""/>
+							<builder arguments="" command="makeapp.bat" id="com.arm.toolchain.baremetal.builder.336097792" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="com.arm.toolchain.baremetal.builder"/>
+							<tool id="com.arm.tool.c.compiler.1352738538" name="ARM C Compiler 5" superClass="com.arm.tool.c.compiler">
+								<inputType id="com.arm.tool.c.compiler.input.1224294934" superClass="com.arm.tool.c.compiler.input"/>
+								<inputType id="com.arm.tool.cpp.compiler.input.2145805098" superClass="com.arm.tool.cpp.compiler.input"/>
+							</tool>
+							<tool id="com.arm.tool.cpp.compiler.1997956733" name="ARM C++ Compiler 5" superClass="com.arm.tool.cpp.compiler"/>
+							<tool id="com.arm.tool.assembler.2091718856" name="ARM Assembler 5" superClass="com.arm.tool.assembler"/>
+							<tool id="com.arm.tool.c.linker.365276219" name="ARM Linker 5" superClass="com.arm.tool.c.linker"/>
+							<tool id="com.arm.tool.librarian.614686961" name="ARM Librarian 5" superClass="com.arm.tool.librarian"/>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="uefi-socfpga.null.601583018" name="uefi-socfpga"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/uefi-socfpga"/>
+		</configuration>
+		<configuration configurationName="App">
+			<resource resourceType="PROJECT" workspacePath="/uefi-socfpga"/>
+		</configuration>
+		<configuration configurationName="UEFI App"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cproject>
