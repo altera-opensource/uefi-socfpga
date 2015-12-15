@@ -99,7 +99,7 @@ export EDK2_ARCH=ARM
 export EDK2_BUILD=RELEASE
 
 # Additional build macros
-export EDK2_MACROS= -y report.log
+export EDK2_MACROS= -y report.log -j build.log -Y PCD -Y LIBRARY -Y FLASH -Y DEPEX -Y BUILD_FLAGS -Y FIXED_ADDRESS
 
 # DTB path as defined in .FDF
 # (do no change, it must match the on in .FDF file)
