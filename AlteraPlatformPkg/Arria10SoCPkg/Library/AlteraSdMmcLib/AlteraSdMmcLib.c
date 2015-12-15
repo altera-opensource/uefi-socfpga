@@ -243,15 +243,18 @@ EnablePowerToTheCard(
 
   if (PcdGet32 (PcdIsAlteraSoCFPGADevelopmentBoards != 0))
   {
-    // A10 Dev Kit Board Workaround
-    MmioAndThenOr32 (
-      ALT_SDMMC_OFST +
-      ALT_SDMMC_PWREN_OFST,
-      ALT_SDMMC_PWREN_POWER_EN_CLR_MSK,
-      ALT_SDMMC_PWREN_POWER_EN_SET(ALT_SDMMC_PWREN_POWER_EN_E_OFF)
-      );
-    if (PcdGet32 (PcdDebugMsg_SdMmc) != 0)
-      SerialPortPrint ("\tSDMMC: %a ()  A10 Dev Kit Board Workaround.\r\n", __FUNCTION__);
+    if (MmioRead32 (ALT_SYSMGR_OFST + ALT_SYSMGR_SILICONID1_OFST) == ALT_SYSMGR_SILICONID1_ES1)
+    {
+      // A10 Dev Kit Rev A Board Workaround
+      MmioAndThenOr32 (
+        ALT_SDMMC_OFST +
+        ALT_SDMMC_PWREN_OFST,
+        ALT_SDMMC_PWREN_POWER_EN_CLR_MSK,
+        ALT_SDMMC_PWREN_POWER_EN_SET(ALT_SDMMC_PWREN_POWER_EN_E_OFF)
+        );
+      if (PcdGet32 (PcdDebugMsg_SdMmc) != 0)
+        SerialPortPrint ("\tSDMMC: %a ()  A10 Dev Kit Rev A Board Workaround.\r\n", __FUNCTION__);
+    }
   }
   // Time to wait for the power ramp-up to the card
   // The exact power ramp-up is card vendor specific
