@@ -53,6 +53,19 @@
 
 #define DDR_READ_LATENCY_DELAY 40
 
+/// Definition for HMC and EMIF related register bit
+#define ALT_FPGAMGR_GPO_31_HPS2EMIF_RST_OVR_ACT_LOW      BIT31
+#define ALT_FPGAMGR_GPO_30_HPS2OCT_OCT_CAL_REQ_ACT_HIGH  BIT30
+#define ALT_FPGAMGR_GPI_31_OCT2HPS_OCT_CAL_RDY_ACT_HIGH  BIT31
+#define ALT_RSTMGR_HMCGPI_7_SEQ2CORE_OCT_REQ_ACT_HIGH    BIT7
+#define ALT_RSTMGR_HMCGPO_7_CORE2SEQ_OCT_RDY_ACT_HIGH    BIT7
+#define ALT_RSTMGR_HMCGPI_F_SEQ2CORE_MASK                0x0F
+#define ALT_RSTMGR_HMCGPO_F_CORE2SEQ_INT_REQ             0x0F
+#define ALT_RSTMGR_HMCGPI_3_SEQ2CORE_INT_RESP_BIT        BIT3
+#define CLEAR_EMIF_DELAY                                 50000
+#define CLEAR_EMIF_TIMEOUT                               0x100000
+#define TIMEOUT_INT_RESP                                 10000
+
 //
 // Functions
 //
@@ -92,6 +105,33 @@ InitHardMemoryController (
 
 EFI_STATUS
 EFIAPI
+ClearEMIF (
+  VOID
+  )
+{
+  UINT32          Data32;
+  UINTN           TimeOutCount;
+  // Request HMC to Clear EMIF
+  MmioWrite32 (ALT_RSTMGR_OFST +
+               ALT_RSTMGR_HMCGPOUT_OFST,
+               ALT_RSTMGR_HMCGPOUT_RESET);
+  // Wait for Clear EMIF done.
+  TimeOutCount = 0;
+  do {
+    Data32 = MmioRead32 (ALT_RSTMGR_OFST + ALT_RSTMGR_HMCGPIN_OFST);
+    if ((Data32 & ALT_RSTMGR_HMCGPI_F_SEQ2CORE_MASK) == 0)
+      break;
+    MicroSecondDelay (CLEAR_EMIF_DELAY);
+  } while (++TimeOutCount < CLEAR_EMIF_TIMEOUT);
+  if (TimeOutCount >= CLEAR_EMIF_TIMEOUT) {
+    return EFI_TIMEOUT;
+  }
+  return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+EFIAPI
 MemoryCalibration (
   VOID
   )
@@ -120,18 +160,12 @@ MemoryCalibration (
     }
 
     //
-    // Silicon Specific Initialization Sequence
+    // ES1 Silicon Specific Initialization Sequence
     //
     Data32 = MmioRead32 (ALT_SYSMGR_OFST + ALT_SYSMGR_SILICONID1_OFST);
-    #define ALT_SYSMGR_SILICONID1_BRING_UP       0x00010001
-    if (Data32 == ALT_SYSMGR_SILICONID1_BRING_UP)
+    if (Data32 == ALT_SYSMGR_SILICONID1_ES1)
     {
       // case:248063 HPS/EMIF OCT Handshake
-      #define ALT_FPGAMGR_GPO_31_HPS2EMIF_RST_OVR_ACT_LOW      BIT31
-      #define ALT_FPGAMGR_GPO_30_HPS2OCT_OCT_CAL_REQ_ACT_HIGH  BIT30
-      #define ALT_FPGAMGR_GPI_31_OCT2HPS_OCT_CAL_RDY_ACT_HIGH  BIT31
-      #define ALT_RSTMGR_HMCGPI_7_SEQ2CORE_OCT_REQ_ACT_HIGH    BIT7
-      #define ALT_RSTMGR_HMCGPO_7_CORE2SEQ_OCT_RDY_ACT_HIGH    BIT7
       #define RESET_DELAY_OCT                                  5000
       #define RESET_DELAY_EMIF                                 10000
       #define TIMEOUT_OCT                                      10000
@@ -285,11 +319,47 @@ MemoryCalibration (
       // skip the current loop and start from the top again.
       continue;
     }
+    ProgressPrint ("\t\t DRAM calibration successful.\r\n");
+    ProgressPrint ("\t\t Calibration wait time = ~%d us\r\n", TimeOutCount);
+
+    //
+    // ES2 & Production Silicon Specific Initialization Sequence
+    //
+    Data32 = MmioRead32 (ALT_SYSMGR_OFST + ALT_SYSMGR_SILICONID1_OFST);
+    if (Data32 != ALT_SYSMGR_SILICONID1_ES1)
+    {
+      // Step 1 - if SEQ2CORE (HMCGPI) register not already zero then Clear EMIF
+      Data32 = MmioRead32 (ALT_RSTMGR_OFST + ALT_RSTMGR_HMCGPIN_OFST);
+      if ((Data32 & ALT_RSTMGR_HMCGPI_F_SEQ2CORE_MASK) &&
+           EFI_ERROR(ClearEMIF())) {
+        ProgressPrint ("\t\t Timeout during Clear EMIF #1\r\n");
+      }
+
+      // Step 2 -  Send EMIF interrupt request
+      MmioWrite32 (ALT_RSTMGR_OFST +
+                   ALT_RSTMGR_HMCGPOUT_OFST,
+                   ALT_RSTMGR_HMCGPO_F_CORE2SEQ_INT_REQ);
+
+      // Step 3 -  Wait for Interrupt Response Bits = 0
+      TimeOutCount = 0;
+      do {
+        Data32 = MmioRead32 (ALT_RSTMGR_OFST + ALT_RSTMGR_HMCGPIN_OFST);
+        if ((Data32 & ALT_RSTMGR_HMCGPI_3_SEQ2CORE_INT_RESP_BIT) == 0)
+          break;
+        MicroSecondDelay (1);
+      } while (++TimeOutCount < TIMEOUT_INT_RESP);
+      if (TimeOutCount >= TIMEOUT_INT_RESP) {
+        InfoPrint ("\t\t Timeout EMIF INT_RESP\r\n");
+      }
+
+      // Step 4 - Clear EMIF
+      if (EFI_ERROR(ClearEMIF())) {
+        ProgressPrint ("\t\t Timeout during Clear EMIF #2\r\n");
+      }
+    }
 
     // If it reach here, calibration has success.
     Status = EFI_SUCCESS;
-    ProgressPrint ("\t\t DRAM calibration successful.\r\n");
-    ProgressPrint ("\t\t Calibration wait time = ~%d us\r\n", TimeOutCount);
     // Stop the while loop, because we have success.
     break;
 
@@ -1030,7 +1100,7 @@ DisplayMemoryInfo (
                     ALT_IO48_HMC_MMR_NIOSRESERVE1_ACDS_VARIANT_GET(Data32));
         break;
     }
-	InfoPrint ("\r\n");
+    InfoPrint ("\r\n");
   } else {
     InfoPrint ("N/A\r\n");
   }
