@@ -52,7 +52,7 @@
   PLATFORM_NAME                  = Altera(R) Arria(R) 10 SoC Development Board
   PLATFORM_GUID                  = A2D10D02-7C36-4de8-831B-EFBFC2092D1B
   PLATFORM_VERSION               = 0.1
-  FIRMWARE_VERSION               = 1.0 Beta
+  FIRMWARE_VERSION               = 1.0
   DSC_SPECIFICATION              = 0x00010005
   SUPPORTED_ARCHITECTURES        = ARM
   BUILD_TARGETS                  = DEBUG|RELEASE
@@ -151,6 +151,7 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdDebugMsg_Rbf|1
   gAlteraSocFpgaTokenSpaceGuid.PcdDebugMsg_Nand|1
   gAlteraSocFpgaTokenSpaceGuid.PcdDebugMsg_Qspi|1
+  gAlteraSocFpgaTokenSpaceGuid.PcdDebugMsg_EmacSnpDxe|1
 
   #
   # Platform Init Assertion
@@ -208,6 +209,13 @@
   gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_Base|0xFFD00100
   gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_ClkFreqInHz|100000000
   gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_InterruptNum|150
+
+  ##------------------------------------------------------------------------------
+  ## Pcd Settings - HPS EMAC
+  ##------------------------------------------------------------------------------
+  #  EMAC Default Source Mac Address
+  gAlteraSocFpgaTokenSpaceGuid.PcdDefaultMacAddress|0x021122334455
+  gAlteraSocFpgaTokenSpaceGuid.PcdDefaultMacInterface|0
 
   #-------------------------------
   # gArmPlatformTokenSpaceGuid
@@ -793,18 +801,25 @@
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   AlteraPlatformPkg/Arria10SoCPkg/Drivers/AlteraSdMmcDxe/AlteraSdMmcDxe.inf
 
-  # Networking stack
-  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
+  #
+  # Platform Specific Networking stack
+  #
+  AlteraPlatformPkg/Arria10SoCPkg/Drivers/AlteraSnpDxe/AlteraSnpDxe.inf
+
+  #
+  # Universal Networking stack
+  #
   MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
   MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
+  MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
   MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
+  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
   MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
-  MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
   MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
   MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
   MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
-  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+  MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
 
   # ISP1761 USB OTG Controller
   #EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf

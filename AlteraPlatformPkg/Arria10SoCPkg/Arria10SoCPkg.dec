@@ -92,6 +92,7 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdDebugMsg_Rbf|1|UINT32|0xFEDC000d
   gAlteraSocFpgaTokenSpaceGuid.PcdDebugMsg_Nand|1|UINT32|0xFEDC000e
   gAlteraSocFpgaTokenSpaceGuid.PcdDebugMsg_Qspi|1|UINT32|0xFEDC000f
+  gAlteraSocFpgaTokenSpaceGuid.PcdDebugMsg_EmacSnpDxe|1|UINT32|0xFEDC0010
 
   ## Maximum FAT32 Partition Volumn cluster size:
   # Valid value are:
@@ -208,4 +209,9 @@
   # Pit Stop Utility
   gAlteraSocFpgaTokenSpaceGuid.PcdEnablePitStopUtility|0|UINT32|0xFEDC0401
 
+  ## HPS EMac Default Source Mac Address
+  gAlteraSocFpgaTokenSpaceGuid.PcdDefaultMacAddress|0x021122334455|UINT64|0xFEDC0402
+
+  ## HPS EMac Interface
+  gAlteraSocFpgaTokenSpaceGuid.PcdDefaultMacInterface|0|UINT32|0xFEDC0403
 

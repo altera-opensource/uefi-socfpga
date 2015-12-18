@@ -121,10 +121,10 @@ FV = FV_DXE_COMPRESSED
 
 [FD.FD_DXE_BEFORE_COMPRESSION]
 BaseAddress   = 0x01000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
-Size          = 0x00160000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes
+Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes
 ErasePolarity = 1
 BlockSize     = 0x00000001
-NumBlocks     = 0x00160000
+NumBlocks     = 0x00200000
 
 ################################################################################
 #
@@ -141,7 +141,7 @@ NumBlocks     = 0x00160000
 #
 ################################################################################
 
-0x00000000|0x00160000
+0x00000000|0x00200000
 FV = FV_DXE_BEFORE_COMPRESSION
 
 ################################################################################
@@ -253,7 +253,6 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
   INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-#hwphang  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   INF MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
@@ -306,26 +305,29 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
   # INF AlteraPlatformPkg/Arria10SoCPkg/ArmVExpressFastBootDxe/ArmVExpressFastBootDxe.inf
 
   #
-  # Networking stack
+  # Platform Specific Networking stack
   #
-  #INF MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
-  #INF MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
-  #INF MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
-  #INF MdeModulePkg/Universal/Network/Ip4ConfigDxe/Ip4ConfigDxe.inf
-  #INF MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
-  #INF MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
-  #INF MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
-  #INF MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
-  #INF MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
-  #INF MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
-  #INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
-  #INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-  #INF EmbeddedPkg/Drivers/Lan9118Dxe/Lan9118Dxe.inf
+  INF AlteraPlatformPkg/Arria10SoCPkg/Drivers/AlteraSnpDxe/AlteraSnpDxe.inf
+
+  #
+  # Universal Networking stack
+  #
+  INF MdeModulePkg/Universal/Network/ArpDxe/ArpDxe.inf
+  INF MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
+  INF MdeModulePkg/Universal/Network/DpcDxe/DpcDxe.inf
+  INF MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
+  INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+  INF MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
+  INF MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
+  INF MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
+  INF MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+  INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
+  INF MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
 
   #
   # UEFI application (Shell Embedded Boot Loader)
   #
-  INF ShellBinPkg/UefiShell/UefiShell.inf
+  INF AlteraPlatformPkg/ShellBinPkg/UefiShell.inf
 
   #
   # Bds
@@ -335,7 +337,7 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
 
   # FV Filesystem
   INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
-  
+
   # Legacy Linux Loader
   INF ArmPkg/Application/LinuxLoader/LinuxLoader.inf
 
