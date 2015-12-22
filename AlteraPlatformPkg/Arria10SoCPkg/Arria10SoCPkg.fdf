@@ -305,6 +305,11 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
   # INF AlteraPlatformPkg/Arria10SoCPkg/ArmVExpressFastBootDxe/ArmVExpressFastBootDxe.inf
 
   #
+  # Platform Specific Init for DXE phase
+  #
+  INF AlteraPlatformPkg/Arria10SoCPkg/Drivers/AlteraPlatformDxe/AlteraPlatformDxe.inf
+
+  #
   # Platform Specific Networking stack
   #
   INF AlteraPlatformPkg/Arria10SoCPkg/Drivers/AlteraSnpDxe/AlteraSnpDxe.inf

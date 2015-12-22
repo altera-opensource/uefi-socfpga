@@ -796,6 +796,11 @@
   AlteraPlatformPkg/Arria10SoCPkg/Drivers/AlteraSdMmcDxe/AlteraSdMmcDxe.inf
 
   #
+  # Platform Specific Init for DXE phase
+  #
+  AlteraPlatformPkg/Arria10SoCPkg/Drivers/AlteraPlatformDxe/AlteraPlatformDxe.inf
+
+  #
   # Platform Specific Networking stack
   #
   AlteraPlatformPkg/Arria10SoCPkg/Drivers/AlteraSnpDxe/AlteraSnpDxe.inf
