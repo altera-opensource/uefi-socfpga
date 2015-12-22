@@ -63,6 +63,7 @@
   UefiDriverEntryPoint
 
 [FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription
   gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath
   gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument
 

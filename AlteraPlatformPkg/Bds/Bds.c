@@ -562,6 +562,12 @@ BdsEntry (
   Status = gBS->CalculateCrc32 ((VOID*)gST, gST->Hdr.HeaderSize, &gST->Hdr.CRC32);
   ASSERT_EFI_ERROR (Status);
 
+  // Need to connect every drivers to ensure no dependencies are missing when running UEFI application
+  Status = BdsConnectAllDrivers ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_ERROR, "FAIL to connect all drivers\n"));
+  }
+
   // Timer before initiating the default boot selection
   StartDefaultBootOnTimeout ();
 

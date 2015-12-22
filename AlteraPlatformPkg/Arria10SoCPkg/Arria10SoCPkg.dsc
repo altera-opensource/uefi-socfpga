@@ -387,7 +387,7 @@
   #gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"ConOutSetupVar"|gArmGlobalVariableGuid|0x0|132
   #gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"ConOutSetupVar"|gArmGlobalVariableGuid|0x4|43
 
-  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|10
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|5
 
   # RunAxf support via Dynamic Shell Command protocol
   # We want to use the Shell Libraries but don't want it to initialise
@@ -410,12 +410,9 @@
   ##----------------------------------------
   ## UEFI Boot Menu Default Selections
   ##----------------------------------------
-  #gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"zImage on SD card"
-  #gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"VenHw(7777515A-04D8-49E8-8426-EE80938DA484)/HD(1,MBR,0x000E779B,0x206000,0x199998)/zImage"
-  #        gArmPlatformTokenSpaceGuid.PcdFdtDevicePath|L"VenHw(7777515A-04D8-49E8-8426-EE80938DA484)/HD(1,MBR,0x000E779B,0x206000,0x199998)/socfpga.dtb"
-  #gArmPlatformTokenSpaceGuid.PcdDefaultBootInitrdPath|L""
-  #gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|"console=ttyS0,115200 root=/dev/mmcblk0p2 rw rootwait"
-  #gArmPlatformTokenSpaceGuid.PcdDefaultBootType|2
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDescription|L"Default: Shell"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootDevicePath|L"Fv(5EDA4200-2C5F-43CB-9DA3-0BAF74B1B30C)/Shell.efi"
+  gArmPlatformTokenSpaceGuid.PcdDefaultBootArgument|L"-delay 0"
 
   #FDT address should be above the kernel.
   gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x10000
