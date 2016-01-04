@@ -94,10 +94,10 @@ FILE = AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkg.dtb
 
 [FD.ALTERA_HPS_DRAM_EFI_PART2]
 BaseAddress   = 0x01000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
-Size          = 0x00080000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes
+Size          = 0x00100000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes
 ErasePolarity = 1
 BlockSize     = 0x00000001
-NumBlocks     = 0x00080000
+NumBlocks     = 0x00100000
 
 ################################################################################
 #
@@ -114,17 +114,17 @@ NumBlocks     = 0x00080000
 #
 ################################################################################
 
-0x00000000|0x00080000
+0x00000000|0x00100000
 gAlteraHpsTokenSpaceGuid.PcdFvDxeBaseAddress|gAlteraHpsTokenSpaceGuid.PcdDxeFvSize
 FV = FV_DXE_COMPRESSED
 
 
 [FD.FD_DXE_BEFORE_COMPRESSION]
 BaseAddress   = 0x01000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
-Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes
+Size          = 0x00400000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes
 ErasePolarity = 1
 BlockSize     = 0x00000001
-NumBlocks     = 0x00200000
+NumBlocks     = 0x00400000
 
 ################################################################################
 #
@@ -141,7 +141,7 @@ NumBlocks     = 0x00200000
 #
 ################################################################################
 
-0x00000000|0x00200000
+0x00000000|0x00400000
 FV = FV_DXE_BEFORE_COMPRESSION
 
 ################################################################################
@@ -340,6 +340,13 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
 
   # Legacy Linux Loader
   INF ArmPkg/Application/LinuxLoader/LinuxLoader.inf
+
+  # Include UEFI Shell Start Up Script
+  FILE FREEFORM = AF3F9E26-DDB5-4e85-B4D7-AC60A2772BC2 {
+    SECTION RAW = AlteraPlatformPkg/ShellScript/startup.nsh
+    SECTION UI = "startup.nsh"
+  }
+
 
 ################################################################################
 #

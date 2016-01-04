@@ -178,7 +178,7 @@
 
   ## QSPI/NAND Flash Offset
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_PEIROM_ADDR |0x00000000
-  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_DXEROM_ADDR |0x00680000
+  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_DXEROM_ADDR |0x00620000
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_DTB_ADDR     |0x00100000
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_ADDR         |0x00120000
 
