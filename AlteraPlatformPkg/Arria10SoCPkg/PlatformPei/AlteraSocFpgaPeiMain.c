@@ -33,6 +33,7 @@
 
 #include <Guid/ArmGlobalVariableHob.h>
 #include <Guid/LzmaDecompress.h>
+#include <Guid/MemoryTypeInformation.h>
 
 #include <AlteraPlatform.h>
 #include <PiPei.h>
@@ -59,6 +60,7 @@
 #include "Boot.h"
 #include "LzmaDecompress.h"
 #include "MemoryController.h"
+#include "Mmu.h"
 #include "PlatformInit.h"
 #include "ResetManager.h"
 #include "SdMmc.h"
@@ -69,6 +71,7 @@
 { \
   0xD6A2CB7F, 0x6A18, 0x4e2f, {0xB4, 0x3B, 0x99, 0x20, 0xa7, 0x33, 0x70, 0x0a} \
 }
+
 
 typedef
 VOID
@@ -352,11 +355,45 @@ BuildGlobalVariableHob (
   ARM_HOB_GLOBAL_VARIABLE  *Hob;
 
   Hob = CreateHob (EFI_HOB_TYPE_GUID_EXTENSION, sizeof (ARM_HOB_GLOBAL_VARIABLE));
-  ASSERT(Hob != NULL);
+  ASSERT_PLATFORM_INIT(Hob != NULL);
 
   CopyGuid (&(Hob->Header.Name), &gArmGlobalVariableGuid);
   Hob->GlobalVariableBase = GlobalVariableBase;
   Hob->GlobalVariableSize = GlobalVariableSize;
+}
+
+
+VOID
+BuildMemoryTypeInfoHob (
+  VOID
+  )
+{
+  EFI_MEMORY_TYPE_INFORMATION   Info[10];
+
+  Info[0].Type          = EfiACPIReclaimMemory;
+  Info[0].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiACPIReclaimMemory);
+  Info[1].Type          = EfiACPIMemoryNVS;
+  Info[1].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiACPIMemoryNVS);
+  Info[2].Type          = EfiReservedMemoryType;
+  Info[2].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiReservedMemoryType);
+  Info[3].Type          = EfiRuntimeServicesData;
+  Info[3].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiRuntimeServicesData);
+  Info[4].Type          = EfiRuntimeServicesCode;
+  Info[4].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiRuntimeServicesCode);
+  Info[5].Type          = EfiBootServicesCode;
+  Info[5].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiBootServicesCode);
+  Info[6].Type          = EfiBootServicesData;
+  Info[6].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiBootServicesData);
+  Info[7].Type          = EfiLoaderCode;
+  Info[7].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiLoaderCode);
+  Info[8].Type          = EfiLoaderData;
+  Info[8].NumberOfPages = PcdGet32 (PcdMemoryTypeEfiLoaderData);
+
+  // Terminator for the list
+  Info[9].Type          = EfiMaxMemoryType;
+  Info[9].NumberOfPages = 0;
+
+  BuildGuidDataHob (&gEfiMemoryTypeInformationGuid, &Info, sizeof (Info));
 }
 
 
@@ -385,14 +422,9 @@ BuildSystemMemoryHOBs (
       DramMemoryBase,
       DramMemorySize
   );
-  // Now, the permanent memory has been installed, we can call AllocatePages()
 
-  // That's it, we are done building system memory Hobs
-  // We do not want to enable MMU in boot loader phase or for DXE phase
-  // If you want to enable MMU in UEFI phase, you will have to build a
-  // Virtual Memory Map to initialize the MMU on your platform.
-  // You can use the code in ArmPlatformPkg by MemoryInitPei Module
-  // as a reference starting point and insider it here
+  // Build MemoryTypeInformationHob to prevent UEFI memory map fragmentation.
+  BuildMemoryTypeInfoHob ();
 
   return EFI_SUCCESS;
 }
@@ -404,8 +436,9 @@ BootUnCompressedDxeFv (
   VOID
   )
 {
-  UINT32                DxeFileSize;
-  UINTN                 DxeFvBase;
+  UINT32                       DxeFileSize;
+  UINTN                        DxeFvBase;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttributes;
 
   // Load DXE FV to DRAM
   DxeFvBase = (UINTN)PcdGet64(PcdFdBaseAddress); // Defined in .FDF file
@@ -416,8 +449,25 @@ BootUnCompressedDxeFv (
   // Put DXE FV base and size information into Hob
   BuildFvHob (DxeFvBase, DxeFileSize);
 
+  // Reserved the memory space occupied by the firmware volume
+  // Mark the chunk of DRAM contains the DXE FV with non-present attribute
+  ResourceAttributes = (
+      EFI_RESOURCE_ATTRIBUTE_PRESENT |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_TESTED
+  );
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_SYSTEM_MEMORY,
+    ResourceAttributes & ~EFI_RESOURCE_ATTRIBUTE_PRESENT,
+    DxeFvBase,
+    DxeFileSize);
+
   // Find and load main entry point of the DXE Core
-  EnterDxeCoreEntryPoint (DxeFvBase);
+  EnterDxeCoreEntryPoint (DxeFvBase, DxeFileSize);
 
 }
 
@@ -428,17 +478,18 @@ BootCompressedDxeFv (
   VOID
   )
 {
-  EFI_STATUS                  Status;
-  UINT32                      DxeFileSize;
-  UINTN                       DxeDecompressedFvBase;
-  UINTN                       DxeCompressedFvBase;
-  EFI_COMMON_SECTION_HEADER*  Section;
-  VOID*                       OutputBuffer;
-  UINT32                      OutputBufferSize;
-  VOID*                       ScratchBuffer;
-  UINT32                      ScratchBufferSize;
-  UINT16                      SectionAttribute;
-  UINT32                      AuthenticationStatus;
+  EFI_STATUS                   Status;
+  UINT32                       DxeFileSize;
+  UINTN                        DxeDecompressedFvBase;
+  UINTN                        DxeCompressedFvBase;
+  EFI_COMMON_SECTION_HEADER*   Section;
+  VOID*                        OutputBuffer;
+  UINT32                       OutputBufferSize;
+  VOID*                        ScratchBuffer;
+  UINT32                       ScratchBufferSize;
+  UINT16                       SectionAttribute;
+  UINT32                       AuthenticationStatus;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttributes;
 
   // Load Compress DXE FV to DRAM
   // PcdFdBaseAddress is defined in .FDF file
@@ -466,8 +517,34 @@ BootCompressedDxeFv (
   // Put decompressed DXE FV base and size information into Hob
   BuildFvHob (DxeDecompressedFvBase, OutputBufferSize);
 
+  // Reserved the memory space occupied by the firmware volume
+  // Mark the chunk of DRAM contains the DXE FV with non-present attribute
+  ResourceAttributes = (
+      EFI_RESOURCE_ATTRIBUTE_PRESENT |
+      EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+      EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
+      EFI_RESOURCE_ATTRIBUTE_TESTED
+  );
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_SYSTEM_MEMORY,
+    ResourceAttributes & ~EFI_RESOURCE_ATTRIBUTE_PRESENT,
+    DxeDecompressedFvBase,
+    OutputBufferSize);
+
+  SerialPortPrint (
+    "DXE FV compressed   = 0x%08Lx - 0x%08Lx\n"
+    "DXE FV decompressed = 0x%08Lx - 0x%08Lx\n",
+    (UINT64) DxeCompressedFvBase,
+    (UINT64) DxeCompressedFvBase + DxeFileSize - 1,
+    (UINT64) DxeDecompressedFvBase,
+    (UINT64) DxeDecompressedFvBase + OutputBufferSize - 1
+    );
+
   // Find and load main entry point of the DXE Core
-  EnterDxeCoreEntryPoint (DxeDecompressedFvBase);
+  EnterDxeCoreEntryPoint (DxeDecompressedFvBase, OutputBufferSize);
 
 }
 
@@ -475,7 +552,8 @@ BootCompressedDxeFv (
 VOID
 EFIAPI
 EnterDxeCoreEntryPoint (
-  IN UINTN                    DxeFvBase
+  IN UINTN                    DxeFvBase,
+  IN UINTN                    DxeFvSize
   )
 {
   EFI_PHYSICAL_ADDRESS              DxeCoreAddress;
@@ -487,6 +565,9 @@ EnterDxeCoreEntryPoint (
   EFI_FFS_FILE_HEADER              *FfsFileHeader;
   EFI_COMMON_SECTION_HEADER        *Section;
   UINT32                            FileSize;
+  VOID                             *BaseOfStack;
+  VOID                             *TopOfStack;
+  EFI_HOB_HANDOFF_INFO_TABLE       *Hob;
 
   //
   // Find the DXE Entry point
@@ -537,7 +618,6 @@ EnterDxeCoreEntryPoint (
   {
     // Found "MZ" and "PE" signature, prepare to boot DXE phase
     DxeCoreEntryPoint = (*((UINT32*)(PECoffBase + 0x80 + 0x34)) + *((UINT32*)(PECoffBase + 0x80 + 0x28)));
-    SerialPortPrint ("DXE Core entry at 0x%08Lx\n", DxeCoreEntryPoint);
 
     // Add HOB for the DXE Core
     BuildModuleHob (
@@ -547,8 +627,45 @@ EnterDxeCoreEntryPoint (
       DxeCoreEntryPoint
       );
 
-    // Load the DXE Core and transfer control to it
-    ((DXE_CORE_ENTRY_POINT)(UINTN)DxeCoreEntryPoint) (PrePeiGetHobList());
+    // Allocate 128KB of Stack for DXE phase
+    #define STACK_SIZE 0x20000
+
+    // Compute the top of the stack we were allocated.
+    BaseOfStack = (VOID*)(UINTN)(DxeFvBase + ALIGN_VALUE (DxeFvSize, EFI_PAGE_SIZE));
+    TopOfStack = (VOID *) ((UINTN) BaseOfStack + EFI_SIZE_TO_PAGES (STACK_SIZE) * EFI_PAGE_SIZE - CPU_STACK_ALIGNMENT);
+    TopOfStack = ALIGN_POINTER (TopOfStack, CPU_STACK_ALIGNMENT);
+
+    // Update stack HOB to reflect the real stack info passed to DxeCore.
+    UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, STACK_SIZE);
+
+    SerialPortPrint (
+      "DXE Stack           = 0x%08Lx - 0x%08Lx\n",
+      (UINT64)(UINTN)BaseOfStack,
+      (UINT64)(UINTN)TopOfStack + 7
+      );
+
+    // Enable the MMU because the UEFI DXE phase's ArmPkg\Drivers\CpuDxe
+    // required MMU to be enabled and filed with section translations
+    InitMmu ();
+
+    // Update PHIT HOB to reflect the DRAM memory range instead of OCRAM
+    Hob = GetHobList ();
+    Hob->EfiMemoryTop        = (UINTN)GetMpuWindowDramBaseAddr() + GetMpuWindowDramSize();
+    Hob->EfiMemoryBottom     = (UINTN)GetMpuWindowDramBaseAddr();
+    Hob->EfiFreeMemoryTop    = Hob->EfiMemoryTop;
+    Hob->EfiFreeMemoryBottom = Hob->EfiMemoryBottom;
+
+    // Jump to DxeCoreEntryPoint after switch Stack pointer from OCRAM to DRAM
+    SerialPortPrint ("DXE Core entry at 0x%08Lx\n", DxeCoreEntryPoint);
+    SwitchStack (
+      (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
+      PrePeiGetHobList(),
+      NULL,
+      TopOfStack
+      );
+    // Function will not / should not return here
+    // Note: If for some reason not going to use SwitchStack, then use jump only as follow:
+    //       ((DXE_CORE_ENTRY_POINT)(UINTN)DxeCoreEntryPoint) (PrePeiGetHobList());
 
   }
 

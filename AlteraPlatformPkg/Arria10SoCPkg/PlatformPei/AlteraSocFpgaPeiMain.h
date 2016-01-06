@@ -98,7 +98,8 @@ BootCompressedDxeFv (
 VOID
 EFIAPI
 EnterDxeCoreEntryPoint (
-  IN UINTN                    DxeFvBase
+  IN UINTN                    DxeFvBase,
+  IN UINTN                    DxeFvSize
   );
 
 // List of Library Constructor in use

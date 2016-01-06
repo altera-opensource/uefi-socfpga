@@ -47,6 +47,7 @@
 #include "AlteraSnpDxe.h"
 #include "EmacDxeUtil.h"
 #include "PhyDxeUtil.h"
+#include <Library/UncachedMemoryAllocationLib.h>
 
 #include <Library/SerialPortPrintLib.h>
 #if (FixedPcdGet32(PcdDebugMsg_EmacSnpDxe) == 0)
@@ -113,7 +114,7 @@ AlteraSnpDxeEntry (
 
   Status = EFI_SUCCESS;
   // Allocate Resources
-  Driver = AllocateZeroPool (sizeof (EFI_SIMPLE_NETWORK_DRIVER));
+  Driver = UncachedAllocatePages (EFI_SIZE_TO_PAGES (sizeof (EFI_SIMPLE_NETWORK_DRIVER)));
   if (Driver == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }

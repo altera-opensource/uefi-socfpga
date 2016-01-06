@@ -58,6 +58,7 @@
   MemoryController.c
   MemoryTest.c
   MkimageHeader.c
+  Mmu.c
   NandLib.c
   Pinmux.c
   PitStopUtility.c
@@ -93,7 +94,6 @@
   HobLib
   IoLib
   LzmaDecompressLib
-  MemoryAllocationLib
   PcdLib
   PeCoffGetEntryPointLib
   PrePiHobListPointerLib
@@ -114,6 +114,7 @@
   gArmMpCoreInfoGuid
 
 [FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdCacheEnable
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
   gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
 
