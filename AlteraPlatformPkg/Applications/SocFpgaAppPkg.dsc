@@ -151,6 +151,9 @@
 #  EDK II native, "hello" application
   AppPkg/Applications/Hello/Hello.inf        # No LibC includes or functions.
 
+# Blinking LED application for Arria 10 Soc Dev Kit Board
+  AlteraPlatformPkg/Applications/BlinkingLED_A10SoCDevKit/BlinkingLED_A10SoCDevKit.inf
+
 ##############################################################################
 #
 #  Include Boilerplate text required for building with the Standard Libraries.
