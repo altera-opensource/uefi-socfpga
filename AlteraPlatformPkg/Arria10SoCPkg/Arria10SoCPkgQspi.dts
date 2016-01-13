@@ -40,11 +40,7 @@
 	model = "SOCFPGA Arria10 Dev Kit";	/* Bootloader setting: arria10_uboot.model */
 
 	chosen {
-		/*
-		 * Bootloader setting: arria10_uboot.peripheral_rbf_filename
-		 * Bootloader setting: arria10_uboot.core_rbf_filename
-		 */
-		cff-file = "ghrd_10as066n2.periph.rbf", "ghrd_10as066n2.core.rbf";
+		cff-offset = <0x00720000>;	/* Bootloader setting: uboot.rbf_offset */
 	};
 
 	/* Clock sources */
