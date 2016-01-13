@@ -87,5 +87,21 @@ ListFileInRootDirectory (
   VOID
   );
 
+EFI_STATUS
+EFIAPI
+MmcReadLba (
+  IN EFI_LBA                  Lba,
+  IN UINTN                    BufferSize,
+  OUT VOID                    *Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+MmcWriteLba (
+  IN EFI_LBA                  Lba,
+  IN UINTN                    BufferSize,
+  IN VOID                     *Buffer
+  );
+
 #endif
 

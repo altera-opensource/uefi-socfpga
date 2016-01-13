@@ -1145,6 +1145,99 @@ DumpTextFile (
 
 //-------------------------------------------------------------------
 //
+// UTILITY FUNCTION
+//
+//-------------------------------------------------------------------
+
+EFI_STATUS
+EFIAPI
+MmcReadLba (
+  IN EFI_LBA                  Lba,
+  IN UINTN                    BufferSize,
+  OUT VOID                    *Buffer
+  )
+{
+  EFI_STATUS          Status;
+
+  Status = MmcReadBlocks (
+             &(MmcHostInstance->BlockIo),
+             MmcHostInstance->BlockIo.Media->MediaId,
+             Lba,
+             BufferSize,
+             Buffer);
+
+  if (Status != EFI_SUCCESS) {
+    InfoPrint ("MMC Read LBA 0x%08X fail!\r\n", Lba);
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+EFIAPI
+MmcWriteLba (
+  IN EFI_LBA                  Lba,
+  IN UINTN                    BufferSize,
+  IN VOID                     *Buffer
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       BytesRemainingToBeTransfered;
+  UINTN       Percentage;
+  UINTN       BytesWrittenCounter;
+  Percentage = 0;
+  BytesWrittenCounter = 0;
+
+  // Perform a single block read to switch back to single block mode
+  Status = MmcReadBlocks (
+             &(MmcHostInstance->BlockIo),
+			 MmcHostInstance->BlockIo.Media->MediaId,
+             Lba,
+             MmcHostInstance->BlockIo.Media->BlockSize,
+			 mDataBuffer);
+  if (Status != EFI_SUCCESS) {
+    InfoPrint ("MMC Read LBA 0x%08X fail!\r\n", Lba);
+    return EFI_DEVICE_ERROR;
+  }
+
+  // Write a single block at a time
+  BytesRemainingToBeTransfered = BufferSize;
+  while (BytesRemainingToBeTransfered > 0) {
+
+    Status = MmcWriteBlocks (
+               &(MmcHostInstance->BlockIo),
+               MmcHostInstance->BlockIo.Media->MediaId,
+               Lba,
+               MmcHostInstance->BlockIo.Media->BlockSize,
+               Buffer);
+    if (Status != EFI_SUCCESS) {
+      InfoPrint ("MMC Write LBA 0x%08lX fail!\r\n", Lba);
+      return EFI_DEVICE_ERROR;
+    }
+
+    BytesRemainingToBeTransfered -= MmcHostInstance->BlockIo.Media->BlockSize;
+    Lba += 1;
+    Buffer = (UINT8 *)Buffer + (MmcHostInstance->BlockIo.Media->BlockSize);
+
+    // Count progress
+    BytesWrittenCounter += (MmcHostInstance->BlockIo.Media->BlockSize);
+    // Update progress once every 10%
+    if (((BytesWrittenCounter * 100 / BufferSize) - Percentage) >= 10)
+    {
+      Percentage = (BytesWrittenCounter * 100 / BufferSize);
+      ProgressPrint ("\r%2d%% ", Percentage);
+    }
+  }
+  ProgressPrint ("\rDone.\r\n");
+
+  return EFI_SUCCESS;
+}
+
+
+//-------------------------------------------------------------------
+//
 // INIT FUNCTION
 //
 //-------------------------------------------------------------------
