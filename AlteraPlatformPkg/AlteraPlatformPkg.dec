@@ -97,7 +97,7 @@
 
   ## Osc1Timer0 reference clock frequency in Hz
   # @Prompt Osc1Timer0 clockk frequency in Hz
-  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_ClkFreqInHz|100000000|UINT32|0xABCD0002
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_ClkFreqInHz|50000000|UINT32|0xABCD0002
 
   ## Base address of Osc1Timer1 used by AlteraHpsTimerDxe
   # Will be used by AlteraHpsTimerDxe as periodic interrupt generator
@@ -106,7 +106,7 @@
 
   ## Osc1Timer1 reference clock frequency in Hz
   # @Prompt Osc1Timer1 clockk frequency in Hz
-  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_ClkFreqInHz|100000000|UINT32|0xABCD0004
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_ClkFreqInHz|50000000|UINT32|0xABCD0004
 
   ## GIC Interrupt Number of Osc1Timer1
   # @Prompt GIC Interrupt Number of Osc1Timer1

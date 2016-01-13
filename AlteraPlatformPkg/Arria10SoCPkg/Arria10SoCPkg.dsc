@@ -198,10 +198,10 @@
   ##------------------------------------------------------------------------------
   #  Clock souce from HPS_CLK1 pin to osc1_clk to Osc1Timer0 and Osc1Timer1
   gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_Base|0xFFD00000
-  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_ClkFreqInHz|100000000
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_ClkFreqInHz|50000000
 
   gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_Base|0xFFD00100
-  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_ClkFreqInHz|100000000
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_ClkFreqInHz|50000000
   gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_InterruptNum|150
 
   ##------------------------------------------------------------------------------
@@ -357,8 +357,8 @@
   ## UART clock frequency is for the baud rate configuration.
   # @Prompt Serial Port Clock Rate.
   # On PC this is 1.8432 MHz - 1843200
-  # On Altera SoC FPGA HPS UART clock source is l4_sp_clk 100 MHz
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|100000000
+  # On Altera SoC FPGA HPS UART clock source is l4_sp_clk
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|50000000
 
   ## Baud rate for the 16550 serial port.  Default is 115200 baud.
   # @Prompt Baud rate for serial port.
