@@ -341,7 +341,7 @@
 
 	hps_fpgabridge3: fpgabridge@3 {
 		compatible = "altr,socfpga-fpga2sdram0-bridge";
-		init-val = <1>;
+		init-val = <0>;
 	};
 
 	hps_fpgabridge4: fpgabridge@4 {
