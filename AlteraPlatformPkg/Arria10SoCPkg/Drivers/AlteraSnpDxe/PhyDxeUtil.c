@@ -120,6 +120,10 @@ PhyConfig (
   // Read back and display Skew settings
   PhyDisplayConfigSkew (PhyDriver);
 
+  // Configure AN FLP Burst Trasmit timing interval
+  PhyConfigFlpBurstTiming (PhyDriver);
+  PhyDisplayFlpBurstTiming (PhyDriver);
+
   // Configure AN and Advertise
   PhyAutoNego (PhyDriver);
 
@@ -220,6 +224,26 @@ PhyDisplayConfigSkew (
   InfoPrint("SNP:PHY: RGMII TX Data Pad Skew  = 0x%04X\r\n", Phy9031ExtendedRead(PhyDriver, PHY_KSZ9031_MOD_DATA_NO_POST_INC, PHY_KSZ9031RN_DEV_ADDR, PHY_KSZ9031RN_TX_DATA_PAD_SKEW_REG));
 }
 
+VOID
+EFIAPI
+PhyConfigFlpBurstTiming (
+  IN PHY_DRIVER* PhyDriver
+  )
+{
+  Phy9031ExtendedWrite(PhyDriver, PHY_KSZ9031_MOD_DATA_NO_POST_INC, PHY_KSZ9031RN_MMD_DEV_ADDR_00, PHY_KSZ9031RN_MMD_D0_FLP_LO_REG, PHY_KSZ9031RN_MMD_D0_FLP_16MS_LO);
+  Phy9031ExtendedWrite(PhyDriver, PHY_KSZ9031_MOD_DATA_NO_POST_INC, PHY_KSZ9031RN_MMD_DEV_ADDR_00, PHY_KSZ9031RN_MMD_D0_FLP_HI_REG, PHY_KSZ9031RN_MMD_D0_FLP_16MS_HI);
+}
+
+VOID
+EFIAPI
+PhyDisplayFlpBurstTiming (
+  IN PHY_DRIVER* PhyDriver
+  )
+{
+  // Display Auto-Negotiation FLP burst transmit timing
+  InfoPrint("SNP:PHY: AN FLP Burst Transmit - LO = 0x%04X\r\n", Phy9031ExtendedRead(PhyDriver, PHY_KSZ9031_MOD_DATA_NO_POST_INC, PHY_KSZ9031RN_MMD_DEV_ADDR_00, PHY_KSZ9031RN_MMD_D0_FLP_LO_REG));
+  InfoPrint("SNP:PHY: AN FLP Burst Transmit - HI = 0x%04X\r\n", Phy9031ExtendedRead(PhyDriver, PHY_KSZ9031_MOD_DATA_NO_POST_INC, PHY_KSZ9031RN_MMD_DEV_ADDR_00, PHY_KSZ9031RN_MMD_D0_FLP_HI_REG));
+}
 
 // Do auto-negotiation
 EFI_STATUS

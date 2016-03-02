@@ -189,6 +189,13 @@ typedef struct {
 
 #define PHY_KSZ9031RN_DEV_ADDR                  0x2
 
+// MMD Address 0h, Auto-Negotiation FLP burst transmit timing
+#define PHY_KSZ9031RN_MMD_DEV_ADDR_00       0x00
+#define PHY_KSZ9031RN_MMD_D0_FLP_LO_REG     3
+#define PHY_KSZ9031RN_MMD_D0_FLP_16MS_LO    0x1A80
+#define PHY_KSZ9031RN_MMD_D0_FLP_HI_REG     4
+#define PHY_KSZ9031RN_MMD_D0_FLP_16MS_HI    0x0006
+
 // HPS MII
 #define MII_BUSY		                    (1 << 0)
 #define MII_WRITE		                    (1 << 1)
@@ -249,6 +256,18 @@ PhyConfigSkew (
 VOID
 EFIAPI
 PhyDisplayConfigSkew (
+  IN PHY_DRIVER* PhyDriver
+  );
+
+VOID
+EFIAPI
+PhyConfigFlpBurstTiming (
+  IN PHY_DRIVER* PhyDriver
+  );
+
+VOID
+EFIAPI
+PhyDisplayFlpBurstTiming (
   IN PHY_DRIVER* PhyDriver
   );
 
