@@ -179,19 +179,25 @@
   ## QSPI/NAND Flash Offset
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_PEIROM_ADDR |0x00000000
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_DXEROM_ADDR |0x00620000
-  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_DTB_ADDR     |0x00100000
+  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_LINUX_DTB_ADDR         |0x00100000
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_ADDR         |0x00120000
 
-  ## SD/MMC Flash
-  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmc_BOOTIMAGE_DTB_FILENAME      |"socfpga_arria10_socdk.dtb"
-  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmc_BOOTIMAGE_FILENAME          |"bootimage.bin"
+  ## Various Filename in root directory of the SD/MMC FAT32 partition
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_DXE_ROM                 |"DXE.ROM"
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_LINUX_DTB               |"socfpga_arria10_socdk.dtb"
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_BOOTIMAGE_BIN           |"bootimage.bin"
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_ZIMAGE                  |"zImage"
 
   # Boot Image Load Address and Entry Point
   # If the image have mkimage header, it will based on mkimage header
   # If the image do not have an mkimage header, it will base on PCDs
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_BOOTIMAGE_MEM_LOAD_ADDR      |0x100000
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR      |0x100000
+
+  # Extra Boot Option for PEI Phase
+  gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_ZIMAGE_AT_PEI_PHASE     |0
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_UEFI_DXE_PHASE          |0
+
 
   ##------------------------------------------------------------------------------
   ## Pcd Settings - Timer Frequency
@@ -833,7 +839,7 @@
   EmbeddedPkg/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
 
   # Legacy Linux Loader
-  ArmPkg/Application/LinuxLoader/LinuxLoader.inf
+  AlteraPlatformPkg/Applications/LinuxLoader/LinuxLoader.inf
 
 [BuildOptions]
   #-------------------------------

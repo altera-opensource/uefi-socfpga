@@ -109,8 +109,8 @@ AlteraSocFpgaPeiMainEntry (
     );
 
   // Boot UEFI DXE phase
-  BootCompressedDxeFv ();    // Try LZMA compressed DXE FV
-  BootUnCompressedDxeFv ();  // If it fail try RAW DXE FV
+  BootCompressedDxeFv (SecCoreData);    // Try LZMA compressed DXE FV
+  BootUnCompressedDxeFv (SecCoreData);  // If it fail try RAW DXE FV
 
   // Should not reach here
   ASSERT_PLATFORM_INIT(0);
@@ -433,7 +433,7 @@ BuildSystemMemoryHOBs (
 VOID
 EFIAPI
 BootUnCompressedDxeFv (
-  VOID
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData
   )
 {
   UINT32                       DxeFileSize;
@@ -467,7 +467,7 @@ BootUnCompressedDxeFv (
     DxeFileSize);
 
   // Find and load main entry point of the DXE Core
-  EnterDxeCoreEntryPoint (DxeFvBase, DxeFileSize);
+  EnterDxeCoreEntryPoint (SecCoreData, DxeFvBase, DxeFileSize);
 
 }
 
@@ -475,7 +475,7 @@ BootUnCompressedDxeFv (
 VOID
 EFIAPI
 BootCompressedDxeFv (
-  VOID
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData
   )
 {
   EFI_STATUS                   Status;
@@ -544,7 +544,7 @@ BootCompressedDxeFv (
     );
 
   // Find and load main entry point of the DXE Core
-  EnterDxeCoreEntryPoint (DxeDecompressedFvBase, OutputBufferSize);
+  EnterDxeCoreEntryPoint (SecCoreData, DxeDecompressedFvBase, OutputBufferSize);
 
 }
 
@@ -552,8 +552,9 @@ BootCompressedDxeFv (
 VOID
 EFIAPI
 EnterDxeCoreEntryPoint (
-  IN UINTN                    DxeFvBase,
-  IN UINTN                    DxeFvSize
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
+  IN UINTN                       DxeFvBase,
+  IN UINTN                       DxeFvSize
   )
 {
   EFI_PHYSICAL_ADDRESS              DxeCoreAddress;
@@ -568,7 +569,12 @@ EnterDxeCoreEntryPoint (
   VOID                             *BaseOfStack;
   VOID                             *TopOfStack;
   EFI_HOB_HANDOFF_INFO_TABLE       *Hob;
-
+  UINT32                            PeiHeapBegin;
+  UINT32                            PeiHeapEnd;
+  UINT32                            CopyOfPeiHeapBegin;
+  UINT32                            CopyOfPeiHeapEnd;
+  VOID*                             SourceBuffer;
+  VOID*                             DestBuffer;
   //
   // Find the DXE Entry point
   //
@@ -653,13 +659,35 @@ EnterDxeCoreEntryPoint (
     Hob->EfiMemoryTop        = (UINTN)GetMpuWindowDramBaseAddr() + GetMpuWindowDramSize();
     Hob->EfiMemoryBottom     = (UINTN)GetMpuWindowDramBaseAddr();
     Hob->EfiFreeMemoryTop    = Hob->EfiMemoryTop;
-    Hob->EfiFreeMemoryBottom = Hob->EfiMemoryBottom;
+
+    // Make a copy of PEI Hob to DRAM memory range for DXE Core HOB relocation code to work correctly
+    // because DXE Core Gcd.c CoreInitializeGcdServices will Relocate HOB List using
+    // the calculation formula "PhitHob->EfiFreeMemoryBottom - (*HobStart)"
+    // which will have the wrong hob size calculated if EfiFreeMemoryBottom is not within the SDRAM range.
+    PeiHeapBegin = (UINT32)SecCoreData->PeiTemporaryRamBase;
+    PeiHeapEnd = (UINT32)SecCoreData->PeiTemporaryRamBase + (UINT32)SecCoreData->PeiTemporaryRamSize - 1;
+    CopyOfPeiHeapBegin = ALIGN_VALUE ((UINTN)TopOfStack + CPU_STACK_ALIGNMENT, EFI_PAGE_SIZE);
+    CopyOfPeiHeapEnd = CopyOfPeiHeapBegin + (UINT32)SecCoreData->PeiTemporaryRamSize - 1;
+    Hob->EfiFreeMemoryBottom = CopyOfPeiHeapEnd + 1;
+    DestBuffer = (VOID*)(UINTN)(CopyOfPeiHeapBegin);
+    SourceBuffer = (VOID*)(UINTN)(PeiHeapBegin);
+    CopyMem (DestBuffer, SourceBuffer, (UINT32)SecCoreData->PeiTemporaryRamSize);
+
+    //SerialPortPrint ("PrePeiGetHobList    = 0x%08x\n", (UINT32) PrePeiGetHobList());
+    //SerialPortPrint ("PeiHeapBegin        = 0x%08x\n", (UINT32) PeiHeapBegin);
+    //SerialPortPrint ("PeiHeapEnd          = 0x%08x\n", (UINT32) PeiHeapEnd);
+    //SerialPortPrint ("CopyOfPeiHeapBegin  = 0x%08x\n", (UINT32) CopyOfPeiHeapBegin);
+    //SerialPortPrint ("CopyOfPeiHeapEnd    = 0x%08x\n", (UINT32) CopyOfPeiHeapEnd);
+    //SerialPortPrint ("EfiMemoryBottom     = 0x%08x\n", (UINT32) Hob->EfiMemoryBottom);
+    //SerialPortPrint ("EfiMemoryTop        = 0x%08x\n", (UINT32) Hob->EfiMemoryTop);
+    //SerialPortPrint ("EfiFreeMemoryBottom = 0x%08x\n", (UINT32) Hob->EfiFreeMemoryBottom);
+    //SerialPortPrint ("EfiFreeMemoryTop    = 0x%08x\n", (UINT32) Hob->EfiFreeMemoryTop);
 
     // Jump to DxeCoreEntryPoint after switch Stack pointer from OCRAM to DRAM
     SerialPortPrint ("DXE Core entry at 0x%08Lx\n", DxeCoreEntryPoint);
     SwitchStack (
       (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-      PrePeiGetHobList(),
+      (VOID*)(UINTN)CopyOfPeiHeapBegin,
       NULL,
       TopOfStack
       );

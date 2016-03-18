@@ -344,7 +344,7 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
   INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
 
   # Legacy Linux Loader
-  INF ArmPkg/Application/LinuxLoader/LinuxLoader.inf
+  INF AlteraPlatformPkg/Applications/LinuxLoader/LinuxLoader.inf
 
   # Include UEFI Shell Start Up Script
   FILE FREEFORM = AF3F9E26-DDB5-4e85-B4D7-AC60A2772BC2 {

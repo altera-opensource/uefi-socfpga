@@ -197,7 +197,7 @@ PitStopCmdLine (
   CHAR8 Argument[100][100];
   INTN ArgCnt = 0;
   UINTN  Data, Addr, FromAddr, ToAddr;
-  UINTN Addr1, Addr2;
+  UINTN  Addr1, Addr2;
   CHAR8  TextFileName[100];
   UINTN  Len, Offset;
   UINTN  R0, R1, R2;
@@ -483,6 +483,20 @@ PitStopCmdLine (
 
       JumpToEntry (Addr, R0, R1, R2 );
 
+    // bootz - Boot Linux-SocFPGA's zImage
+    } else if (AsciiStrCmp((CHAR8*)Argument[0], "bootz") == 0) {
+
+      if (ArgCnt < 1) {
+        AsciiStrCpy ((CHAR8*)TextFileName, (CHAR8*) PcdGetPtr (PcdFileName_LINUX_DTB));
+      } else {
+        AsciiStrCpy ((CHAR8*)TextFileName, (CHAR8*)Argument[1]);
+      }
+
+      LoadBootImageAndTransferControl (
+        GetBootSourceType (),
+        1,
+        (CHAR8*)TextFileName
+        );
     // exit
     } else if (AsciiStrCmp((CHAR8*)Argument[0], "exit") == 0) {
 
@@ -523,6 +537,7 @@ PitStopCmdLine (
       SerialPortPrint ("fatload mmc addr file\r\n");
 
       SerialPortPrint ("jump addr [r0] [r1] [r2]\r\n");
+      SerialPortPrint ("bootz [OPTIONAL:filename.dtb]\r\n");
       SerialPortPrint ("exit\r\n");
       SerialPortPrint ("Note: Use HEX format for number.  addr means memory address.\r\n");
       SerialPortPrint ("offset refer to flash device.  blockcnt is multiply of 512 bytes.\r\n");

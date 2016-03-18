@@ -44,6 +44,7 @@
 #include <Library/PrintLib.h>
 #include <Library/SerialPortPrintLib.h>
 #include <Library/TimerLib.h>
+#include <Chipset/ArmCortexA9.h>
 #include "AlteraSdMmcPei/AlteraSdMmcPei.h"
 #include "Assert.h"
 #include "DeviceTree.h"
@@ -112,6 +113,9 @@ PreparePlatformHardwareToBoot (
   // Disable Gic Distributor
   ArmGicDisableDistributor (PcdGet32 (PcdGicDistributorBase));
 
+  // Make sure CP15.ACTRL SMP bit is turned off, this is required to boot Linux.
+  ArmUnsetCpuActlrBit (A9_FEATURE_SMP);
+
   // Clean before Disable else the Stack gets corrupted with old data.
   ArmCleanDataCache ();
   ArmDisableDataCache ();
@@ -175,7 +179,7 @@ LoadDxeImageToRam (
     case BOOT_SOURCE_SDMMC:
       // Read DXE.ROM file from root folder of FAT32 partition on SD/MMC card
       LoadFileToMemory (
-        (CHAR8*) PcdGetPtr (PcdSdmmc_BOOTLOADER_DXEROM_FILENAME),
+        (CHAR8*) PcdGetPtr (PcdFileName_DXE_ROM),
         DestinationMemoryBase,
         pFileSize);
       break;
@@ -221,7 +225,9 @@ LoadDxeImageToRam (
 VOID
 EFIAPI
 LoadBootImageAndTransferControl (
-  IN  BOOT_SOURCE_TYPE  BootSourceType
+  IN  BOOT_SOURCE_TYPE  BootSourceType,
+  IN  UINT32            IsLinuxBoot,
+  IN  CHAR8*            LinuxDtbFilename
   )
 {
   EFI_STATUS        Status;
@@ -233,9 +239,11 @@ LoadBootImageAndTransferControl (
   UINTN             R0;
   UINTN             R1;
   UINTN             R2;
-  UINT32            BootImageDtbAddr;
-  UINT32            BootImageDtbFileSize;
-
+  UINT32            OriginalFdtOffset;
+  UINT32            OriginalFdtSize;
+  UINT32            RelocatedFdtOffset;
+  UINT32            RelocatedFdtSize;
+  UINT32            *zImageSignaturePtr;
 
   LoadAddr = PcdGet32 (PcdBoot_BOOTIMAGE_MEM_LOAD_ADDR);
   EntryPoint = PcdGet32 (PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR);
@@ -253,15 +261,29 @@ LoadBootImageAndTransferControl (
   {
     case BOOT_SOURCE_SDMMC:
       // Load the file to memory
-      // If the file contain an MKIMAGE header,
-      // it will utilize the LoadAddr and EntryPoint value from the MKIMAGE header
-      // otherwiser, value from the PCDs will be used
-      Status = LoadBootImageFile (
-        (CHAR8*) PcdGetPtr (PcdSdmmc_BOOTIMAGE_FILENAME),
-        &LoadAddr,
-        &EntryPoint,
-        &DataSize
-        );
+
+      if (IsLinuxBoot == 1)
+      {
+        // Read linux-socfpga zImage file into memory
+        // linux-socfpga zImage entry is fixed address at 0x8000
+        LoadAddr   = LINUX_ZIMAGE_LOAD_ADDR;
+        EntryPoint = LINUX_ZIMAGE_LOAD_ADDR;
+        Status = LoadFileToMemory (
+          (CHAR8*) PcdGetPtr (PcdFileName_ZIMAGE),
+          LoadAddr,
+          &DataSize);
+      } else {
+        // Read binary image file of Baremetal Application or RTOS into memory
+        // If the file contain an MKIMAGE header,
+        // it will utilize the LoadAddr and EntryPoint value from the MKIMAGE header
+        // otherwiser, value from the PCDs will be used
+        Status = LoadBootImageFile (
+          (CHAR8*) PcdGetPtr (PcdFileName_BOOTIMAGE_BIN),
+          &LoadAddr,
+          &EntryPoint,
+          &DataSize
+          );
+      }
       // Check if BootImage loading failed?
       if (EFI_ERROR(Status)) {
         ASSERT_PLATFORM_INIT(0);
@@ -334,46 +356,69 @@ LoadBootImageAndTransferControl (
       break;
   }
 
-  // Support loading of .DTB file for Boot Image ?
-  if (PcdGet32 (PcdBoot_LOAD_BOOTIMAGE_DTB_FILE) == 1)
+  // Support loading of .DTB file for Linux zImage ?
+  if (IsLinuxBoot == 1)
   {
-    // If DTB for BootImage exist, then load it.
-    BootImageDtbAddr = (LoadAddr + DataSize + 0x2000000) & 0xFE000000;
+    // Load Linux DTB file from Flash storage.
+    OriginalFdtOffset = LINUX_DTB_ORIGINAL_OFFSET;
     switch (BootSourceType)
     {
       case BOOT_SOURCE_SDMMC:
         Status = LoadFileToMemory (
-          (CHAR8*) PcdGetPtr (PcdSdmmc_BOOTIMAGE_DTB_FILENAME),
-          BootImageDtbAddr,
-          &BootImageDtbFileSize);
-        if (Status == EFI_SUCCESS) {
-          // Patch the DTB
-          Status = UpdateBootImageDtbWithMemoryInfoAndBootArgs (BootImageDtbAddr);
-          if (Status == EFI_SUCCESS) {
-            R2 = BootImageDtbAddr;
-          }
-        }
+          LinuxDtbFilename,
+          OriginalFdtOffset,
+          &OriginalFdtSize);
         break;
 
       case BOOT_SOURCE_NAND:
       case BOOT_SOURCE_QSPI:
-        FlashOffset = PcdGet64 (PcdQspiOrNand_BOOTIMAGE_DTB_ADDR);
-        DataSize = PcdGet32 (PcdQspiOrNand_BOOTIMAGE_DTB_SIZE);
+        FlashOffset = PcdGet64 (PcdQspiOrNand_LINUX_DTB_ADDR);
+        DataSize = PcdGet32 (PcdQspiOrNand_LINUX_DTB_SIZE);
+        OriginalFdtSize = DataSize;
         if (BootSourceType == BOOT_SOURCE_QSPI)
         {
           // Read from QSPI
-          Status = QspiRead ((VOID *) BootImageDtbAddr, FlashOffset, DataSize);
+          Status = QspiRead ((VOID *) OriginalFdtOffset, FlashOffset, DataSize);
         } else {
           // Read from NAND
-          Status = NandRead ((VOID *) BootImageDtbAddr, FlashOffset, DataSize);
+          Status = NandRead ((VOID *) OriginalFdtOffset, FlashOffset, DataSize);
         }
         break;
 
       case BOOT_SOURCE_RSVD:
       case BOOT_SOURCE_FPGA:
       default:
+        Status = EFI_LOAD_ERROR;
         break;
     }
+    // Flash Read Error Checking
+    if (EFI_ERROR(Status)) {
+      InfoPrint ("Error reading linux-socfpga DTB!");
+      ASSERT_PLATFORM_INIT(0);
+      EFI_DEADLOOP();
+    }
+
+    // Relocate the Linux FDT blob and allocate more space for additional entries
+    RelocatedFdtOffset = LINUX_DTB_RELOCATED_OFFSET;
+    Status = RelocateFdt (OriginalFdtOffset, OriginalFdtSize, RelocatedFdtOffset, &RelocatedFdtSize);
+    ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+
+    // and then patch the "memory" node and "chosen" node with runtime detected info
+    Status = UpdateBootImageDtbWithMemoryInfoAndBootArgs (BootSourceType, RelocatedFdtOffset);
+    ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+
+    // Make sure a valide zImage file is loaded prior to transfer control
+    zImageSignaturePtr = (UINT32*)(UINTN)(LINUX_ZIMAGE_LOAD_ADDR + LINUX_ZIMAGE_SIGNATURE_OFFSET);
+    if (*zImageSignaturePtr != LINUX_ZIMAGE_SIGNATURE) {
+      InfoPrint ("Error! Invalid zImage header.");
+      ASSERT_PLATFORM_INIT(0);
+      EFI_DEADLOOP();
+    }
+
+    // Parameters to pass into zImage via CPU registers
+    R0 = LINUX_ENTRY_R0_VALUE;
+    R1 = LINUX_ENTRY_R1_VALUE;
+    R2 = RelocatedFdtOffset;
   }
 
   // Transfer control
@@ -395,8 +440,36 @@ cpu_to_fdtn (UINTN x) {
 
 EFI_STATUS
 EFIAPI
+RelocateFdt (
+  EFI_PHYSICAL_ADDRESS   OriginalFdtOffset,
+  UINTN                  OriginalFdtSize,
+  EFI_PHYSICAL_ADDRESS   RelocatedFdtOffset,
+  UINTN                  *RelocatedFdtSize
+  )
+{
+  INTN                  Error;
+
+  *RelocatedFdtSize = OriginalFdtSize + FDT_ADDITIONAL_ENTRIES_SIZE;
+
+  // Load the Original FDT tree into the new region
+  Error = fdt_open_into (
+            (VOID*)(UINTN) OriginalFdtOffset,
+            (VOID*)(UINTN)(RelocatedFdtOffset),
+            *RelocatedFdtSize
+          );
+  if (Error) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+EFIAPI
 UpdateBootImageDtbWithMemoryInfoAndBootArgs (
-  IN     EFI_PHYSICAL_ADDRESS FdtBlobBase
+  IN  BOOT_SOURCE_TYPE      BootSourceType,
+  IN  EFI_PHYSICAL_ADDRESS  FdtBlobBase
   )
 {
   VOID*                 fdt;
@@ -425,7 +498,8 @@ UpdateBootImageDtbWithMemoryInfoAndBootArgs (
   if (node > 0) {
     // Get RAM Base and Size
     Region.Base = cpu_to_fdtn ((UINTN)GetMpuWindowDramBaseAddr());
-    Region.Size = cpu_to_fdtn ((UINTN)GetMpuWindowDramBaseAddr() + GetMpuWindowDramSize());
+    Region.Size = cpu_to_fdtn ((UINTN)GetMpuWindowDramSize());
+    InfoPrint ("memory reg = <0x%X 0x%X>\n", GetMpuWindowDramBaseAddr(), GetMpuWindowDramSize());
     // Update the DTB
     err = fdt_setprop(fdt, node, "reg", &Region, sizeof(Region));
     if (err) {
@@ -433,7 +507,6 @@ UpdateBootImageDtbWithMemoryInfoAndBootArgs (
       return EFI_INVALID_PARAMETER;
     }
   }
-
 
   //
   // Update chosen->bootargs
@@ -456,9 +529,32 @@ UpdateBootImageDtbWithMemoryInfoAndBootArgs (
   }
 
   // Construct new bootargs
-  length = AsciiSPrint (NewBootArgsPtr, 1024,
-    "console=ttyS0,%d",
-    PcdGet32 (PcdSerialBaudRate));
+  switch (BootSourceType)
+  {
+    case BOOT_SOURCE_SDMMC:
+      // BootArgs for SD/MMC boot, 2nd partition must be Linux partition
+      length = AsciiSPrint (NewBootArgsPtr, 1024,
+        "console=ttyS0,%d root=/dev/mmcblk0p2 rw rootwait",
+        PcdGet32 (PcdSerialBaudRate));
+      break;
+
+    case BOOT_SOURCE_NAND:
+    case BOOT_SOURCE_QSPI:
+      // BootArgs for QSPI / NAND boot
+      length = AsciiSPrint (NewBootArgsPtr, 1024,
+        "console=ttyS0,%d root=/dev/mtdblock1\0 rw rootfstype=jffs2\0",
+        PcdGet32 (PcdSerialBaudRate));
+      break;
+
+    case BOOT_SOURCE_RSVD:
+    case BOOT_SOURCE_FPGA:
+    default:
+      // BootArgs for RAM boot
+      length = AsciiSPrint (NewBootArgsPtr, 1024,
+        "console=ttyS0,%d printk.time=1 debug mem=0x2000000 lpj=3977216",
+        PcdGet32 (PcdSerialBaudRate));
+      break;
+  }
 
   // Update bootargs to new bootargs
   err = fdt_setprop(fdt, node, "bootargs", NewBootArgsStr, AsciiStrSize(NewBootArgsStr));
@@ -470,7 +566,7 @@ UpdateBootImageDtbWithMemoryInfoAndBootArgs (
   // Print new bootargs
   bootargs = fdt_getprop(fdt, node, "bootargs", &length);
   if (bootargs != NULL) {
-    InfoPrint ("old bootargs: %a\n", bootargs);
+    InfoPrint ("new bootargs: %a\n", bootargs);
   }
 
   return EFI_SUCCESS;

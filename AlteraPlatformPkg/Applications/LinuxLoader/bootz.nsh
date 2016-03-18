@@ -1,0 +1,1 @@
+LinuxLoader fs1:zImage -d fs1:socfpga_arria10_socdk.dtb -c "console=ttyS0,115200 root=/dev/mmcblk0p2 rw rootwait"

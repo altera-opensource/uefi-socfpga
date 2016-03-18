@@ -238,7 +238,11 @@ PeiStagePlatformInit (
   //
   if (PcdGet32 (PcdBoot_LOAD_UEFI_DXE_PHASE) != 1)
   {
-    LoadBootImageAndTransferControl (BootSourceType);
+    LoadBootImageAndTransferControl (
+      BootSourceType,
+      PcdGet32 (PcdBoot_LOAD_ZIMAGE_AT_PEI_PHASE),
+      (CHAR8*) PcdGetPtr (PcdFileName_LINUX_DTB)
+      );
   }
 
   return Status;

@@ -86,20 +86,21 @@ BuildSystemMemoryHOBs (
 VOID
 EFIAPI
 BootUnCompressedDxeFv (
-  VOID
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData
   );
 
 VOID
 EFIAPI
 BootCompressedDxeFv (
-  VOID
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData
   );
 
 VOID
 EFIAPI
 EnterDxeCoreEntryPoint (
-  IN UINTN                    DxeFvBase,
-  IN UINTN                    DxeFvSize
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
+  IN UINTN                       DxeFvBase,
+  IN UINTN                       DxeFvSize
   );
 
 // List of Library Constructor in use

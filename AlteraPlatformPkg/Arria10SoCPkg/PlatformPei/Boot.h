@@ -34,6 +34,19 @@
 
 #include "BootSource.h"
 
+#define LINUX_ZIMAGE_LOAD_ADDR           0x00008000
+#define LINUX_ZIMAGE_SIGNATURE_OFFSET    0x00000024
+#define LINUX_ZIMAGE_SIGNATURE           0x016f2818
+#define LINUX_ENTRY_R0_VALUE             0x00000000
+#define LINUX_ENTRY_R1_VALUE             0xAFFDCE9A
+#define LINUX_DTB_ORIGINAL_OFFSET        0x00000100
+#define LINUX_DTB_RELOCATED_OFFSET       0x01FF7000
+// Additional size that could be used for FDT entries added by the UEFI OS Loader
+// Estimation based on: EDID (300bytes) + bootargs (200bytes) + initrd region (20bytes)
+//                      + system memory region (20bytes) + mp_core entries (200 bytes)
+#define FDT_ADDITIONAL_ENTRIES_SIZE      0x300
+
+
 typedef
 VOID
 (EFIAPI *BOOTIMAGE_ENTRY_POINT)(
@@ -76,13 +89,25 @@ LoadDxeImageToRam (
 VOID
 EFIAPI
 LoadBootImageAndTransferControl (
-  IN  BOOT_SOURCE_TYPE  BootSourceType
+  IN  BOOT_SOURCE_TYPE  BootSourceType,
+  IN  UINT32            IsLinuxBoot,
+  IN  CHAR8*            LinuxDtbFilename
   );
 
 EFI_STATUS
 EFIAPI
 UpdateBootImageDtbWithMemoryInfoAndBootArgs (
-  IN     EFI_PHYSICAL_ADDRESS FdtBlobBase
+  IN  BOOT_SOURCE_TYPE      BootSourceType,
+  IN  EFI_PHYSICAL_ADDRESS  FdtBlobBase
+  );
+
+EFI_STATUS
+EFIAPI
+RelocateFdt (
+  EFI_PHYSICAL_ADDRESS   OriginalFdtOffset,
+  UINTN                  OriginalFdtSize,
+  EFI_PHYSICAL_ADDRESS   RelocatedFdtOffset,
+  UINTN                  *RelocatedFdtSize
   );
 
 #endif
