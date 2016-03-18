@@ -590,7 +590,7 @@
   ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Sec/SecArmPlatformGlobalVariableLib.inf
   ArmPlatformLib|AlteraPlatformPkg/Arria10SoCPkg/Library/AlteraPlatformLib/AlteraPlatformLibSec.inf
   ArmPlatformSecExtraActionLib|ArmPlatformPkg/Library/DebugSecExtraActionLib/DebugSecExtraActionLib.inf
-  ArmPlatformSecLib|ArmPlatformPkg/Library/ArmPlatformSecLibNull/ArmPlatformLibNullSec.inf
+  ArmPlatformSecLib|AlteraPlatformPkg/Arria10SoCPkg/Library/ArmPlatformSecLib/ArmPlatformSecLib.inf
   ArmTrustedMonitorLib|ArmPlatformPkg/Library/ArmTrustedMonitorLibNull/ArmTrustedMonitorLibNull.inf
   DebugAgentLib|ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
   DefaultExceptionHandlerLib|AlteraPlatformPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLibBase.inf
