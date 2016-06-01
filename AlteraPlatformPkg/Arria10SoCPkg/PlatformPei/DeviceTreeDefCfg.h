@@ -119,6 +119,7 @@ typedef struct {
 // ------------------------------------------------------------------
 typedef struct {
   UINT32  nocclk;
+  UINT32  mpuclk;
 } CLOCK_MANAGER_ALTERA_GRP_CONFIG;
 
 // ------------------------------------------------------------------

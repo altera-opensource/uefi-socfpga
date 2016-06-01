@@ -53,6 +53,24 @@
   #define InfoPrint     SerialPortPrint
 #endif
 
+#define MAIN_PLL 0
+#define PERI_PLL 1
+
+#define ALT_CLKMGR_PLL_RAMP_MPUCLK_THRESHOLD_HZ  900000000
+#define ALT_CLKMGR_PLL_RAMP_NOCCLK_THRESHOLD_HZ  300000000
+#define ALT_CLKMGR_PLL_RAMP_MPUCLK_INCREMENT_HZ  100000000
+#define ALT_CLKMGR_PLL_RAMP_NOCCLK_INCREMENT_HZ   33000000
+
+#define ALT_CLKMGR_MPUCLK_MAINCNT_LSB    0
+#define ALT_CLKMGR_MPUCLK_MAINCNT_SET_MSK 0x07ff
+#define ALT_CLKMGR_MPUCLK_MAINCNT_GET(value) (((value) & 0x000007ff) >> 0)
+#define ALT_CLKMGR_MPUCLK_MAINCNT_SET(value) (((value) << 0) & 0x000007ff)
+
+#define ALT_CLKMGR_MPUCLK_PERICNT_LSB    16
+#define ALT_CLKMGR_MPUCLK_PERICNT_SET_MSK 0x07ff0000
+#define ALT_CLKMGR_MPUCLK_PERICNT_GET(value) (((value) & 0x07ff0000) >> 16)
+#define ALT_CLKMGR_MPUCLK_PERICNT_SET(value) (((value) << 16) & 0x07ff0000)
+
 //
 // Global Variables
 //
@@ -91,6 +109,8 @@ SetClockManagerCfg (
   )
 {
   UINT32 Data32;
+  UINT32 PllRampMainHz = 0;
+  UINT32 PllRampPeripheralHz = 0;
   // ----------------------
   // Background Information:
   // ----------------------
@@ -171,20 +191,51 @@ SetClockManagerCfg (
 
   // vco1 - Initialize denominator counter settings.
   // vco1 of mainpllgrp
-  MmioAndThenOr32 (ALT_CLKMGR_MAINPLL_OFST +
+  // Program VCO Numerator and Denominator for main PLL
+  // This is fixed for fogbugz case 372465 - Implement UEFI update for clock ramping
+  if (IsPllRampRequired(MAIN_PLL)) {
+    // set main PLL to safe starting threshold frequency
+    if (Cfg->mainpll.mpuclk_src == ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_MAIN)
+      PllRampMainHz = ALT_CLKMGR_PLL_RAMP_MPUCLK_THRESHOLD_HZ;
+    else if (Cfg->mainpll.nocclk_src == ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_MAIN)
+      PllRampMainHz = ALT_CLKMGR_PLL_RAMP_NOCCLK_THRESHOLD_HZ;
+
+    MmioAndThenOr32 (ALT_CLKMGR_MAINPLL_OFST +
                    ALT_CLKMGR_MAINPLL_VCO1_OFST,
                    ALT_CLKMGR_MAINPLL_VCO1_DENOM_CLR_MSK &
                    ALT_CLKMGR_MAINPLL_VCO1_NUMER_CLR_MSK,
                    ALT_CLKMGR_MAINPLL_VCO1_DENOM_SET(Cfg->mainpll.vco1_denom) |
-                   ALT_CLKMGR_MAINPLL_VCO1_NUMER_SET(Cfg->mainpll.vco1_numer));
-  // vco1 of perpllgrp
-  MmioAndThenOr32 (ALT_CLKMGR_PERPLL_OFST +
-                   ALT_CLKMGR_PERPLL_VCO1_OFST,
-                   ALT_CLKMGR_PERPLL_VCO1_DENOM_CLR_MSK &
-                   ALT_CLKMGR_PERPLL_VCO1_NUMER_CLR_MSK,
-                   ALT_CLKMGR_PERPLL_VCO1_DENOM_SET(Cfg->perpll.vco1_denom) |
-                   ALT_CLKMGR_PERPLL_VCO1_NUMER_SET(Cfg->perpll.vco1_numer));
+                   ALT_CLKMGR_MAINPLL_VCO1_NUMER_SET(GetSafePllNumerator(0, PllRampMainHz)));
+  } else {
+    MmioAndThenOr32 (ALT_CLKMGR_MAINPLL_OFST +
+                     ALT_CLKMGR_MAINPLL_VCO1_OFST,
+                     ALT_CLKMGR_MAINPLL_VCO1_DENOM_CLR_MSK &
+                     ALT_CLKMGR_MAINPLL_VCO1_NUMER_CLR_MSK,
+                     ALT_CLKMGR_MAINPLL_VCO1_DENOM_SET(Cfg->mainpll.vco1_denom) |
+                     ALT_CLKMGR_MAINPLL_VCO1_NUMER_SET(Cfg->mainpll.vco1_numer));
+  }
+  // Program VCO Numerator and Denominator for periph PLL
+  if (IsPllRampRequired(PERI_PLL)) {
+  // set periph PLL to safe starting threshold frequency
+    if (Cfg->mainpll.mpuclk_src == ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_PERI)
+      PllRampPeripheralHz = ALT_CLKMGR_PLL_RAMP_MPUCLK_THRESHOLD_HZ;
+    else if (Cfg->mainpll.nocclk_src == ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_PERI)
+      PllRampPeripheralHz = ALT_CLKMGR_PLL_RAMP_NOCCLK_THRESHOLD_HZ;
 
+    MmioAndThenOr32 (ALT_CLKMGR_PERPLL_OFST +
+                     ALT_CLKMGR_PERPLL_VCO1_OFST,
+                     ALT_CLKMGR_PERPLL_VCO1_DENOM_CLR_MSK &
+                     ALT_CLKMGR_PERPLL_VCO1_NUMER_CLR_MSK,
+                     ALT_CLKMGR_PERPLL_VCO1_DENOM_SET(Cfg->perpll.vco1_denom) |
+                     ALT_CLKMGR_PERPLL_VCO1_NUMER_SET(GetSafePllNumerator(1, PllRampPeripheralHz)));
+  } else {
+    MmioAndThenOr32 (ALT_CLKMGR_PERPLL_OFST +
+                     ALT_CLKMGR_PERPLL_VCO1_OFST,
+                     ALT_CLKMGR_PERPLL_VCO1_DENOM_CLR_MSK &
+                     ALT_CLKMGR_PERPLL_VCO1_NUMER_CLR_MSK,
+                     ALT_CLKMGR_PERPLL_VCO1_DENOM_SET(Cfg->perpll.vco1_denom) |
+                     ALT_CLKMGR_PERPLL_VCO1_NUMER_SET(Cfg->perpll.vco1_numer));
+  }
   // #############################################################
   // Give enough time for software-managed clock to be reset
   MicroSecondDelay (5);
@@ -226,6 +277,11 @@ SetClockManagerCfg (
   MmioWrite32 (ALT_CLKMGR_ALTERA_OFST +
                ALT_CLKMGR_NOCCLK_OFST,
                Cfg->alteragrp.nocclk);
+
+  // alteragrp.mpuclk
+  MmioWrite32 (ALT_CLKMGR_ALTERA_OFST +
+               ALT_CLKMGR_MPUCLK_OFST,
+               Cfg->alteragrp.mpuclk);
 
   // Main PLL Clock Source and Counters/Divider
   // ------------------------------------------
@@ -424,6 +480,13 @@ SetClockManagerCfg (
   } while ((ALT_CLKMGR_CLKMGR_STAT_BUSY_GET(Data32) != ALT_CLKMGR_CLKMGR_STAT_BUSY_E_IDLE));
   // =============================================================
 
+  // This is fixed for fogbugz case 372465 - Implement UEFI update for clock ramping
+  // Ramp to final value if needed
+  if (PllRampMainHz != 0)
+    PllRampMain(PllRampMainHz);
+  if (PllRampPeripheralHz != 0)
+    PllRampPeripheral(PllRampPeripheralHz);
+  //==============================================================
   // Enable mainpllgrp's software-managed clock
   MmioWrite32 (ALT_CLKMGR_MAINPLL_OFST +
                ALT_CLKMGR_MAINPLL_ENS_OFST,
@@ -445,6 +508,416 @@ SetClockManagerCfg (
                ALT_CLKMGR_CLKMGR_INTR_PERPLLFBSLIP_SET_MSK |
                ALT_CLKMGR_CLKMGR_INTR_MAINPLLACHIEVED_SET_MSK |
                ALT_CLKMGR_CLKMGR_INTR_PERPLLACHIEVED_SET_MSK);
+}
+
+// return TRUE if PLL ramp is required
+BOOLEAN
+EFIAPI
+IsPllRampRequired(
+  IN UINTN MainOrPeripheral
+  )
+{
+  CLOCK_MANAGER_CONFIG*  Cfg;
+  Cfg = &mClkCfg;
+
+  // Check for main PLL
+  if (MainOrPeripheral == MAIN_PLL) {
+    //
+    // PLL ramp is not required if both MPU clock and NOC clock are
+    // not sourced from main PLL
+    //
+    if (Cfg->mainpll.mpuclk_src != ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_MAIN &&
+        Cfg->mainpll.nocclk_src != ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_MAIN)
+      return FALSE;
+
+    //
+    // PLL ramp is required if MPU clock is sourced from main PLL
+    // and MPU clock is over 900MHz (as advised by HW team)
+    //
+    if (Cfg->mainpll.mpuclk_src == ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_MAIN &&
+        (GetMpuClockFrequencyInHz() > ALT_CLKMGR_PLL_RAMP_MPUCLK_THRESHOLD_HZ))
+      return TRUE;
+
+    //
+    // PLL ramp is required if NOC clock is sourced from main PLL
+    // and NOC clock is over 300MHz (as advised by HW team)
+    //
+    if (Cfg->mainpll.nocclk_src == ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_MAIN &&
+        (GetNocClockFrequencyInHz() > ALT_CLKMGR_PLL_RAMP_NOCCLK_THRESHOLD_HZ))
+      return TRUE;
+
+  } else if (MainOrPeripheral == PERI_PLL) {
+    //
+    // PLL ramp is not required if both MPU clock and NOC clock are
+    // not sourced from periph PLL
+    //
+    if (Cfg->mainpll.mpuclk_src != ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_PERI &&
+        Cfg->mainpll.nocclk_src != ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_PERI)
+      return FALSE;
+
+    //
+    // PLL ramp is required if MPU clock are source from periph PLL
+    // and MPU clock is over 900MHz (as advised by HW team)
+    //
+    if (Cfg->mainpll.mpuclk_src == ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_PERI &&
+        (GetMpuClockFrequencyInHz() > ALT_CLKMGR_PLL_RAMP_MPUCLK_THRESHOLD_HZ))
+      return TRUE;
+
+    //
+    // PLL ramp is required if NOC clock are source from periph PLL
+    // and NOC clock is over 300MHz (as advised by HW team)
+    //
+    if (Cfg->mainpll.nocclk_src == ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_PERI &&
+        (GetNocClockFrequencyInHz() > ALT_CLKMGR_PLL_RAMP_NOCCLK_THRESHOLD_HZ))
+      return TRUE;
+  }
+  return FALSE;
+}
+
+//
+// Calculate the new PLL numerator which is based on existing DTS hand off and
+// intended safe frequency (SafeHz). Note that PLL ramp is only modifying the
+// numerator while maintaining denominator as denominator will influence the
+// jitter condition. Please refer A10 HPS TRM for the jitter guide. Note final
+// value for numerator is minus with 1 to cater our register value
+// representation.
+//
+UINT32
+EFIAPI
+GetSafePllNumerator (
+  IN UINTN  MainOrPeripheral,
+  IN UINT32 SafeHz
+  )
+{
+  UINT32 ClkHz = 0;
+  CLOCK_MANAGER_CONFIG*  Cfg;
+  Cfg = &mClkCfg;
+
+  // Check for main PLL
+  if (MainOrPeripheral == MAIN_PLL) {
+  // Applicable if MPU clock is from main PLL
+    if (Cfg->mainpll.mpuclk_src == ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_MAIN) {
+      // calculate the safe numer value
+      ClkHz = (SafeHz / GetMainVcoClockSource()) *
+              (Cfg->mainpll.mpuclk_cnt + 1) *
+              (ALT_CLKMGR_MPUCLK_MAINCNT_GET(Cfg->alteragrp.mpuclk) + 1) *
+              (Cfg->mainpll.vco1_denom + 1) - 1;
+    }
+    // Reach here if MPU clk not from main PLL but NOC clk is
+    else if (Cfg->mainpll.nocclk_src == ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_MAIN) {
+      // calculate the safe numer value
+      ClkHz = (SafeHz / GetMainVcoClockSource()) *
+              (Cfg->mainpll.nocclk_cnt + 1) *
+              (ALT_CLKMGR_NOCCLK_MAINCNT_GET(Cfg->alteragrp.nocclk) + 1) *
+              (Cfg->mainpll.vco1_denom + 1) - 1;
+    }
+  } else if (MainOrPeripheral == PERI_PLL) {
+    if (Cfg->mainpll.mpuclk_src == ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_PERI) {
+      // calculate the safe numer value
+      ClkHz = (SafeHz / GetPeripheralVcoClockSource()) *
+              (Cfg->mainpll.mpuclk_cnt + 1) *
+              (ALT_CLKMGR_MPUCLK_PERICNT_GET(Cfg->alteragrp.mpuclk) + 1) *
+              (Cfg->perpll.vco1_denom + 1) - 1;
+    }
+    // Reach here if MPU clk not from periph PLL but NOC clk is
+    else if (Cfg->mainpll.nocclk_src == ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_PERI) {
+      // calculate the safe numer value
+      ClkHz = (SafeHz / GetPeripheralVcoClockSource()) *
+              (Cfg->mainpll.nocclk_cnt + 1) *
+              (ALT_CLKMGR_NOCCLK_PERICNT_GET(Cfg->alteragrp.nocclk) + 1) *
+              (Cfg->perpll.vco1_denom +1 ) - 1;
+    }
+  }
+
+  return ClkHz;
+}
+
+// ramping the main PLL to final value
+VOID
+EFIAPI
+PllRampMain(
+  IN UINT32 PllRampMainHz
+  )
+{
+  UINT32  ClkHz = 0;
+  UINT32  ClkIncrementHz = 0;
+  UINT32  ClkFinalHz = 0;
+  CLOCK_MANAGER_CONFIG*  Cfg;
+  Cfg = &mClkCfg;
+
+  // find out the increment value
+  if (Cfg->mainpll.mpuclk_src == ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_MAIN) {
+    ClkIncrementHz = ALT_CLKMGR_PLL_RAMP_MPUCLK_INCREMENT_HZ;
+    ClkFinalHz = GetMpuClockFrequencyInHz();
+  } else if (Cfg->mainpll.nocclk_src == ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_MAIN) {
+    ClkIncrementHz = ALT_CLKMGR_PLL_RAMP_NOCCLK_INCREMENT_HZ;
+    ClkFinalHz = GetNocClockFrequencyInHz();
+  }
+  // execute the ramping here/
+  for (ClkHz = PllRampMainHz + ClkIncrementHz; ClkHz < ClkFinalHz; ClkHz += ClkIncrementHz) {
+    MmioAndThenOr32 (ALT_CLKMGR_MAINPLL_OFST +
+                    ALT_CLKMGR_MAINPLL_VCO1_OFST,
+                    ALT_CLKMGR_MAINPLL_VCO1_DENOM_CLR_MSK &
+                    ALT_CLKMGR_MAINPLL_VCO1_NUMER_CLR_MSK,
+                    ALT_CLKMGR_MAINPLL_VCO1_DENOM_SET(Cfg->mainpll.vco1_denom) |
+                    ALT_CLKMGR_MAINPLL_VCO1_NUMER_SET(GetSafePllNumerator(0, ClkHz)));
+
+    MicroSecondDelay(1000);
+     // Wait until both the Main PLL and the Peripheral PLL is locked
+    WaitPllLocked ();
+  }
+  MmioAndThenOr32 (ALT_CLKMGR_MAINPLL_OFST +
+                   ALT_CLKMGR_MAINPLL_VCO1_OFST,
+                   ALT_CLKMGR_MAINPLL_VCO1_DENOM_CLR_MSK &
+                   ALT_CLKMGR_MAINPLL_VCO1_NUMER_CLR_MSK,
+                   ALT_CLKMGR_MAINPLL_VCO1_DENOM_SET(Cfg->mainpll.vco1_denom) |
+                   ALT_CLKMGR_MAINPLL_VCO1_NUMER_SET(Cfg->mainpll.vco1_numer));
+  MicroSecondDelay(1000);
+  // Wait until both the Main PLL and the Peripheral PLL is locked
+  WaitPllLocked ();
+
+}
+
+VOID
+EFIAPI
+PllRampPeripheral(
+  IN UINT32 PllRampHz
+  )
+{
+  UINT32 ClkHz = 0;
+  UINT32 ClkIncrementHz = 0;
+  UINT32 ClkFinalHz = 0;
+  CLOCK_MANAGER_CONFIG*  Cfg;
+
+  Cfg = &mClkCfg;
+
+  // find out the increment value and final clk freq
+  if (Cfg->mainpll.mpuclk_src == ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_PERI) {
+    ClkIncrementHz = ALT_CLKMGR_PLL_RAMP_MPUCLK_INCREMENT_HZ;
+    ClkFinalHz = GetMpuClockFrequencyInHz();
+  } else if (Cfg->mainpll.nocclk_src == ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_PERI) {
+    ClkIncrementHz = ALT_CLKMGR_PLL_RAMP_NOCCLK_INCREMENT_HZ;
+    ClkFinalHz = GetNocClockFrequencyInHz();
+  }
+  // execute the ramping here
+  for (ClkHz = PllRampHz + ClkIncrementHz; ClkHz < ClkFinalHz; ClkHz += ClkIncrementHz) {
+    MmioAndThenOr32 (ALT_CLKMGR_PERPLL_OFST +
+                    ALT_CLKMGR_PERPLL_VCO1_OFST,
+                    ALT_CLKMGR_PERPLL_VCO1_DENOM_CLR_MSK &
+                    ALT_CLKMGR_PERPLL_VCO1_NUMER_CLR_MSK,
+                    ALT_CLKMGR_PERPLL_VCO1_DENOM_SET(Cfg->perpll.vco1_denom) |
+                    ALT_CLKMGR_PERPLL_VCO1_NUMER_SET(GetSafePllNumerator(0, ClkHz)));
+
+    MicroSecondDelay(1000);
+     // Wait until both the Main PLL and the Peripheral PLL is locked
+    WaitPllLocked ();
+  }
+  MmioAndThenOr32 (ALT_CLKMGR_PERPLL_OFST +
+                   ALT_CLKMGR_PERPLL_VCO1_OFST,
+                   ALT_CLKMGR_PERPLL_VCO1_DENOM_CLR_MSK &
+                   ALT_CLKMGR_PERPLL_VCO1_NUMER_CLR_MSK,
+                   ALT_CLKMGR_PERPLL_VCO1_DENOM_SET(Cfg->perpll.vco1_denom) |
+                   ALT_CLKMGR_PERPLL_VCO1_NUMER_SET(Cfg->perpll.vco1_numer));
+
+  MicroSecondDelay(1000);
+  // Wait until both the Main PLL and the Peripheral PLL is locked
+  WaitPllLocked ();
+
+}
+
+VOID
+EFIAPI
+WaitPllLocked (
+  VOID
+  )
+{
+  UINT32 Data32;
+  do {
+    Data32 = MmioRead32 (ALT_CLKMGR_CLKMGR_OFST +
+                         ALT_CLKMGR_CLKMGR_STAT_OFST);
+  } while ((ALT_CLKMGR_CLKMGR_STAT_MAINPLLLOCKED_GET(Data32) == 0) ||
+           (ALT_CLKMGR_CLKMGR_STAT_PERPLLLOCKED_GET(Data32) == 0));
+}
+
+UINT32
+EFIAPI
+GetMainVcoClockFrequencyInHz(
+  VOID
+  )
+{
+  UINT32  PLL0VcoFreqInHz;
+  CLOCK_MANAGER_CONFIG*  Cfg;
+
+  Cfg = &mClkCfg;
+
+  PLL0VcoFreqInHz = GetMainVcoClockSource();
+  PLL0VcoFreqInHz = PLL0VcoFreqInHz / (Cfg->mainpll.vco1_denom + 1);
+  PLL0VcoFreqInHz = PLL0VcoFreqInHz * (Cfg->mainpll.vco1_numer + 1);
+
+  return PLL0VcoFreqInHz;
+}
+
+UINT32
+EFIAPI
+GetMainVcoClockSource(
+  VOID
+  )
+{
+  UINT32  Clk;
+  CLOCK_MANAGER_CONFIG*  Cfg;
+
+  Cfg = &mClkCfg;
+
+  switch (Cfg->mainpll.vco0_psrc)
+  {
+    case ALT_CLKMGR_MAINPLL_VCO0_PSRC_E_EOSC1:
+      Clk = mClkSrc.clk_freq_of_eosc1;
+      break;
+    case ALT_CLKMGR_MAINPLL_VCO0_PSRC_E_INTOSC:
+      Clk = mClkSrc.clk_freq_of_cb_intosc_ls;
+      break;
+    case ALT_CLKMGR_MAINPLL_VCO0_PSRC_E_F2S:
+      Clk = mClkSrc.clk_freq_of_f2h_free;
+      break;
+    default:
+      // We should have covered all possible conditions above
+      Clk = 0;
+      ASSERT_PLATFORM_INIT(0);
+      break;
+  }
+  return Clk;
+}
+
+UINT32
+EFIAPI
+GetPeripheralVcoClockFrequencyInHz(
+  VOID
+  )
+{
+  UINT32  PLL1VcoFreqInHz;
+
+  CLOCK_MANAGER_CONFIG*  Cfg;
+  Cfg = &mClkCfg;
+
+  PLL1VcoFreqInHz = GetPeripheralVcoClockSource ();
+  PLL1VcoFreqInHz = PLL1VcoFreqInHz / (Cfg->perpll.vco1_denom + 1);
+  PLL1VcoFreqInHz = PLL1VcoFreqInHz * (Cfg->perpll.vco1_numer + 1);
+
+  return PLL1VcoFreqInHz;
+}
+UINT32
+EFIAPI
+GetPeripheralVcoClockSource(
+  VOID
+  )
+{
+  UINT32  Clk;
+  CLOCK_MANAGER_CONFIG*  Cfg;
+
+  Cfg = &mClkCfg;
+
+  switch (Cfg->perpll.vco0_psrc)
+  {
+    case ALT_CLKMGR_PERPLL_VCO0_PSRC_E_EOSC1:
+      Clk = mClkSrc.clk_freq_of_eosc1;
+      break;
+    case ALT_CLKMGR_PERPLL_VCO0_PSRC_E_INTOSC:
+      Clk = mClkSrc.clk_freq_of_cb_intosc_ls;
+      break;
+    case ALT_CLKMGR_PERPLL_VCO0_PSRC_E_F2S:
+      Clk = mClkSrc.clk_freq_of_f2h_free;
+      break;
+    case ALT_CLKMGR_PERPLL_VCO0_PSRC_E_MAIN:
+      Clk = GetMainVcoClockFrequencyInHz();
+      Clk /= Cfg->mainpll.cntr15clk_cnt;
+      break;
+    default:
+      // We should have covered all supported conditions above
+      Clk = 0;
+      ASSERT_PLATFORM_INIT(0);
+      break;
+  }
+  return Clk;
+}
+
+// calculate the intended MPU clock frequency based on handoff
+UINT32
+EFIAPI
+GetMpuClockFrequencyInHz(
+  VOID
+  )
+{
+  UINT32 MpuClk;
+  CLOCK_MANAGER_CONFIG*  Cfg;
+  Cfg = &mClkCfg;
+
+  switch (Cfg->mainpll.mpuclk_src) {
+  case ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_MAIN:
+    MpuClk = GetMainVcoClockFrequencyInHz();
+    MpuClk /= ((Cfg->alteragrp.mpuclk & ALT_CLKMGR_MPUCLK_MAINCNT_SET_MSK) + 1);
+    break;
+  case ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_PERI:
+    MpuClk = GetPeripheralVcoClockFrequencyInHz();
+    MpuClk /= (((Cfg->alteragrp.mpuclk >>
+             ALT_CLKMGR_MPUCLK_PERICNT_LSB) &
+             ALT_CLKMGR_MPUCLK_PERICNT_SET_MSK) + 1);
+    break;
+  case ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_OSC1:
+    MpuClk = mClkSrc.clk_freq_of_eosc1;
+    break;
+  case ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_INTOSC:
+    MpuClk =  mClkSrc.clk_freq_of_cb_intosc_ls;
+    break;
+  case ALT_CLKMGR_MAINPLL_MPUCLK_SRC_E_FPGA:
+    MpuClk = mClkSrc.clk_freq_of_f2h_free;
+    break;
+  default:
+    MpuClk = 0;
+    break;
+  }
+
+  MpuClk /= (Cfg->mainpll.mpuclk_cnt + 1);
+  return MpuClk;
+
+}
+
+UINT32
+EFIAPI
+GetNocClockFrequencyInHz(
+  VOID
+  )
+{
+  UINT32 NocClk;
+  CLOCK_MANAGER_CONFIG*  Cfg;
+  Cfg = &mClkCfg;
+
+  switch (Cfg->mainpll.nocclk_src) {
+  case ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_MAIN:
+    NocClk = GetMainVcoClockFrequencyInHz();
+    NocClk /= ((Cfg->alteragrp.nocclk & ALT_CLKMGR_NOCCLK_MAINCNT_SET_MSK) + 1);
+    break;
+  case ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_PERI:
+    NocClk = GetPeripheralVcoClockFrequencyInHz();
+    NocClk /= (((Cfg->alteragrp.nocclk >>
+              ALT_CLKMGR_NOCCLK_PERICNT_LSB) &
+              ALT_CLKMGR_NOCCLK_PERICNT_SET_MSK) + 1);
+    break;
+  case ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_OSC1:
+    NocClk = mClkSrc.clk_freq_of_eosc1;
+    break;
+  case ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_INTOSC:
+    NocClk =  mClkSrc.clk_freq_of_cb_intosc_ls;
+    break;
+  case ALT_CLKMGR_MAINPLL_NOCCLK_SRC_E_FPGA:
+    NocClk = mClkSrc.clk_freq_of_f2h_free;
+    break;
+  default:
+    NocClk = 0;
+    break;
+  }
+
+  NocClk /= (Cfg->mainpll.nocclk_cnt + 1);
+  return NocClk;
 }
 
 
@@ -1031,4 +1504,3 @@ SaveClockManagerCfg (
                ALT_SYSMGR_ROM_ISW_HANDOFF_OFST + ISW_HANDOFF_SLOT8_L4_SP_CLK_IN_MHZ_OFST,
                ALT_SYSMGR_ROM_ISW_HANDOFF_ISW_HANDOFF_SET(l4_sp_clk_InMhz));
 }
-

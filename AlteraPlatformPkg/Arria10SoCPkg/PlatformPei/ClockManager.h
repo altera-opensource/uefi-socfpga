@@ -81,4 +81,72 @@ Get_l4_sp_ClockFrequencyInMhz (
   VOID
   );
 
+BOOLEAN
+EFIAPI
+IsPllRampRequired(
+  IN UINTN MainOrPeripheral
+  );
+
+UINT32
+EFIAPI
+GetSafePllNumerator (
+  IN UINTN  MainOrPeripheral,
+  IN UINT32 SafeHz
+  );
+
+VOID
+EFIAPI
+PllRampMain(
+  IN UINT32 PllRampMainHz
+  );
+
+VOID
+EFIAPI
+PllRampPeripheral(
+  IN UINT32 PllRampMainHz
+  );
+
+UINT32
+EFIAPI
+GetMainVcoClockFrequencyInHz(
+  VOID
+  );
+
+UINT32
+EFIAPI
+GetPeripheralVcoClockFrequencyInHz(
+  VOID
+  );
+
+UINT32
+EFIAPI
+GetMpuClockFrequencyInHz(
+  VOID
+  );
+
+UINT32
+EFIAPI
+GetNocClockFrequencyInHz(
+  VOID
+  );
+
+VOID
+EFIAPI
+WaitPllLocked (
+  VOID
+  );
+
+UINT32
+EFIAPI
+GetMainVcoClockSource(
+  VOID
+  );
+
+UINT32
+EFIAPI
+GetPeripheralVcoClockSource(
+  VOID
+  );
+
+
 #endif

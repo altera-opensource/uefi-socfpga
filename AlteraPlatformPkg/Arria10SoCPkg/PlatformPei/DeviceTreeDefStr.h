@@ -132,6 +132,7 @@ PROPERTY_NAME ClockManagerPerPllCfgStr[] = {
 
 PROPERTY_NAME ClockManagerAlteraGrpCfgStr[] = {
   { "nocclk" },
+  { "mpuclk" },
 };
 
 // ------------------------------------------------------------------
