@@ -252,114 +252,9 @@ LoadBootImageAndTransferControl (
   R1 = 0;
   R2 = 0;
 
-  // Open and Load Boot Image
-  // Objective:
-  // 1. Get Data location and Size of the BootImage
-  // 2. Get Memory Load Address and CPU Entry Point of the BootImage
-  // 3. Copy BootImage from Flash to Memory
-  switch (BootSourceType)
-  {
-    case BOOT_SOURCE_SDMMC:
-      // Load the file to memory
-
-      if (IsLinuxBoot == 1)
-      {
-        // Read linux-socfpga zImage file into memory
-        // linux-socfpga zImage entry is fixed address at 0x8000
-        LoadAddr   = LINUX_ZIMAGE_LOAD_ADDR;
-        EntryPoint = LINUX_ZIMAGE_LOAD_ADDR;
-        Status = LoadFileToMemory (
-          (CHAR8*) PcdGetPtr (PcdFileName_ZIMAGE),
-          LoadAddr,
-          &DataSize);
-      } else {
-        // Read binary image file of Baremetal Application or RTOS into memory
-        // If the file contain an MKIMAGE header,
-        // it will utilize the LoadAddr and EntryPoint value from the MKIMAGE header
-        // otherwiser, value from the PCDs will be used
-        Status = LoadBootImageFile (
-          (CHAR8*) PcdGetPtr (PcdFileName_BOOTIMAGE_BIN),
-          &LoadAddr,
-          &EntryPoint,
-          &DataSize
-          );
-      }
-      // Check if BootImage loading failed?
-      if (EFI_ERROR(Status)) {
-        ASSERT_PLATFORM_INIT(0);
-        // Halt the system
-        EFI_DEADLOOP();
-      }
-      break;
-
-    case BOOT_SOURCE_NAND:
-    case BOOT_SOURCE_QSPI:
-      FlashOffset = PcdGet64 (PcdQspiOrNand_BOOTIMAGE_ADDR);
-
-      // Check if MKIMAGE header exist
-      // if MKIMAGE header exist, image size and entry point will be based on MKIMAGE header
-      // else value in PCDs will be used.
-      if (BootSourceType == BOOT_SOURCE_QSPI)
-      {
-        // Read from QSPI
-        Status = QspiRead ((VOID *) &ImgHdr, FlashOffset, sizeof(ImgHdr));
-      } else {
-        // Read from NAND
-        Status = NandRead ((VOID *) &ImgHdr, FlashOffset, sizeof(ImgHdr));
-      }
-      // Flash Read Error Checking
-      if (EFI_ERROR(Status)) {
-        InfoPrint ("Flash Read Error!");
-        ASSERT_PLATFORM_INIT(0);
-        EFI_DEADLOOP();
-      }
-
-      Status = ValidateMkimageHeader(&ImgHdr);
-      if (EFI_ERROR(Status)) {
-        // Boot Image do not use mkimage header
-        DataSize    = PcdGet32 (PcdQspiOrNand_BOOTIMAGE_SIZE);
-      } else {
-        // Boot Image have mkimage header
-        FlashOffset = FlashOffset + sizeof(ImgHdr);
-        DataSize    = ImgHdr.DataSize;
-        LoadAddr    = ImgHdr.LoadAddr;
-        EntryPoint  = ImgHdr.EntryPoint;
-      }
-
-      // Print message that we are going to read BootImage from QSPI or NAND flash
-      ProgressPrint ("Copying BootImage from Flash Offset 0x%08lx to Memory Address 0x%08lx where BootImage's size is 0x%08x bytes\r\n",
-        (UINT64) FlashOffset,
-        (UINT64) LoadAddr,
-        (UINT32) DataSize);
-      if (BootSourceType == BOOT_SOURCE_QSPI)
-      {
-        // Read from QSPI
-        Status = QspiRead ((VOID *) LoadAddr, FlashOffset, DataSize);
-      } else {
-        // Read from NAND
-        Status = NandRead ((VOID *) LoadAddr, FlashOffset, DataSize);
-      }
-      // Flash Read Error Checking
-      if (EFI_ERROR(Status)) {
-        InfoPrint ("Flash Read Error!");
-        ASSERT_PLATFORM_INIT(0);
-        EFI_DEADLOOP();
-      }
-      break;
-
-    case BOOT_SOURCE_RSVD:
-    case BOOT_SOURCE_FPGA:
-    default:
-      // No Flash device.
-      ASSERT_PLATFORM_INIT(0);
-      EFI_DEADLOOP();
-      break;
-  }
-
-  // Support loading of .DTB file for Linux zImage ?
+  // Load Linux DTB file for loading zImage ?
   if (IsLinuxBoot == 1)
   {
-    // Load Linux DTB file from Flash storage.
     OriginalFdtOffset = LINUX_DTB_ORIGINAL_OFFSET;
     switch (BootSourceType)
     {
@@ -406,7 +301,129 @@ LoadBootImageAndTransferControl (
     // and then patch the "memory" node and "chosen" node with runtime detected info
     Status = UpdateBootImageDtbWithMemoryInfoAndBootArgs (BootSourceType, RelocatedFdtOffset);
     ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+  }
 
+
+  // Open and Load Boot Image
+  // Objective:
+  // 1. Get Data location and Size of the BootImage
+  // 2. Get Memory Load Address and CPU Entry Point of the BootImage
+  // 3. Copy BootImage from Flash to Memory
+  switch (BootSourceType)
+  {
+    case BOOT_SOURCE_SDMMC:
+      // Load the file to memory
+
+      if (IsLinuxBoot == 1)
+      {
+        // Read linux-socfpga zImage file into memory
+        // linux-socfpga zImage entry is fixed address at 0x8000
+        LoadAddr   = LINUX_ZIMAGE_LOAD_ADDR;
+        EntryPoint = LINUX_ZIMAGE_LOAD_ADDR;
+        Status = LoadFileToMemory (
+          (CHAR8*) PcdGetPtr (PcdFileName_ZIMAGE),
+          LoadAddr,
+          &DataSize);
+      } else {
+        // Read binary image file of Baremetal Application or RTOS into memory
+        // If the file contain an MKIMAGE header,
+        // it will utilize the LoadAddr and EntryPoint value from the MKIMAGE header
+        // otherwiser, value from the PCDs will be used
+        LoadAddr = PcdGet32 (PcdBoot_BOOTIMAGE_MEM_LOAD_ADDR);
+        EntryPoint = PcdGet32 (PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR);
+        Status = LoadBootImageFile (
+          (CHAR8*) PcdGetPtr (PcdFileName_BOOTIMAGE_BIN),
+          &LoadAddr,
+          &EntryPoint,
+          &DataSize
+          );
+      }
+      // Check if BootImage loading failed?
+      if (EFI_ERROR(Status)) {
+        ASSERT_PLATFORM_INIT(0);
+        // Halt the system
+        EFI_DEADLOOP();
+      }
+      break;
+
+    case BOOT_SOURCE_NAND:
+    case BOOT_SOURCE_QSPI:
+      FlashOffset = PcdGet64 (PcdQspiOrNand_BOOTIMAGE_ADDR);
+
+      // Check if MKIMAGE header exist
+      // if MKIMAGE header exist, image size and entry point will be based on MKIMAGE header
+      // else value in PCDs will be used.
+      if (BootSourceType == BOOT_SOURCE_QSPI)
+      {
+        // Read from QSPI
+        Status = QspiRead ((VOID *) &ImgHdr, FlashOffset, sizeof(ImgHdr));
+      } else {
+        // Read from NAND
+        Status = NandRead ((VOID *) &ImgHdr, FlashOffset, sizeof(ImgHdr));
+      }
+      // Flash Read Error Checking
+      if (EFI_ERROR(Status)) {
+        InfoPrint ("Flash Read Error!");
+        ASSERT_PLATFORM_INIT(0);
+        EFI_DEADLOOP();
+      }
+
+      Status = ValidateMkimageHeader(&ImgHdr);
+      if (EFI_ERROR(Status)) {
+        // Boot Image do not use mkimage header
+        DataSize    = PcdGet32 (PcdQspiOrNand_BOOTIMAGE_SIZE);
+        if (IsLinuxBoot == 1)
+        {
+          // If IsLinuxBoot==1 then this is a zImage without mkimage header
+          // Use the default zImage entry address which is fixed address at 0x8000
+          LoadAddr   = LINUX_ZIMAGE_LOAD_ADDR;
+          EntryPoint = LINUX_ZIMAGE_LOAD_ADDR;
+        } else {
+          LoadAddr = PcdGet32 (PcdBoot_BOOTIMAGE_MEM_LOAD_ADDR);
+          EntryPoint = PcdGet32 (PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR);
+        }
+      } else {
+        // Boot Image have mkimage header
+        FlashOffset = FlashOffset + sizeof(ImgHdr);
+        DataSize    = ImgHdr.DataSize;
+        LoadAddr    = ImgHdr.LoadAddr;
+        EntryPoint  = ImgHdr.EntryPoint;
+      }
+
+      // Print message that we are going to read BootImage from QSPI or NAND flash
+      ProgressPrint ("Copying BootImage from Flash Offset 0x%08lx to Memory Address 0x%08lx where BootImage's size is 0x%08x bytes\r\n",
+        (UINT64) FlashOffset,
+        (UINT64) LoadAddr,
+        (UINT32) DataSize);
+      if (BootSourceType == BOOT_SOURCE_QSPI)
+      {
+        // Read from QSPI
+        Status = QspiRead ((VOID *) LoadAddr, FlashOffset, DataSize);
+      } else {
+        // Read from NAND
+        Status = NandRead ((VOID *) LoadAddr, FlashOffset, DataSize);
+      }
+      // Flash Read Error Checking
+      if (EFI_ERROR(Status)) {
+        InfoPrint ("Flash Read Error!");
+        ASSERT_PLATFORM_INIT(0);
+        EFI_DEADLOOP();
+      }
+      break;
+
+    case BOOT_SOURCE_RSVD:
+    case BOOT_SOURCE_FPGA:
+    default:
+      // No Flash device.
+      ASSERT_PLATFORM_INIT(0);
+      EFI_DEADLOOP();
+      break;
+  }
+
+
+  // Transfer control to Linux zImage ?
+  if (IsLinuxBoot == 1)
+  {
     // Make sure a valide zImage file is loaded prior to transfer control
     zImageSignaturePtr = (UINT32*)(UINTN)(LINUX_ZIMAGE_LOAD_ADDR + LINUX_ZIMAGE_SIGNATURE_OFFSET);
     if (*zImageSignaturePtr != LINUX_ZIMAGE_SIGNATURE) {
@@ -542,7 +559,7 @@ UpdateBootImageDtbWithMemoryInfoAndBootArgs (
     case BOOT_SOURCE_QSPI:
       // BootArgs for QSPI / NAND boot
       length = AsciiSPrint (NewBootArgsPtr, 1024,
-        "console=ttyS0,%d root=/dev/mtdblock1\0 rw rootfstype=jffs2\0",
+        "console=ttyS0,%d root=/dev/mtdblock1 rw rootfstype=jffs2",
         PcdGet32 (PcdSerialBaudRate));
       break;
 
