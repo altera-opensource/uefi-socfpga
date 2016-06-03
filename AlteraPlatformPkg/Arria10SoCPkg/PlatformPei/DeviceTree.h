@@ -70,7 +70,7 @@ GetFirewallCfg (
 
 VOID
 EFIAPI
-GetRbfFileCfg (
+GetRbfFileCfgFromDeviceTree (
   IN  CONST VOID*                  Fdt,
   OUT       RBF_FILE_CONFIG*       Cfg
   );
@@ -97,11 +97,18 @@ IsSkipFpgaConfig (
 
 VOID
 EFIAPI
-GetRbfOffset (
+GetRbfOffsetFromDeviceTree (
   IN  CONST VOID*                  Fdt,
   OUT       UINT32*                RbfOffset
   );
-  
+
+VOID
+EFIAPI
+GetRbfTypeFromDeviceTree (
+  IN  CONST VOID*                  Fdt,
+  OUT       UINT32*                RbfType
+  );
+
 VOID
 EFIAPI
 GetFpgaBridgeCfg (

@@ -40,7 +40,8 @@
 	model = "SOCFPGA Arria10 Dev Kit";	/* Bootloader setting: uboot.model */
 
 	chosen {
-		cff-file = "ghrd_10as066n2.rbf";	/* Bootloader setting: uboot.rbf_filename */
+		cff-file = "ghrd_10as066n2.periph.rbf";	/* Bootloader setting: uboot.rbf_filename */
+		early-release-fpga-config;
 	};
 
 	/* Clock sources */
@@ -341,7 +342,7 @@
 
 	hps_fpgabridge3: fpgabridge@3 {
 		compatible = "altr,socfpga-fpga2sdram0-bridge";
-		init-val = <0>;
+		init-val = <1>;
 	};
 
 	hps_fpgabridge4: fpgabridge@4 {

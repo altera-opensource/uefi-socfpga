@@ -167,6 +167,10 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_ZIMAGE_AT_PEI_PHASE
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_UEFI_DXE_PHASE
+  gAlteraSocFpgaTokenSpaceGuid.PcdAutoProgramCoreRbf
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_CORE_RBF
+  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_CORE_RBF_ADDR
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdramBaseAddress_CORE_RBF
   gArmPlatformTokenSpaceGuid.PcdClusterCount
   gArmPlatformTokenSpaceGuid.PcdCoreCount
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize

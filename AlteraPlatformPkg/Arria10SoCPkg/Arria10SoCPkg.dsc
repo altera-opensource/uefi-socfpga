@@ -188,6 +188,12 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_BOOTIMAGE_BIN           |"bootimage.bin"
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_ZIMAGE                  |"zImage"
 
+  ## Early IO Release - Peripheral RBF is programmed first and Core RBF is programmed auto / manually later
+  gAlteraSocFpgaTokenSpaceGuid.PcdAutoProgramCoreRbf               |1
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_CORE_RBF                |"ghrd_10as066n2.core.rbf"
+  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_CORE_RBF_ADDR         |0x00820000
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdramBaseAddress_CORE_RBF        |0x40
+
   # Boot Image Load Address and Entry Point
   # If the image have mkimage header, it will based on mkimage header
   # If the image do not have an mkimage header, it will base on PCDs

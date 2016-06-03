@@ -47,6 +47,7 @@
 #define NODE_cff_file "cff-file"
 #define NODE_ext_fpga_config "external-fpga-config"
 #define NODE_cff_offset "cff-offset"
+#define NODE_early_release_fpga_config "early-release-fpga-config"
 
 // ------------------------------------------------------------------
 // clock source

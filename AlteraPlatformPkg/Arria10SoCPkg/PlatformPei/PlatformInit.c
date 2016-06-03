@@ -56,6 +56,7 @@
 #include "PlatformInit.h"
 #include "QspiLib.h"
 #include "ResetManager.h"
+#include "RawBinaryFile.h"
 #include "SdMmc.h"
 #include "SecurityManager.h"
 #include "SystemManager.h"
@@ -78,7 +79,9 @@ PeiStagePlatformInit (
   BOOLEAN           FlashDeviceIsAvailable;
   BOOLEAN           ReProgramFpgaEvenIfFpgaIsAlreadyInUserMode;
   BOOLEAN           DecidedToProgramFpga;
+  UINT32            RbfType;
 
+  RbfType = 0;
   Status = EFI_SUCCESS;
   AlreadyInitSerialPort = FALSE;
   DecidedToProgramFpga = FALSE;
@@ -176,13 +179,15 @@ PeiStagePlatformInit (
   // Start FPGA full configuration
   if ( DecidedToProgramFpga == TRUE )
   {
-    Status = FpgaFullConfiguration (Fdt, BootSourceType);
+    GetRbfTypeFromDeviceTree (Fdt, &RbfType);
+
+    Status = FpgaFullConfiguration (Fdt, BootSourceType, RbfType);
     ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
   }
 
   // Start Talking if FPGA ready and UART is not yet init
   // (if Dediacted IO then it is init above before caling GetBootSourceType)
-  if (( FpgaIsInUserMode() == TRUE ) &&
+  if ((( FpgaIsInUserMode() == TRUE ) ||(FpgaIsInEarlyUserMode () == TRUE)) &&
       ( AlreadyInitSerialPort == FALSE ))
   {
     // Start Talking
@@ -191,9 +196,9 @@ PeiStagePlatformInit (
   }
 
   // FPGA must have entered User Mode before we can proceed with HMC init
-  if (FpgaIsInUserMode() == FALSE )
+  if ((FpgaIsInUserMode() == FALSE) && (FpgaIsInEarlyUserMode () == FALSE))
   {
-    InfoPrint ("FPGA not in User Mode, cannot begin HMC init!\r\n");
+    InfoPrint ("FPGA not in User Mode or Early Use Mode, cannot begin HMC init!\r\n");
     EFI_DEADLOOP();
   }
 
@@ -214,8 +219,19 @@ PeiStagePlatformInit (
   // Display Firewall Info
   DisplayFirewallInfo ();
 
+  if ((DecidedToProgramFpga == TRUE) &&
+      (PcdGet32 (PcdAutoProgramCoreRbf) == 1) &&
+      (FpgaIsInEarlyUserMode () == TRUE) &&
+      (FpgaIsInUserMode() == FALSE ))
+  {
+    InfoPrint ("Program Core RBF\r\n");
+    RbfType = CORE_RBF;
+    Status = FpgaFullConfiguration (NULL, BootSourceType, RbfType);
+    ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+  }
+
   // Enable Hps and Fpga Bridges
-  if ( FpgaIsInUserMode() == TRUE )
+  if ((FpgaIsInUserMode() == TRUE))
   {
     EnableHpsAndFpgaBridges (Fdt);
   }

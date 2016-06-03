@@ -41,6 +41,7 @@
 #include "Assert.h"
 #include "DeviceTree.h"
 #include "DeviceTreeDefStr.h"
+#include "RawBinaryFile.h"
 
 #if (FixedPcdGet32(PcdDebugMsg_FDT) == 0)
   #define InfoPrint(FormatString, ...)    /* do nothing */
@@ -366,7 +367,7 @@ GetFirewallCfg (
 
 VOID
 EFIAPI
-GetRbfFileCfg (
+GetRbfFileCfgFromDeviceTree (
   IN  CONST VOID*                  Fdt,
   OUT       RBF_FILE_CONFIG*       Cfg
   )
@@ -403,7 +404,6 @@ GetRbfFileCfg (
     // Point to the next NULL terminated ASCII string
     while(*RbfFileName++ != 0);
   }
-
 }
 
 BOOLEAN
@@ -434,7 +434,7 @@ IsSkipFpgaConfig (
 
 VOID
 EFIAPI
-GetRbfOffset (
+GetRbfOffsetFromDeviceTree (
   IN  CONST VOID*                  Fdt,
   OUT       UINT32*                RbfOffset
   )
@@ -460,6 +460,33 @@ GetRbfOffset (
 
 }
 
+VOID
+EFIAPI
+GetRbfTypeFromDeviceTree (
+  IN  CONST VOID*                  Fdt,
+  OUT       UINT32*                RbfType
+  )
+{
+  INT32        Node;
+
+  // Point to "Chosen"
+  Node = fdt_subnode_offset(Fdt, 0, NODE_chosen);
+  if (Node == -FDT_ERR_NOTFOUND) {
+    InfoPrint ("FDT: %a not found\r\n", NODE_chosen);
+    ASSERT_PLATFORM_INIT(Node >= 0);
+    return;
+  }
+
+  if (fdt_getprop(Fdt, Node, NODE_early_release_fpga_config, NULL) != NULL) {
+    InfoPrint ("FDT: early IO release is enabled\r\n");
+    *RbfType = PERI_RBF;
+    return;
+  } else {
+    InfoPrint ("FDT: early IO release is disabled\r\n");
+    *RbfType = COMBINE_RBF;
+    return;
+  }
+}
 
 VOID
 EFIAPI
@@ -569,4 +596,3 @@ GetFpgaBridgeCfg (
              Cfg->f2sdr2.enable);
 
 }
-

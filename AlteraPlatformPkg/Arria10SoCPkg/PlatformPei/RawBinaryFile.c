@@ -47,6 +47,8 @@
 #include "QspiLib.h"
 #include "MkimageHeader.h"
 #include "RawBinaryFile.h"
+#include "PitStopUtility.h"
+#include "SdMmc.h"
 
 #if (FixedPcdGet32(PcdDebugMsg_Rbf) == 0)
   #define ProgressPrint(FormatString, ...)    /* do nothing */
@@ -156,7 +158,7 @@ OpenRawBinaryFile(
     case BOOT_SOURCE_NAND:
     case BOOT_SOURCE_QSPI:
       GetRbfOffset (Fdt, &mQspiNandRbfOffset);
-	  Status = FlashRead(mQspiNandRbfOffset, &ImgHdr, sizeof(ImgHdr));
+      Status = FlashRead(mQspiNandRbfOffset, &ImgHdr, sizeof(ImgHdr));
       if (EFI_ERROR(Status)) return Status;
 
       Status = ValidateMkimageHeader(&ImgHdr);
@@ -226,7 +228,7 @@ ReadRawBinaryFile(
   {
     case BOOT_SOURCE_NAND:
     case BOOT_SOURCE_QSPI:
-	  Status = FlashRead (mQspiNandRbfOffset + Offset + sizeof(MKIMG_HEADER), DestBuffer, ReadSize);
+      Status = FlashRead (mQspiNandRbfOffset + Offset + sizeof(MKIMG_HEADER), DestBuffer, ReadSize);
       break;
 
     case BOOT_SOURCE_SDMMC:
@@ -326,3 +328,101 @@ ReadRawBinaryFile(
   return Status;
 }
 
+VOID
+EFIAPI
+LoadCoreRbfImageToRam (
+  IN  UINTN            DestinationMemoryBase,
+  IN  UINT32           RbfSize
+  )
+{
+  EFI_STATUS        Status;
+  BOOT_SOURCE_TYPE  BootSourceType;
+
+  // Detect Boot Source Type
+  BootSourceType = GetBootSourceType ();
+  // Flash Device Type
+  switch (BootSourceType)
+  {
+    case BOOT_SOURCE_SDMMC:
+      // Read DXE.ROM file from root folder of FAT32 partition on SD/MMC card
+      LoadFileToMemory (
+        mFdtRbfCfg.RBF_FileName[0],
+        DestinationMemoryBase,
+        &RbfSize);  // this is just the dummy RbfSize that wont need to return back value to caller functions.
+
+      break;
+    case BOOT_SOURCE_NAND:
+    case BOOT_SOURCE_QSPI:
+      // Print message that we are going to read DXE.ROM from QSPI or NAND flash
+      ProgressPrint ("Copying DXE from Flash Offset 0x%08lx to RAM Address 0x%08lx with image size 0x%08x\r\n",
+        (UINT64) mQspiNandRbfOffset,
+        (UINT64) DestinationMemoryBase,
+        (UINT32) RbfSize);
+       if (BootSourceType == BOOT_SOURCE_QSPI)
+      {
+        // Read from QSPI
+        Status = QspiRead(
+          (VOID *) DestinationMemoryBase,
+          mQspiNandRbfOffset,
+          RbfSize);
+      } else {
+        // Read from NAND
+        Status = NandRead(
+          (VOID *) DestinationMemoryBase,
+          mQspiNandRbfOffset,
+          RbfSize);
+      }
+      // Error Checking
+      if (EFI_ERROR(Status)) {
+        InfoPrint ("Error Reading Core RBF image\r\n");
+      }
+      break;
+    case BOOT_SOURCE_RSVD:
+    case BOOT_SOURCE_FPGA:
+    default:
+      // No Flash device.
+      InfoPrint ("No flash devices\r\n");
+      break;
+  }
+
+}
+
+VOID
+EFIAPI
+GetRbfOffset (
+  IN  CONST VOID*                  Fdt,
+  OUT       UINT32*                RbfOffset
+  )
+{
+  if (Fdt != NULL) {
+    // get peri or combine RBF offset from DTB
+    GetRbfOffsetFromDeviceTree (Fdt, RbfOffset);
+  } else if (PcdGet32 (PcdAutoProgramCoreRbf) == 1) {
+    // get core RBF offset from PCD
+    *RbfOffset = (UINT32) PcdGet32(PcdQspiOrNand_CORE_RBF_ADDR);
+  } else {
+    //get core/peri/combine rbf offset from pitstop
+    GetRbfOffsetFromPitStop (RbfOffset);
+  }
+}
+
+VOID
+EFIAPI
+GetRbfFileCfg (
+  IN  CONST VOID*                  Fdt,
+  OUT       RBF_FILE_CONFIG*        RbfCfg
+  )
+{
+  if (Fdt != NULL) {
+    // get core/peri rbf file name from dtb
+    GetRbfFileCfgFromDeviceTree (Fdt, RbfCfg);
+  } else if (PcdGet32 (PcdAutoProgramCoreRbf) == 1) {
+    // get core rbf filename from PCD
+    RbfCfg->NumOfRbfFileParts = 1;
+    RbfCfg->RBF_FileName[0] = (CHAR8*) PcdGetPtr (PcdFileName_CORE_RBF);
+  } else {
+    //get core/peri/combine rbf offset from pitstop
+    RbfCfg->NumOfRbfFileParts = 1;
+    GetRbfFileNameFromPitStop(&RbfCfg->RBF_FileName[0]);
+  }
+}

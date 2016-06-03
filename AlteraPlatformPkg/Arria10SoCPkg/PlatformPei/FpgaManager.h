@@ -33,12 +33,12 @@
 #define __FPGAMANAGER_H__
 
 #include "BootSource.h"
-
+#include "RawBinaryFile.h"
 // ==================================================================
 // CONSTANT Definition
 // ==================================================================
 
-/* Timeout counter */
+// Timeout counter
 #define FPGA_TIMEOUT_CNT      0x1000000
 
 // ==================================================================
@@ -46,9 +46,9 @@
 // ==================================================================
 
 #define ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL_SET_MSD (\
-	ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_SET_MSK |\
-	ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_SET_MSK |\
-	ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_SET_MSK)
+        ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL0_SET_MSK |\
+        ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL1_SET_MSK |\
+        ALT_FPGAMGR_IMGCFG_STAT_F2S_MSEL2_SET_MSK)
 
 #define GET_MSEL \
        (((MmioRead32 (ALT_FPGAMGR_OFST + \
@@ -119,7 +119,8 @@ EFI_STATUS
 EFIAPI
 FpgaFullConfiguration (
   IN  VOID*             Fdt,
-  IN  BOOT_SOURCE_TYPE  BootSourceType
+  IN  BOOT_SOURCE_TYPE  BootSourceType,
+  IN  RBF_TYPE          RbfType
   );
 
 VOID
@@ -187,6 +188,23 @@ FpgaProgramWrite (
   IN UINTN  RbfSize
   );
 
+EFI_STATUS
+EFIAPI
+FpgaProgramWriteCore (
+  IN UINTN  RbfSize
+  );
+
+BOOLEAN
+EFIAPI
+FpgaIsInEarlyUserMode (
+  VOID
+  );
+
+EFI_STATUS
+EFIAPI
+WaitForEarlyUserMode (
+  VOID
+  );
 #endif
 
 

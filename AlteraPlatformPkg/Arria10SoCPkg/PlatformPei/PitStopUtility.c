@@ -47,6 +47,7 @@
 #include "QspiLib.h"
 #include "RawBinaryFile.h"
 #include "SdMmc.h"
+#include "FpgaManager.h"
 
 #define CARRIAGE_RERTURN 13
 #define NEWLINE_FEED     10
@@ -56,6 +57,9 @@
 #define MmioHexDump     SerialPortMmioHexDump
 //#define SerialPortScan  SemihostRead
 #define SerialPortScan  SerialPortRead
+
+UINT32            mRbfOffsetPitStop;
+CHAR8*            mRbfFileNamePitStop;
 
 VOID
 EFIAPI
@@ -204,6 +208,10 @@ PitStopCmdLine (
   BOOLEAN Same;
   EFI_STATUS Status;
   UINTN i;
+  UINT32 BootSourceType;
+  UINT32 RbfType;
+  CHAR8* BootSourceName;
+  CHAR8* RbfTypeName;
 
   while(1) {
     ArgCnt = 0;
@@ -473,6 +481,38 @@ PitStopCmdLine (
 
         LoadFileToMemory(TextFileName, Addr, NULL);
       }
+
+    // program rbf file
+    } else if (AsciiStrCmp((CHAR8*)Argument[0], "programrbf") == 0) {
+      // flash type
+      BootSourceType = 0;
+      BootSourceName = (CHAR8*)Argument[1];
+      Status = GetBootSourceTypeFromPitStop (BootSourceName, &BootSourceType);
+      if(EFI_ERROR(Status)){
+        SerialPortPrint ("Error: Invalid flash type\r\n");
+        continue;
+      }
+      // rbf type
+      RbfType = 0;
+      RbfTypeName = (CHAR8*)Argument[2];
+      Status = GetRbfTypeFromPitStop (RbfTypeName, &RbfType);
+      if(EFI_ERROR(Status)){
+        SerialPortPrint ("Error: Invalid rbf type\r\n");
+        continue;
+      }
+      // get file name or offset
+      if (AsciiStrCmp(BootSourceName, "mmc") == 0) {
+        AsciiStrCpy ((CHAR8*)TextFileName, (CHAR8*)Argument[3]);
+        SetRbfFileNameFromPitStop(TextFileName);
+      }
+      else {
+        Offset = AsciiStrHexToUintn((CHAR8*)Argument[3]); // LBA
+        SetRbfOffsetFromPitStop (Offset);
+      }
+
+      Status = FpgaFullConfiguration(NULL, BootSourceType, RbfType);
+      ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+
     // jump
     } else if (AsciiStrCmp((CHAR8*)Argument[0], "jump") == 0) {
 
@@ -536,11 +576,14 @@ PitStopCmdLine (
       SerialPortPrint ("hexdump file \r\n");
       SerialPortPrint ("fatload mmc addr file\r\n");
 
+      SerialPortPrint ("programrbf flashtype rbftype file/offset\r\n");
+
       SerialPortPrint ("jump addr [r0] [r1] [r2]\r\n");
       SerialPortPrint ("bootz [OPTIONAL:filename.dtb]\r\n");
       SerialPortPrint ("exit\r\n");
       SerialPortPrint ("Note: Use HEX format for number.  addr means memory address.\r\n");
       SerialPortPrint ("offset refer to flash device.  blockcnt is multiply of 512 bytes.\r\n");
+      SerialPortPrint ("rbftype value can be 'core' only for now.  flashtype value can be 'mmc','qspi'.\r\n");
 
     } else {
       SerialPortPrint("Invalid command\r\n");
@@ -551,3 +594,80 @@ PitStopCmdLine (
 
 }
 
+EFI_STATUS
+EFIAPI
+GetBootSourceTypeFromPitStop (
+  IN CHAR8*   BootSourceName,
+  OUT UINT32* BootSourceType
+  )
+{
+  if (AsciiStrCmp(BootSourceName, "mmc") == 0)
+    *BootSourceType = BOOT_SOURCE_SDMMC;
+  else if (AsciiStrCmp(BootSourceName, "nand") == 0)
+    *BootSourceType = BOOT_SOURCE_NAND;
+  else if (AsciiStrCmp(BootSourceName, "qspi") == 0)
+    *BootSourceType = BOOT_SOURCE_QSPI;
+  else
+    return EFI_NOT_FOUND;
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+GetRbfTypeFromPitStop (
+  IN CHAR8*   RbfTypeName,
+  OUT UINT32* RbfType
+  )
+{
+  if (AsciiStrCmp(RbfTypeName, "peripheral") == 0)
+    *RbfType = PERI_RBF;
+  else if (AsciiStrCmp(RbfTypeName, "core") == 0)
+    *RbfType = CORE_RBF;
+  else if (AsciiStrCmp(RbfTypeName, "combined") == 0)
+    *RbfType = COMBINE_RBF;
+  else
+    return EFI_NOT_FOUND;
+ return EFI_SUCCESS;
+}
+
+
+VOID
+EFIAPI
+SetRbfOffsetFromPitStop (
+  IN UINT32 RbfOffset
+  )
+{
+  mRbfOffsetPitStop = RbfOffset;
+
+}
+
+VOID
+EFIAPI
+GetRbfOffsetFromPitStop (
+  OUT UINT32* RbfOffset
+  )
+{
+  *RbfOffset = mRbfOffsetPitStop;
+
+}
+
+VOID
+EFIAPI
+SetRbfFileNameFromPitStop (
+  IN CHAR8* RbfFileName
+  )
+{
+  mRbfFileNamePitStop = RbfFileName;
+
+}
+
+VOID
+EFIAPI
+GetRbfFileNameFromPitStop (
+  IN CHAR8** RbfFileName
+  )
+{
+  *RbfFileName = mRbfFileNamePitStop;
+
+}

@@ -33,6 +33,13 @@
 #define __RAW_BINARY_FILE_H__
 
 #include "BootSource.h"
+#include "DeviceTree.h"
+
+typedef enum {
+    PERI_RBF = 0,
+    CORE_RBF,
+    COMBINE_RBF,
+} RBF_TYPE;
 
 // ==================================================================
 // Functions Definition
@@ -68,6 +75,27 @@ ReadRawBinaryFile(
   IN  UINT32  Offset,
   IN  UINTN   ReadSize,
   OUT VOID*   Buffer
+  );
+
+VOID
+EFIAPI
+LoadCoreRbfImageToRam (
+  IN  UINTN            DestinationMemoryBase,
+  IN  UINT32           RbfSize
+  );
+
+VOID
+EFIAPI
+GetRbfFileCfg (
+  IN  CONST VOID*                  Fdt,
+  OUT       RBF_FILE_CONFIG*       RbfCfg
+  );
+
+VOID
+EFIAPI
+GetRbfOffset (
+  IN  CONST VOID*                  Fdt,
+  OUT       UINT32*                RbfOffset
   );
 
 #endif

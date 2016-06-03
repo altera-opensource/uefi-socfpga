@@ -43,7 +43,7 @@
 #include "Assert.h"
 #include "DeviceTree.h"
 #include "FpgaManager.h"
-#include "RawBinaryFile.h"
+#include "PitStopUtility.h"
 
 #if (FixedPcdGet32(PcdDebugMsg_FpgaManager) == 0)
   //#define ProgressPrint(FormatString, ...)    /* do nothing */
@@ -155,7 +155,6 @@ FpgaIsInUserMode (
     return FALSE;
   }
 }
-
 
 EFI_STATUS
 EFIAPI
@@ -371,9 +370,98 @@ FpgaProgramWrite (
 
 EFI_STATUS
 EFIAPI
+FpgaProgramWriteCore (
+  IN UINTN  RbfSize
+  )
+{
+  UINTN       i;
+  UINT32*     SrcDataPtr;
+  UINT32*     DstDataPtr;
+  UINT32      SyncData;
+  UINTN       SdramBaseAddress;
+
+  DstDataPtr = (UINT32 *)ALT_FPGAMGRDATA_OFST;
+  SdramBaseAddress = (UINTN)PcdGet64(PcdSdramBaseAddress_CORE_RBF);
+
+  LoadCoreRbfImageToRam (SdramBaseAddress, RbfSize);
+
+  // Sending block of Data to FPGA
+  SrcDataPtr = (UINT32*)SdramBaseAddress;
+  for (i = 0; i < (RbfSize/4); i++)
+  {
+    *DstDataPtr = *SrcDataPtr++;
+  }
+
+  // Send SYNC words to make sure that all data clock through the control block
+  SyncData = 0xffffffff;
+  for (i = 0; i < 10; i++)
+  {
+    *DstDataPtr = SyncData;
+  }
+
+  ProgressPrint ("\rDone.\r\n");
+  return EFI_SUCCESS;
+}
+
+BOOLEAN
+EFIAPI
+FpgaIsInEarlyUserMode (
+  VOID
+  )
+{
+  UINT32      Data32;
+
+  Data32 = MmioRead32(ALT_FPGAMGR_OFST + ALT_FPGAMGR_IMGCFG_STAT_OFST);
+
+  if (ALT_FPGAMGR_IMGCFG_STAT_F2S_EARLY_USERMOD_GET(Data32) == 1)
+  {
+    //InfoPrint ("FPGA is in Early User Mode\r\n");
+    return TRUE;
+  } else {
+    InfoPrint ("FPGA is not in Early User Mode\r\n");
+    return FALSE;
+  }
+}
+
+EFI_STATUS
+EFIAPI
+WaitForEarlyUserMode (
+  VOID
+  )
+{
+  UINTN       i;
+  UINT32*     DstDataPtr;
+  UINT32      SyncData;
+
+
+  DstDataPtr = (UINT32 *)ALT_FPGAMGRDATA_OFST;
+  // Send SYNC words to make sure that all data clock through the control block
+  SyncData = 0xffffffff;
+
+  for (i = 0; i < FPGA_TIMEOUT_CNT; i++) {
+    if (FpgaIsInEarlyUserMode () == TRUE)
+      break;
+    *DstDataPtr = SyncData;
+    MicroSecondDelay (1000);
+  }
+  //check timeout
+  if (i >= FPGA_TIMEOUT_CNT)
+  {
+    DisplayFpgaManagerInfo ();
+    InfoPrint ("Timeout waiting for FPGA to enter User Mode\r\n");
+    ASSERT_PLATFORM_INIT(0);
+    return EFI_TIMEOUT;
+  } else {
+    return EFI_SUCCESS;
+  }
+}
+
+EFI_STATUS
+EFIAPI
 FpgaFullConfiguration (
   IN  VOID*             Fdt,
-  IN  BOOT_SOURCE_TYPE  BootSourceType
+  IN  BOOT_SOURCE_TYPE  BootSourceType,
+  IN  RBF_TYPE          RbfType
   )
 {
   EFI_STATUS  Status;
@@ -394,13 +482,35 @@ FpgaFullConfiguration (
   InfoPrint ( "FPGA Manager Info before configuration begin:\r\n");
   DisplayFpgaManagerInfo ();
 
-  Status = OpenRawBinaryFile(Fdt, BootSourceType, &RbfSize);
+  // checking input RbfType value
+  if ((RbfType != PERI_RBF) &&
+      (RbfType != CORE_RBF) &&
+      (RbfType != COMBINE_RBF)) {
+    InfoPrint ("Invalid RbfType value = %d\r\n", RbfType);
+    return EFI_NOT_FOUND;
+  }
+  // open core rbf only if FPGA is in early user mode
+  if (RbfType == CORE_RBF) {
+    if (FpgaIsInEarlyUserMode () == FALSE) {
+      InfoPrint ("Fpga is Not In Early User Mode\r\n");
+      return EFI_DEVICE_ERROR;
+    }
+    InfoPrint ("Open Core Rbf\r\n");
+    Status = OpenRawBinaryFile(NULL, BootSourceType, &RbfSize);
+  } else {
+    InfoPrint ("Open peri/combined Rbf\r\n");
+    Status = OpenRawBinaryFile(Fdt, BootSourceType, &RbfSize);
+  }
+
   if ((Status != EFI_SUCCESS) ||
       (RbfSize < RBF_BUFFER_SIZE)) {
     InfoPrint ("Error opening RBF file\r\n");
     return EFI_BAD_BUFFER_SIZE;
   }
 
+  if (RbfType == CORE_RBF) {
+    goto WriteData;
+  }
   //
   // Arria 10 SoC FPGA Full Configuration Flow:
   //
@@ -589,8 +699,19 @@ FpgaFullConfiguration (
   Status = WaitForNconfigAndNstatusToGoesHigh ();
   if (EFI_ERROR(Status)) return Status;
 
-  Status = FpgaProgramWrite (RbfSize);
-  if (EFI_ERROR(Status)) return Status;
+WriteData:
+  if (RbfType == CORE_RBF) {
+    Status = FpgaProgramWriteCore (RbfSize);
+    if (EFI_ERROR(Status)) return Status;
+  } else {
+    Status = FpgaProgramWrite (RbfSize);
+    if (EFI_ERROR(Status)) return Status;
+  }
+
+  // for IO release peripheral core
+  if (RbfType == PERI_RBF) {
+    return WaitForEarlyUserMode();
+  }
 
   // InfoPrint ("Step 11\r\n");
   //
@@ -614,6 +735,7 @@ FpgaFullConfiguration (
   // Wait for Initialization Sequence Completion.
   // Loop until F2S_USERMODE=1
   //
+
   Status = WaitForUserMode();
   if (EFI_ERROR(Status)) return Status;
 
@@ -623,6 +745,7 @@ FpgaFullConfiguration (
   // Stop DATA path and Dclk
   // EN_CFG_CTRL and EN_CFG_DATA = 0
   //
+
   MmioAnd32(ALT_FPGAMGR_OFST +
             ALT_FPGAMGR_IMGCFG_CTL_02_OFST,
             ALT_FPGAMGR_IMGCFG_CTL_02_EN_CFG_DATA_CLR_MSK &

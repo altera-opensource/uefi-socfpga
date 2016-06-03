@@ -41,6 +41,7 @@
 
 	chosen {
 		cff-offset = <0x00720000>;	/* Bootloader setting: uboot.rbf_offset */
+		early-release-fpga-config;
 	};
 
 	/* Clock sources */
@@ -341,7 +342,7 @@
 
 	hps_fpgabridge3: fpgabridge@3 {
 		compatible = "altr,socfpga-fpga2sdram0-bridge";
-		init-val = <0>;
+		init-val = <1>;
 	};
 
 	hps_fpgabridge4: fpgabridge@4 {

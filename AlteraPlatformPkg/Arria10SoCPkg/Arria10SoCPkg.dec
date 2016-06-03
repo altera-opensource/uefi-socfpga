@@ -217,3 +217,8 @@
   ## HPS EMac Interface
   gAlteraSocFpgaTokenSpaceGuid.PcdDefaultMacInterface|0|UINT32|0xFEDC0403
 
+  ## Early IO Release - Peripheral RBF is programmed first and Core RBF is programmed auto / manually later
+  gAlteraSocFpgaTokenSpaceGuid.PcdAutoProgramCoreRbf               |1|UINT32|0xFEDC0404
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_CORE_RBF                |"ghrd_10as066n2.core.rbf"|VOID*|0xFEDC0405
+  gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_CORE_RBF_ADDR         |0x00820000|UINT32|0xFEDC0406
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdramBaseAddress_CORE_RBF        |0x40|UINT64|0xFEDC0407

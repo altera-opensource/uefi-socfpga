@@ -51,5 +51,43 @@ IsEnterPitStop (
   VOID
   );
 
+EFI_STATUS
+EFIAPI
+GetBootSourceTypeFromPitStop (
+  IN CHAR8*   BootSourceName,
+  OUT UINT32* BootSourceType
+  );
+
+EFI_STATUS
+EFIAPI
+GetRbfTypeFromPitStop (
+  IN CHAR8*   RbfTypeName,
+  OUT UINT32* RbfType
+  );
+
+VOID
+EFIAPI
+SetRbfOffsetFromPitStop (
+  IN UINT32 RbfOffset
+  );
+
+VOID
+EFIAPI
+GetRbfOffsetFromPitStop (
+  OUT UINT32* RbfOffset
+  );
+
+VOID
+EFIAPI
+SetRbfFileNameFromPitStop (
+  IN CHAR8* RbfFileName
+  );
+
+VOID
+EFIAPI
+GetRbfFileNameFromPitStop (
+  IN CHAR8** RbfFileName
+  );
+
 #endif
 
