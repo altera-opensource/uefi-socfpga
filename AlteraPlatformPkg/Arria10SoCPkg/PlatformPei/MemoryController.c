@@ -395,14 +395,13 @@ ConfigureHmcAdaptorRegisters (
                 ALT_IO48_HMC_MMR_NIOSRESERVE0_OFST));
   Data32 = MmioRead32 (ALT_IO48_HMC_MMR_OFST + ALT_IO48_HMC_MMR_NIOSRESERVE1_OFST);
   // Check if the IO Size value from HMC MMR is legit
-  if (((DramIoWidth >= 16) && (DramIoWidth <= 64)) &&
-      (ALT_IO48_HMC_MMR_NIOSRESERVE1_ACDS_MAJOR_VER_GET(Data32) != 0))
+  if ((DramIoWidth >= 16) && (DramIoWidth <= 64))
   {
     // niosreserve(N) registers looks legit
     ProgressPrint ("\t\t DRAM IoSize from HMC_MMR.\r\n");
     DramIoWidth = DramIoWidth >> 5; // Convert it to DDRIOCTL_IO_SIZE format
   } else {
-    ProgressPrint ("\t\t ERROR! Fail to get DRAM IoSize from HMC_MMR_NIOSRESERVE1 using '1'.\r\n");
+    ProgressPrint ("\t\t ERROR! DRAM IoSize from HMC_MMR_NIOSRESERVE0 does not look legit\r\n");
     DramIoWidth = 1;
   }
   // Program the Dram IO Width
@@ -1073,8 +1072,8 @@ DisplayMemoryInfo (
   Data32 = MmioRead32 (ALT_IO48_HMC_MMR_OFST + ALT_IO48_HMC_MMR_NIOSRESERVE1_OFST);
   InfoPrint ( "\t IO48_HMC_MMR_NIOSRESERVE1: 0x%08x\r\n", Data32);
 
-  InfoPrint ("\t\t EMIF IP ACDS version : ");
   if (ALT_IO48_HMC_MMR_NIOSRESERVE1_ACDS_MAJOR_VER_GET(Data32) != 0) {
+    InfoPrint ("\t\t EMIF IP ACDS version : ");
     // Print "Major.Minor"
     InfoPrint ( "%d.%d",
                 ALT_IO48_HMC_MMR_NIOSRESERVE1_ACDS_MAJOR_VER_GET(Data32),
@@ -1101,8 +1100,6 @@ DisplayMemoryInfo (
         break;
     }
     InfoPrint ("\r\n");
-  } else {
-    InfoPrint ("N/A\r\n");
   }
 
   //-----------------------------------------------------------------------------
