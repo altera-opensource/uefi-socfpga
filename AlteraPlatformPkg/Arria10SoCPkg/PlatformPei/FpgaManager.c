@@ -55,6 +55,7 @@
 #endif
 
 #define RBF_BUFFER_SIZE    4096
+#define RBF_PERI_SIZE_MAX  512000
 
 //
 // Clock-to-data ratio (CDRATIO) is dependent on cfg width
@@ -489,6 +490,11 @@ FpgaFullConfiguration (
       (RbfSize < RBF_BUFFER_SIZE)) {
     InfoPrint ("Error opening RBF file\r\n");
     return EFI_BAD_BUFFER_SIZE;
+  }
+  // peripheral rbf file size should not exceed its max size
+  if ((RbfType == PERI_RBF) && (RbfSize > RBF_PERI_SIZE_MAX)) {
+    InfoPrint ("Programmed RBF is not peripheral\r\n");
+    return EFI_DEVICE_ERROR;
   }
 
   if (RbfType == CORE_RBF) {
