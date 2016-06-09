@@ -79,9 +79,9 @@ PeiStagePlatformInit (
   BOOLEAN           FlashDeviceIsAvailable;
   BOOLEAN           ReProgramFpgaEvenIfFpgaIsAlreadyInUserMode;
   BOOLEAN           DecidedToProgramFpga;
-  UINT32            RbfType;
+  RBF_TYPE          RbfType;
 
-  RbfType = 0;
+  RbfType = PERI_RBF;
   Status = EFI_SUCCESS;
   AlreadyInitSerialPort = FALSE;
   DecidedToProgramFpga = FALSE;

@@ -33,7 +33,7 @@
 #define __RAW_BINARY_FILE_H__
 
 #include "BootSource.h"
-#include "DeviceTree.h"
+#include "DeviceTreeDefCfg.h"
 
 typedef enum {
     PERI_RBF = 0,

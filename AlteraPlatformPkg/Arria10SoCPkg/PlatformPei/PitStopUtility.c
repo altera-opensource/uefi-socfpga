@@ -208,8 +208,8 @@ PitStopCmdLine (
   BOOLEAN Same;
   EFI_STATUS Status;
   UINTN i;
-  UINT32 BootSourceType;
-  UINT32 RbfType;
+  BOOT_SOURCE_TYPE BootSourceType;
+  RBF_TYPE RbfType;
   CHAR8* BootSourceName;
   CHAR8* RbfTypeName;
 
@@ -485,7 +485,7 @@ PitStopCmdLine (
     // program rbf file
     } else if (AsciiStrCmp((CHAR8*)Argument[0], "programrbf") == 0) {
       // flash type
-      BootSourceType = 0;
+      BootSourceType = BOOT_SOURCE_RSVD;
       BootSourceName = (CHAR8*)Argument[1];
       Status = GetBootSourceTypeFromPitStop (BootSourceName, &BootSourceType);
       if(EFI_ERROR(Status)){
@@ -493,7 +493,7 @@ PitStopCmdLine (
         continue;
       }
       // rbf type
-      RbfType = 0;
+      RbfType = PERI_RBF;
       RbfTypeName = (CHAR8*)Argument[2];
       Status = GetRbfTypeFromPitStop (RbfTypeName, &RbfType);
       if(EFI_ERROR(Status)){
@@ -597,8 +597,8 @@ PitStopCmdLine (
 EFI_STATUS
 EFIAPI
 GetBootSourceTypeFromPitStop (
-  IN CHAR8*   BootSourceName,
-  OUT UINT32* BootSourceType
+  IN  CHAR8*            BootSourceName,
+  OUT BOOT_SOURCE_TYPE* BootSourceType
   )
 {
   if (AsciiStrCmp(BootSourceName, "mmc") == 0)
@@ -616,8 +616,8 @@ GetBootSourceTypeFromPitStop (
 EFI_STATUS
 EFIAPI
 GetRbfTypeFromPitStop (
-  IN CHAR8*   RbfTypeName,
-  OUT UINT32* RbfType
+  IN  CHAR8*            RbfTypeName,
+  OUT RBF_TYPE*         RbfType
   )
 {
   if (AsciiStrCmp(RbfTypeName, "peripheral") == 0)

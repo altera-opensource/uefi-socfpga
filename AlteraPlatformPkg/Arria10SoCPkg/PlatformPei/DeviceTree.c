@@ -464,7 +464,7 @@ VOID
 EFIAPI
 GetRbfTypeFromDeviceTree (
   IN  CONST VOID*                  Fdt,
-  OUT       UINT32*                RbfType
+  OUT       RBF_TYPE*              RbfType
   )
 {
   INT32        Node;

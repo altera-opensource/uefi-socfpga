@@ -32,6 +32,8 @@
 #ifndef __PIT_STOP_UTILITY_H__
 #define __PIT_STOP_UTILITY_H__
 
+#include "RawBinaryFile.h"
+
 // ==================================================================
 // Functions Definition
 // ==================================================================
@@ -54,15 +56,15 @@ IsEnterPitStop (
 EFI_STATUS
 EFIAPI
 GetBootSourceTypeFromPitStop (
-  IN CHAR8*   BootSourceName,
-  OUT UINT32* BootSourceType
+  IN  CHAR8*            BootSourceName,
+  OUT BOOT_SOURCE_TYPE* BootSourceType
   );
 
 EFI_STATUS
 EFIAPI
 GetRbfTypeFromPitStop (
-  IN CHAR8*   RbfTypeName,
-  OUT UINT32* RbfType
+  IN  CHAR8*            RbfTypeName,
+  OUT RBF_TYPE*         RbfType
   );
 
 VOID

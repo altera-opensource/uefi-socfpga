@@ -33,6 +33,7 @@
 #define __DEVICE_TREE_H__
 
 #include "DeviceTreeDefCfg.h"
+#include "RawBinaryFile.h"
 
 // ==================================================================
 // Functions Definition
@@ -106,7 +107,7 @@ VOID
 EFIAPI
 GetRbfTypeFromDeviceTree (
   IN  CONST VOID*                  Fdt,
-  OUT       UINT32*                RbfType
+  OUT       RBF_TYPE*              RbfType
   );
 
 VOID

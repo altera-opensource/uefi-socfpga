@@ -144,11 +144,13 @@ OpenRawBinaryFile(
   OUT UINT32*           RbfSize
   )
 {
-  EFI_STATUS    Status;
-  INTN          i;
+  EFI_STATUS        Status;
+  INTN              i;
   // QSPI and NAND RBF files will have an MKIMAGE header
   // (MKIMAGE Header + file1 + file2 + ...)
-  MKIMG_HEADER  ImgHdr;
+  MKIMG_HEADER      ImgHdr;
+  RBF_FILE_CONFIG   RbfCfg;
+  UINT32            RbfOffset;
 
   mBootSourceType = BootSourceType;
   Status = EFI_UNSUPPORTED;
@@ -157,7 +159,8 @@ OpenRawBinaryFile(
   {
     case BOOT_SOURCE_NAND:
     case BOOT_SOURCE_QSPI:
-      GetRbfOffset (Fdt, &mQspiNandRbfOffset);
+      GetRbfOffset (Fdt, &RbfOffset);
+      mQspiNandRbfOffset = RbfOffset;
       Status = FlashRead(mQspiNandRbfOffset, &ImgHdr, sizeof(ImgHdr));
       if (EFI_ERROR(Status)) return Status;
 
@@ -172,7 +175,8 @@ OpenRawBinaryFile(
 
     case BOOT_SOURCE_SDMMC:
       *RbfSize = 0;
-      GetRbfFileCfg (Fdt, &mFdtRbfCfg);
+      GetRbfFileCfg (Fdt, &RbfCfg);
+      mFdtRbfCfg = RbfCfg;
       if (mFdtRbfCfg.NumOfRbfFileParts == 0) {
         return EFI_NOT_FOUND;
       }
@@ -337,6 +341,7 @@ LoadCoreRbfImageToRam (
 {
   EFI_STATUS        Status;
   BOOT_SOURCE_TYPE  BootSourceType;
+  UINT32            FileSize;
 
   // Detect Boot Source Type
   BootSourceType = GetBootSourceType ();
@@ -344,17 +349,17 @@ LoadCoreRbfImageToRam (
   switch (BootSourceType)
   {
     case BOOT_SOURCE_SDMMC:
-      // Read DXE.ROM file from root folder of FAT32 partition on SD/MMC card
+      // Read core RBF file from root folder of FAT32 partition on SD/MMC card
       LoadFileToMemory (
         mFdtRbfCfg.RBF_FileName[0],
         DestinationMemoryBase,
-        &RbfSize);  // this is just the dummy RbfSize that wont need to return back value to caller functions.
+        &FileSize);  // this is just the dummy FileSize that wont need to return back value to caller functions.
 
       break;
     case BOOT_SOURCE_NAND:
     case BOOT_SOURCE_QSPI:
-      // Print message that we are going to read DXE.ROM from QSPI or NAND flash
-      ProgressPrint ("Copying DXE from Flash Offset 0x%08lx to RAM Address 0x%08lx with image size 0x%08x\r\n",
+      // Print message that we are going to read core RBF from QSPI or NAND flash
+      ProgressPrint ("Copying Core RBF from Flash Offset 0x%08lx to RAM Address 0x%08lx with image size 0x%08x\r\n",
         (UINT64) mQspiNandRbfOffset,
         (UINT64) DestinationMemoryBase,
         (UINT32) RbfSize);
