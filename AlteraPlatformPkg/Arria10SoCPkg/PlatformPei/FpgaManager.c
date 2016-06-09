@@ -317,7 +317,6 @@ FpgaProgramWrite (
   UINT8       RbfData[RBF_BUFFER_SIZE];
   UINTN       Percentage;
   UINTN       BytesReadCounter;
-  UINT32      SyncData;
 
   BytesReadCounter = 0;
   Percentage = 0;
@@ -356,14 +355,6 @@ FpgaProgramWrite (
       ProgressPrint ("\r%2d%% ", Percentage);
     }
   }
-
-  // Send SYNC words to make sure that all data clock through the control block
-  SyncData = 0xffffffff;
-  for (i = 0; i < 10; i++)
-  {
-    *DstDataPtr = SyncData;
-  }
-
   ProgressPrint ("\rDone.\r\n");
   return EFI_SUCCESS;
 }
@@ -377,7 +368,6 @@ FpgaProgramWriteCore (
   UINTN       i;
   UINT32*     SrcDataPtr;
   UINT32*     DstDataPtr;
-  UINT32      SyncData;
   UINTN       SdramBaseAddress;
 
   DstDataPtr = (UINT32 *)ALT_FPGAMGRDATA_OFST;
@@ -390,13 +380,6 @@ FpgaProgramWriteCore (
   for (i = 0; i < (RbfSize/4); i++)
   {
     *DstDataPtr = *SrcDataPtr++;
-  }
-
-  // Send SYNC words to make sure that all data clock through the control block
-  SyncData = 0xffffffff;
-  for (i = 0; i < 10; i++)
-  {
-    *DstDataPtr = SyncData;
   }
 
   ProgressPrint ("\rDone.\r\n");
@@ -418,7 +401,7 @@ FpgaIsInEarlyUserMode (
     //InfoPrint ("FPGA is in Early User Mode\r\n");
     return TRUE;
   } else {
-    InfoPrint ("FPGA is not in Early User Mode\r\n");
+    //InfoPrint ("FPGA is not in Early User Mode\r\n");
     return FALSE;
   }
 }
