@@ -45,7 +45,9 @@
   #define dprintf null_printf
 #endif
 
+#ifndef MIN
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
+#endif
 
 /* Timeout for reset manager */
 #define ALT_I2C_RESET_TMO_INIT      8192
