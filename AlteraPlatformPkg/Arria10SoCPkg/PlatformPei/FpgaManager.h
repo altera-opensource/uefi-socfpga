@@ -120,7 +120,8 @@ EFIAPI
 FpgaFullConfiguration (
   IN  VOID*             Fdt,
   IN  BOOT_SOURCE_TYPE  BootSourceType,
-  IN  RBF_TYPE          RbfType
+  IN  RBF_TYPE          RbfType,
+  IN  BOOLEAN           CalledFromPitStop
   );
 
 VOID

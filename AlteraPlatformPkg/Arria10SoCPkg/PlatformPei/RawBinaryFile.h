@@ -66,7 +66,8 @@ EFIAPI
 OpenRawBinaryFile(
   IN  VOID*             Fdt,
   IN  BOOT_SOURCE_TYPE  BootSourceType,
-  OUT UINT32*           RbfSize
+  OUT UINT32*           RbfSize,
+  IN  BOOLEAN           CalledFromPitStop
   );
 
 EFI_STATUS
@@ -87,15 +88,17 @@ LoadCoreRbfImageToRam (
 VOID
 EFIAPI
 GetRbfFileCfg (
-  IN  CONST VOID*                  Fdt,
-  OUT       RBF_FILE_CONFIG*       RbfCfg
+  IN  CONST VOID*             Fdt,
+  OUT RBF_FILE_CONFIG*        RbfCfg,
+  IN  BOOLEAN                 CalledFromPitStop
   );
 
 VOID
 EFIAPI
 GetRbfOffset (
-  IN  CONST VOID*                  Fdt,
-  OUT       UINT32*                RbfOffset
+  IN  CONST VOID*              Fdt,
+  OUT       UINT32*            RbfOffset,
+  IN        BOOLEAN            CalledFromPitStop
   );
 
 #endif

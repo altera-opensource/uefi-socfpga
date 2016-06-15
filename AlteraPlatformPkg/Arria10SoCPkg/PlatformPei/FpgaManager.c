@@ -445,7 +445,8 @@ EFIAPI
 FpgaFullConfiguration (
   IN  VOID*             Fdt,
   IN  BOOT_SOURCE_TYPE  BootSourceType,
-  IN  RBF_TYPE          RbfType
+  IN  RBF_TYPE          RbfType,
+  IN  BOOLEAN           CalledFromPitStop
   )
 {
   EFI_STATUS  Status;
@@ -474,16 +475,19 @@ FpgaFullConfiguration (
     return EFI_NOT_FOUND;
   }
   // open core rbf only if FPGA is in early user mode
-  if (RbfType == CORE_RBF) {
+  if (CalledFromPitStop) {
+    InfoPrint ("Open Rbf from PitStop\r\n");
+    Status = OpenRawBinaryFile(NULL, BootSourceType, &RbfSize, TRUE);
+  } else if (RbfType == CORE_RBF) {
     if (FpgaIsInEarlyUserMode () == FALSE) {
       InfoPrint ("Fpga is Not In Early User Mode\r\n");
       return EFI_DEVICE_ERROR;
     }
-    InfoPrint ("Open Core Rbf\r\n");
-    Status = OpenRawBinaryFile(NULL, BootSourceType, &RbfSize);
+    InfoPrint ("Open Core Rbf defined by PCD\r\n");
+    Status = OpenRawBinaryFile(NULL, BootSourceType, &RbfSize, FALSE);
   } else {
-    InfoPrint ("Open peri/combined Rbf\r\n");
-    Status = OpenRawBinaryFile(Fdt, BootSourceType, &RbfSize);
+    InfoPrint ("Open peri/combined Rbf defined by DTB\r\n");
+    Status = OpenRawBinaryFile(Fdt, BootSourceType, &RbfSize, FALSE);
   }
 
   if ((Status != EFI_SUCCESS) ||

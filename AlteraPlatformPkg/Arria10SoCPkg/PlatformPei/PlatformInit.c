@@ -181,7 +181,7 @@ PeiStagePlatformInit (
   {
     GetRbfTypeFromDeviceTree (Fdt, &RbfType);
 
-    Status = FpgaFullConfiguration (Fdt, BootSourceType, RbfType);
+    Status = FpgaFullConfiguration (Fdt, BootSourceType, RbfType, FALSE);
     ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
   }
 
@@ -224,9 +224,9 @@ PeiStagePlatformInit (
       (FpgaIsInEarlyUserMode () == TRUE) &&
       (FpgaIsInUserMode() == FALSE ))
   {
-    InfoPrint ("Program Core RBF\r\n");
+    InfoPrint ("Program Core RBF automatically\r\n");
     RbfType = CORE_RBF;
-    Status = FpgaFullConfiguration (NULL, BootSourceType, RbfType);
+    Status = FpgaFullConfiguration (NULL, BootSourceType, RbfType, FALSE);
     ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
   }
 

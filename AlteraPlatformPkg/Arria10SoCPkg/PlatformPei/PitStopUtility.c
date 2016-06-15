@@ -510,7 +510,7 @@ PitStopCmdLine (
         SetRbfOffsetFromPitStop (Offset);
       }
 
-      Status = FpgaFullConfiguration(NULL, BootSourceType, RbfType);
+      Status = FpgaFullConfiguration(NULL, BootSourceType, RbfType, TRUE);
       ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
 
     // jump
@@ -583,7 +583,7 @@ PitStopCmdLine (
       SerialPortPrint ("exit\r\n");
       SerialPortPrint ("Note: Use HEX format for number.  addr means memory address.\r\n");
       SerialPortPrint ("offset refer to flash device.  blockcnt is multiply of 512 bytes.\r\n");
-      SerialPortPrint ("rbftype value can be 'core' only for now.  flashtype value can be 'mmc','qspi'.\r\n");
+      SerialPortPrint ("rbftype value can be 'core, peripheral, combined'.  flashtype value can be 'mmc','qspi', 'nand'.\r\n");
 
     } else {
       SerialPortPrint("Invalid command\r\n");

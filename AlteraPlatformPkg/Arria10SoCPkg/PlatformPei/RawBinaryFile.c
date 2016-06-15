@@ -141,7 +141,8 @@ EFIAPI
 OpenRawBinaryFile(
   IN  VOID*             Fdt,
   IN  BOOT_SOURCE_TYPE  BootSourceType,
-  OUT UINT32*           RbfSize
+  OUT UINT32*           RbfSize,
+  IN  BOOLEAN           CalledFromPitStop
   )
 {
   EFI_STATUS        Status;
@@ -159,7 +160,11 @@ OpenRawBinaryFile(
   {
     case BOOT_SOURCE_NAND:
     case BOOT_SOURCE_QSPI:
-      GetRbfOffset (Fdt, &RbfOffset);
+      GetRbfOffset (Fdt, &RbfOffset, CalledFromPitStop);
+      // Make sure RbfOffset is not invalid value
+      if(RbfOffset == 0xFFFFFFFF)
+        return EFI_INVALID_PARAMETER;
+
       mQspiNandRbfOffset = RbfOffset;
       Status = FlashRead(mQspiNandRbfOffset, &ImgHdr, sizeof(ImgHdr));
       if (EFI_ERROR(Status)) return Status;
@@ -175,7 +180,7 @@ OpenRawBinaryFile(
 
     case BOOT_SOURCE_SDMMC:
       *RbfSize = 0;
-      GetRbfFileCfg (Fdt, &RbfCfg);
+      GetRbfFileCfg (Fdt, &RbfCfg, CalledFromPitStop);
       mFdtRbfCfg = RbfCfg;
       if (mFdtRbfCfg.NumOfRbfFileParts == 0) {
         return EFI_NOT_FOUND;
@@ -396,38 +401,46 @@ VOID
 EFIAPI
 GetRbfOffset (
   IN  CONST VOID*                  Fdt,
-  OUT       UINT32*                RbfOffset
+  OUT       UINT32*                RbfOffset,
+  IN        BOOLEAN                CalledFromPitStop
   )
 {
   if (Fdt != NULL) {
-    // get peri or combine RBF offset from DTB
+    // Get peri or combine RBF offset from DTB
     GetRbfOffsetFromDeviceTree (Fdt, RbfOffset);
+  } else if (CalledFromPitStop == TRUE) {
+    // Get core/peri/combine rbf offset from pitstop
+    GetRbfOffsetFromPitStop (RbfOffset);
   } else if (PcdGet32 (PcdAutoProgramCoreRbf) == 1) {
-    // get core RBF offset from PCD
+    // Get core RBF offset from PCD
     *RbfOffset = (UINT32) PcdGet32(PcdQspiOrNand_CORE_RBF_ADDR);
   } else {
-    //get core/peri/combine rbf offset from pitstop
-    GetRbfOffsetFromPitStop (RbfOffset);
+    // Should not get here
+    *RbfOffset = 0xFFFFFFFF;
   }
 }
 
 VOID
 EFIAPI
 GetRbfFileCfg (
-  IN  CONST VOID*                  Fdt,
-  OUT       RBF_FILE_CONFIG*        RbfCfg
+  IN  CONST VOID*             Fdt,
+  OUT RBF_FILE_CONFIG*        RbfCfg,
+  IN  BOOLEAN                 CalledFromPitStop
   )
 {
   if (Fdt != NULL) {
-    // get core/peri rbf file name from dtb
+    // Get core/peri rbf file name from dtb
     GetRbfFileCfgFromDeviceTree (Fdt, RbfCfg);
+  }  else if (CalledFromPitStop == TRUE) {
+    // Get core/peri/combine rbf offset from pitstop
+    RbfCfg->NumOfRbfFileParts = 1;
+    GetRbfFileNameFromPitStop(&RbfCfg->RBF_FileName[0]);
   } else if (PcdGet32 (PcdAutoProgramCoreRbf) == 1) {
-    // get core rbf filename from PCD
+    // Get core rbf filename from PCD
     RbfCfg->NumOfRbfFileParts = 1;
     RbfCfg->RBF_FileName[0] = (CHAR8*) PcdGetPtr (PcdFileName_CORE_RBF);
   } else {
-    //get core/peri/combine rbf offset from pitstop
-    RbfCfg->NumOfRbfFileParts = 1;
-    GetRbfFileNameFromPitStop(&RbfCfg->RBF_FileName[0]);
+    // Should not get here
+    RbfCfg->NumOfRbfFileParts = 0;
   }
 }
