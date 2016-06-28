@@ -226,14 +226,6 @@ PitStopCmdLine (
       StrSplit(NULL, ' ',  (CHAR8*)Argument[++ArgCnt]);
     }
 
-    //SerialPortPrint("Number of argument is %d \r", ArgCnt);
-    //for (i = 0; i <= ArgCnt; i++)
-    //  SerialPortPrint("%a\n", (CHAR16*)Argument[i]);
-    //SerialPortPrint("Strlen of 1st argument is %d\r\n", AsciiStrLen(Argument[0]));
-    //for (i = 0; i <= AsciiStrLen(Argument[0]); i++)
-    //  SerialPortPrint("%c", Argument[0][i]);
-    //SerialPortPrint("\r\n");
-
     //memory display
     if (AsciiStrCmp((CHAR8*)Argument[0], "mr") == 0) {
       Addr = AsciiStrHexToUintn((CHAR8*)Argument[1]);
@@ -287,7 +279,7 @@ PitStopCmdLine (
     // memory hex dump
     } else if (AsciiStrCmp((CHAR8*)Argument[0], "mdmp") == 0) {
       Addr = AsciiStrHexToUintn((CHAR8*)Argument[1]);
-      Len  = (ArgCnt < 2)? 1: AsciiStrHexToUintn((CHAR8*)Argument[2]);
+      Len  = (ArgCnt < 2)? 4: AsciiStrHexToUintn((CHAR8*)Argument[2]);
       if (Addr & 0x3) {
         SerialPortPrint ("Error: Unaligned address\r\n");
         continue;
@@ -309,8 +301,7 @@ PitStopCmdLine (
         Len = AsciiStrHexToUintn((CHAR8*)Argument[4]);
 
         Status = QspiRead((VOID *)Addr, Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
-        //MmioHexDump(Addr, Len/4);
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       } else if (AsciiStrCmp((CHAR8*)Argument[1], "write") == 0) {
         if(ArgCnt != 4){
@@ -325,7 +316,7 @@ PitStopCmdLine (
         //MmioHexDump(Addr, Len/4);
 
         Status = QspiWrite((VOID *)Addr, Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       } else if (AsciiStrCmp((CHAR8*)Argument[1], "erase") == 0) {
         if(ArgCnt != 3){
@@ -336,7 +327,7 @@ PitStopCmdLine (
         Len  = AsciiStrHexToUintn((CHAR8*)Argument[3]);
 
         Status = QspiErase (Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       } else if (AsciiStrCmp((CHAR8*)Argument[1], "update") == 0) {
         if(ArgCnt != 4){
@@ -348,16 +339,17 @@ PitStopCmdLine (
         Len    = AsciiStrHexToUintn((CHAR8*)Argument[4]);
 
         Status = QspiUpdate((VOID *)Addr, Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       }
     // nand flash access
     } else if (AsciiStrCmp((CHAR8*)Argument[0], "nand") == 0) {
       if (AsciiStrCmp((CHAR8*)Argument[1], "probe") == 0) {
         Status = NandInit ();
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       } else if (AsciiStrCmp((CHAR8*)Argument[1], "read") == 0) {
-        if(ArgCnt != 4){
+        if(ArgCnt != 5){
           SerialPortPrint ("Error: Invalid Arguments\r\n");
           continue;
         }
@@ -365,12 +357,19 @@ PitStopCmdLine (
         Offset = AsciiStrHexToUintn((CHAR8*)Argument[3]);
         Len = AsciiStrHexToUintn((CHAR8*)Argument[4]);
 
-        Status = NandRead((VOID *)Addr, Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
-        //MmioHexDump(Addr, Len/4);
+        if (AsciiStrCmp((CHAR8*)Argument[5], "skip") == 0)
+          Status = NandReadSkipBadBlock((VOID *)Addr, Offset, Len);
+        else if (AsciiStrCmp((CHAR8*)Argument[5], "raw") == 0)
+          Status = NandReadRaw((VOID *)Addr, Offset, Len);
+        else if (AsciiStrCmp((CHAR8*)Argument[5], "spare") == 0)
+          Status = NandReadSpareData((UINT32 *)Addr, Offset, Len); // offset = block, len = page
+        else
+          Status = NandRead((VOID *)Addr, Offset, Len);
+
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       } else if (AsciiStrCmp((CHAR8*)Argument[1], "write") == 0) {
-        if(ArgCnt != 4){
+        if(ArgCnt != 5){
           SerialPortPrint ("Error: Invalid Arguments\r\n");
           continue;
         }
@@ -378,25 +377,30 @@ PitStopCmdLine (
         Offset  = AsciiStrHexToUintn((CHAR8*)Argument[3]);
         Len     = AsciiStrHexToUintn((CHAR8*)Argument[4]);
 
-        //SerialPortPrint("Write Data Content is:\r\n");
-        //MmioHexDump(Addr, Len/4);
+        if (AsciiStrCmp((CHAR8*)Argument[5], "skip") == 0)
+          Status = NandWriteSkipBadBlock((VOID *)Addr, Offset, Len);
+        else
+          Status = NandWrite((VOID *)Addr, Offset, Len);
 
-        Status = NandWrite((VOID *)Addr, Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       } else if (AsciiStrCmp((CHAR8*)Argument[1], "erase") == 0) {
-        if(ArgCnt != 3){
+        if(ArgCnt != 4){
           SerialPortPrint ("Error: Invalid Arguments\r\n");
           continue;
         }
         Offset  = AsciiStrHexToUintn((CHAR8*)Argument[2]);
         Len  = AsciiStrHexToUintn((CHAR8*)Argument[3]);
 
-        Status = NandErase (Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+         if (AsciiStrCmp((CHAR8*)Argument[4], "skip") == 0)
+          Status = NandEraseSkipBadBlock(Offset, Len);
+        else
+          Status = NandErase(Offset, Len);
+
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       } else if (AsciiStrCmp((CHAR8*)Argument[1], "update") == 0) {
-        if(ArgCnt != 4){
+        if(ArgCnt != 5){
           SerialPortPrint ("Error: Invalid Arguments\r\n");
           continue;
         }
@@ -404,8 +408,12 @@ PitStopCmdLine (
         Offset = AsciiStrHexToUintn((CHAR8*)Argument[3]);
         Len    = AsciiStrHexToUintn((CHAR8*)Argument[4]);
 
-        Status = NandUpdate((VOID *)Addr, Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+        if (AsciiStrCmp((CHAR8*)Argument[5], "skip") == 0)
+          Status = NandUpdateSkipBadBlock((VOID *)Addr, Offset, Len);
+        else
+          Status = NandUpdate((VOID *)Addr, Offset, Len);
+
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       } else if (AsciiStrCmp((CHAR8*)Argument[1], "test") == 0) {
         if(ArgCnt != 5){
@@ -418,12 +426,14 @@ PitStopCmdLine (
         Len    = AsciiStrHexToUintn((CHAR8*)Argument[5]);
         MmioHexDump(FromAddr, Len/4);
         Status = NandUpdate((VOID *)FromAddr, Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
         Status = NandRead((VOID *)ToAddr, Offset, Len);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
         MmioHexDump(ToAddr, Len/4);
 
+      } else if (AsciiStrCmp((CHAR8*)Argument[1], "bad") == 0) {
+        NandScanBadBlockWholeChip ();
       }
     // mmc read / write block
     } else if (AsciiStrCmp((CHAR8*)Argument[0], "mmc") == 0) {
@@ -437,7 +447,7 @@ PitStopCmdLine (
         Len = AsciiStrHexToUintn((CHAR8*)Argument[4]) * 512; // block count * 512 block size
 
         Status = MmcReadLba(Offset, Len,(VOID *)Addr);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
       } else if (AsciiStrCmp((CHAR8*)Argument[1], "write") == 0) {
         if(ArgCnt != 4){
@@ -449,7 +459,7 @@ PitStopCmdLine (
         Len = AsciiStrHexToUintn((CHAR8*)Argument[4]) * 512; // block count * 512 block size
 
         Status = MmcWriteLba(Offset, Len,(VOID *)Addr);
-        ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+        if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
       }
 
     // ls
@@ -511,7 +521,7 @@ PitStopCmdLine (
       }
 
       Status = FpgaFullConfiguration(NULL, BootSourceType, RbfType, TRUE);
-      ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
+      if (EFI_ERROR(Status)) SerialPortPrint ("Function return Error\r\n");
 
     // jump
     } else if (AsciiStrCmp((CHAR8*)Argument[0], "jump") == 0) {
@@ -564,10 +574,17 @@ PitStopCmdLine (
       SerialPortPrint ("qspi update addr offset len\r\n");
 
       SerialPortPrint ("nand probe\r\n");
-      SerialPortPrint ("nand read addr offset len\r\n");
-      SerialPortPrint ("nand write addr offset len\r\n");
-      SerialPortPrint ("nand erase offset len\r\n");
-      SerialPortPrint ("nand update addr offset len\r\n");
+      SerialPortPrint ("nand bad\r\n");
+      SerialPortPrint ("nand read addr offset len raw\r\n");
+      SerialPortPrint ("nand read addr offset len skip\r\n");
+      SerialPortPrint ("nand read addr offset len noskip\r\n");
+      SerialPortPrint ("nand read addr block page spare\r\n");
+      SerialPortPrint ("nand write addr offset len skip\r\n");
+      SerialPortPrint ("nand write addr offset len noskip\r\n");
+      SerialPortPrint ("nand erase offset len skip\r\n");
+      SerialPortPrint ("nand erase offset len noskip\r\n");
+      SerialPortPrint ("nand update addr offset len skip\r\n");
+      SerialPortPrint ("nand update addr offset len noskip\r\n");
 
       SerialPortPrint ("mmc read addr offset blockcnt\r\n");
       SerialPortPrint ("mmc write addr offset blockcnt\r\n");
@@ -583,7 +600,7 @@ PitStopCmdLine (
       SerialPortPrint ("exit\r\n");
       SerialPortPrint ("Note: Use HEX format for number.  addr means memory address.\r\n");
       SerialPortPrint ("offset refer to flash device.  blockcnt is multiply of 512 bytes.\r\n");
-      SerialPortPrint ("rbftype value can be 'core, peripheral, combined'.  flashtype value can be 'mmc','qspi', 'nand'.\r\n");
+      SerialPortPrint ("rbftype value can be 'core' only for now.  flashtype value can be 'mmc','qspi'.\r\n");
 
     } else {
       SerialPortPrint("Invalid command\r\n");
