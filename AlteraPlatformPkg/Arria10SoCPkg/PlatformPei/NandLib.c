@@ -64,6 +64,16 @@ UINT32 mLUT_ALT_NAND_STAT_INTR_STATn_OFST[] = {
 };
 
 //
+// Lookup table for ALT_NAND_STAT_INTR_EN[n]_OFST
+//
+UINT32 mLUT_ALT_NAND_STAT_INTR_ENn_OFST[] = {
+  ALT_NAND_STAT_OFST + ALT_NAND_STAT_INTR_EN0_OFST,
+  ALT_NAND_STAT_OFST + ALT_NAND_STAT_INTR_EN1_OFST,
+  ALT_NAND_STAT_OFST + ALT_NAND_STAT_INTR_EN2_OFST,
+  ALT_NAND_STAT_OFST + ALT_NAND_STAT_INTR_EN3_OFST
+};
+
+//
 // Lookup table for ALT_NAND_CFG_DEVICE_RST_BANK[n]_SET_MSK
 //
 UINT32 mLUT_ALT_NAND_CFG_DEVICE_RST_BANKn_SET_MSK[] = {
@@ -89,12 +99,13 @@ NandInit (
   VOID
   )
 {
-  UINTN  bootstrap_noinit;
-  UINTN  bootstrap_noloadb0p0;
-  UINTN  bootstrap_tworowaddr;
-  UINTN  bootstrap_page512;
-  UINTN  bootstrap_page512_x16;
+  UINTN  BootStrapNoInit;
+  UINTN  BootStrapNoLoadB0P0;
+  UINTN  BootStrapTwoRowAddr;
+  UINTN  BootStrapPage512;
+  UINTN  BootStrapPage512x16;
   UINTN  Bank;
+  UINT32 InterruptMask;
 
   ProgressPrint ("Initializing NAND\r\n");
 
@@ -112,25 +123,25 @@ NandInit (
   // If 1, inhibits NAND Flash Controller from performing initialization when coming
   // out of reset. Instead, software must program all registers pertaining to device
   // parameters like page size, width, etc.
-  bootstrap_noinit = 0;
+  BootStrapNoInit = 0;
 
   // Bootstrap Inhibit Load Block 0 Page 0
   // If 1, inhibits NAND Flash Controller from loading page 0 of block 0 of the NAND
   // device as part of the initialization procedure.
-  bootstrap_noloadb0p0 = 0;
+  BootStrapNoLoadB0P0 = 0;
 
   // Bootstrap Two Row Address Cycles
   // If 1, NAND device requires only 2 row address cycles instead of the normal 3 row
   // address cycles.
-  bootstrap_tworowaddr = 0;
+  BootStrapTwoRowAddr = 0;
 
   // Bootstrap 512 Byte Device
   // If 1, NAND device has a 512 byte page size.
-  bootstrap_page512 = 0;
+  BootStrapPage512 = 0;
 
   // Bootstrap 512 Byte and I/O width 16 bits Device
   // If 1, NAND device has 512 bytes page size and I/O width is 16 bits.
-  bootstrap_page512_x16 = 0;
+  BootStrapPage512x16 = 0;
 
   // Set Nand Bootstrap Control Register
   MmioAndThenOr32 (
@@ -141,11 +152,11 @@ NandInit (
     ALT_SYSMGR_NAND_BOOTSTRAP_TWOROWADDR_CLR_MSK &
     ALT_SYSMGR_NAND_BOOTSTRAP_PAGE512_CLR_MSK &
     ALT_SYSMGR_NAND_BOOTSTRAP_PAGE512_X16_CLR_MSK,
-    ALT_SYSMGR_NAND_BOOTSTRAP_NOINIT_SET(bootstrap_noinit) |
-    ALT_SYSMGR_NAND_BOOTSTRAP_NOLDB0P0_SET(bootstrap_noloadb0p0) |
-    ALT_SYSMGR_NAND_BOOTSTRAP_TWOROWADDR_SET(bootstrap_tworowaddr) |
-    ALT_SYSMGR_NAND_BOOTSTRAP_PAGE512_SET(bootstrap_page512) |
-    ALT_SYSMGR_NAND_BOOTSTRAP_PAGE512_X16_SET(bootstrap_page512_x16)
+    ALT_SYSMGR_NAND_BOOTSTRAP_NOINIT_SET(BootStrapNoInit) |
+    ALT_SYSMGR_NAND_BOOTSTRAP_NOLDB0P0_SET(BootStrapNoLoadB0P0) |
+    ALT_SYSMGR_NAND_BOOTSTRAP_TWOROWADDR_SET(BootStrapTwoRowAddr) |
+    ALT_SYSMGR_NAND_BOOTSTRAP_PAGE512_SET(BootStrapPage512) |
+    ALT_SYSMGR_NAND_BOOTSTRAP_PAGE512_X16_SET(BootStrapPage512x16)
     );
 
   // Release Nand Controller from Reset
@@ -185,6 +196,31 @@ NandInit (
     ALT_NAND_CFG_ECC_EN_OFST,
     ALT_NAND_CFG_ECC_EN_FLAG_SET_MSK);
 
+  // set up main access as default
+  MmioWrite32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_TFR_SPARE_REG_OFST,
+    ALT_NAND_CFG_TFR_SPARE_REG_RESET
+    );
+
+  // Ready/Busy pin to 1 for all banks
+  MmioWrite32(ALT_NAND_CFG_OFST +
+              ALT_NAND_CFG_RB_PIN_END_OFST,
+              ALT_NAND_CFG_RB_PIN_END_BANK0_SET_MSK |
+              ALT_NAND_CFG_RB_PIN_END_BANK1_SET_MSK |
+              ALT_NAND_CFG_RB_PIN_END_BANK2_SET_MSK |
+              ALT_NAND_CFG_RB_PIN_END_BANK3_SET_MSK
+              );
+  // Device can work in the chip enable dont care mode
+  MmioWrite32(ALT_NAND_CFG_OFST +
+              ALT_NAND_CFG_CHIP_EN_DONT_CARE_OFST,
+              ALT_NAND_CFG_CHIP_EN_DONT_CARE_FLAG_SET_MSK);
+
+  // spare are marker
+  MmioWrite32(ALT_NAND_CFG_OFST +
+              ALT_NAND_CFG_SPARE_AREA_MARKER_OFST,
+              ALT_NAND_CFG_SPARE_AREA_MARKER_VALUE_RESET);
+
   // Read NAND Flash Characteristic
   NandGetFlashInfo ();
 
@@ -196,14 +232,57 @@ NandInit (
     mFlash.FirstBlockOfNextPlane
     );
 
-  // Enables data DMA operation in the controller
-  MmioOr32 (
-    ALT_NAND_DMA_OFST +
-    ALT_NAND_DMA_DMA_EN_OFST,
-    ALT_NAND_DMA_DMA_EN_FLAG_SET_MSK
-    );
+  // Disable global interrupts
+  MmioWrite32 (ALT_NAND_CFG_OFST +
+               ALT_NAND_CFG_GLOB_INT_EN_OFST,
+               ALT_NAND_CFG_GLOB_INT_EN_RESET);
+
+  // Clear Interrupt status register for all Bank
+  for (Bank = 0; Bank < NAND_NUMBER_OF_BANK; Bank++) {
+    MmioWrite32(mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank], MAX_UINT32);
+  }
+
+  // enable all interrupt
+  InterruptMask = ALT_NAND_STAT_INTR_EN0_ECC_UNCOR_ERR_SET_MSK |
+                  ALT_NAND_STAT_INTR_EN0_DMA_CMD_COMP_SET_MSK  |
+                  ALT_NAND_STAT_INTR_EN0_TIME_OUT_SET_MSK      |
+                  ALT_NAND_STAT_INTR_EN0_PROGRAM_FAIL_SET_MSK  |
+                  ALT_NAND_STAT_INTR_EN0_ERASE_FAIL_SET_MSK    |
+                  ALT_NAND_STAT_INTR_EN0_LD_COMP_SET_MSK       |
+                  ALT_NAND_STAT_INTR_EN0_PROGRAM_COMP_SET_MSK  |
+                  ALT_NAND_STAT_INTR_EN0_ERASE_COMP_SET_MSK    |
+                  ALT_NAND_STAT_INTR_EN0_LOCKED_BLK_SET_MSK    |
+                  ALT_NAND_STAT_INTR_EN0_INT_ACT_SET_MSK       |
+                  ALT_NAND_STAT_INTR_EN0_RST_COMP_SET_MSK;
+
+  for (Bank = 0; Bank < NAND_NUMBER_OF_BANK; Bank++) {
+    MmioWrite32(mLUT_ALT_NAND_STAT_INTR_ENn_OFST[Bank], InterruptMask);
+  }
 
   return EFI_SUCCESS;
+}
+
+VOID
+EFIAPI
+NandEnableDma (
+  IN BOOLEAN Enable
+  )
+{
+  if (Enable == TRUE) {
+    // Enables data DMA operation in the controller
+    MmioOr32 (
+      ALT_NAND_DMA_OFST +
+      ALT_NAND_DMA_DMA_EN_OFST,
+      ALT_NAND_DMA_DMA_EN_FLAG_SET_MSK
+      );
+  } else {
+    // Enables data DMA operation in the controller
+    MmioAnd32 (
+      ALT_NAND_DMA_OFST +
+      ALT_NAND_DMA_DMA_EN_OFST,
+      ALT_NAND_DMA_DMA_EN_FLAG_CLR_MSK
+      );
+  }
 }
 
 
@@ -262,20 +341,17 @@ NandPollForIntStat (
   do {
     Data32 = MmioRead32 (IntStatReg);
     // Break if NAND controller responded with the interrupt we are waiting for or error
-    if (Data32 & (IntStatMask | ALT_NAND_STAT_INTR_STAT0_UNSUP_CMD_SET_MSK ))
+    if (Data32 & (IntStatMask))
       break;
+    MicroSecondDelay (1);
   } while ( (WaitCount++ < NAND_POLL_FOR_INT_STAT_TIMEOUT) );
   if (WaitCount >= NAND_POLL_FOR_INT_STAT_TIMEOUT) {
     InfoPrint ("NAND: Timeout 0x%08X != 0x%08X\r\n", Data32, IntStatMask);
     ASSERT_PLATFORM_INIT(0);
   }
-  if ( Data32 & ALT_NAND_STAT_INTR_EN0_UNSUP_CMD_SET_MSK) {
-    InfoPrint ( "NAND: Unsupported CMD!\r\n" );
-    ASSERT_PLATFORM_INIT(0);
-  }
+
   return Data32;
 }
-
 
 /*
  * Count the consecutive zero bits (trailing) on the right in parallel
@@ -464,7 +540,7 @@ NandErase (
   do {
     // Erase a block of data
     Block  = NandBlockAddressGet(NextEraseOffset);
-    InfoPrint("NAND Erasing Block %d\r\n", Block);
+    InfoPrint("NAND Erasing block %d\r\n", Block);
     Status = NandFlashBlockErase (Block);
     if (EFI_ERROR(Status)) return Status;
 
@@ -517,7 +593,7 @@ NandWrite (
     // Write a page of data into temporary buffer
     Block  = NandBlockAddressGet(NextWriteOffset);
     Page   = NandPageAddressGet(NextWriteOffset);
-    InfoPrint("NAND Writing %d bytes to Block %d Page %d \r\n", NumberOfBytesWriteInThisLoop, Block, Page);
+    InfoPrint("NAND: Writing %d bytes to block %d page %d \r\n", NumberOfBytesWriteInThisLoop, Block, Page);
     Status = NandDmaPageWrite (Bank, Block, Page, (UINT32) &TempReadBuffer[0]);
     if (EFI_ERROR(Status)) return Status;
 
@@ -564,6 +640,15 @@ NandDmaPageRead (
   UINT32      BurstLenInBytes = 64;
   UINT32      IntStatRegOfst = mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank];
 
+  // Enables controller ECC capabilities
+  MmioOr32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_ECC_EN_OFST,
+    ALT_NAND_CFG_ECC_EN_FLAG_SET_MSK);
+
+  // enable DMA
+  NandEnableDma (TRUE);
+
   // Clear Interrupt status register for this Bank
   MmioWrite32(IntStatRegOfst, MAX_UINT32);
 
@@ -573,15 +658,22 @@ NandDmaPageRead (
   // Poll until DMA command completed or errored
   IntStat = NandPollForIntStat(
               IntStatRegOfst,
-              ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK |
-              ALT_NAND_STAT_INTR_STAT0_ECC_UNCOR_ERR_SET_MSK
+              ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK
               );
 
-  if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK) ) {
-    InfoPrint( "NAND: DMA READ ERROR! 0x%08X\r\n", IntStat );
+  if (!(IntStat & ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK) ) {
+    InfoPrint("NAND: DMA read error at block 0x%x page 0x%x ! 0x%08X\r\n", BlockAddr, PageAddr, IntStat);
+    Status = EFI_DEVICE_ERROR;
+  }
+  // if ECC_UNCORRECTABLE error then delay 100us before disable DMA
+  if(IntStat & ALT_NAND_STAT_INTR_STAT0_ECC_UNCOR_ERR_SET_MSK) {
+    InfoPrint("NAND: DMA read ECC uncorrectable error\r\n");
+    MicroSecondDelay(100);
     Status = EFI_DEVICE_ERROR;
   }
 
+  // disable DMA
+  NandEnableDma (FALSE);
   return Status;
 }
 
@@ -601,6 +693,28 @@ NandDmaPageWrite (
   UINT32      PageCount = 1;
   UINT32      BurstLenInBytes = 64;
   UINT32      IntStatRegOfst = mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank];
+  UINT32      Map10CmdAddr;
+
+  // send Map10 command to access main + spare area
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, MAP10_CMD_MAIN_AREA_ACCESS);
+
+  // Enables controller ECC capabilities
+  MmioOr32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_ECC_EN_OFST,
+    ALT_NAND_CFG_ECC_EN_FLAG_SET_MSK);
+
+  // disable spare access
+  MmioAnd32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_TFR_SPARE_REG_OFST,
+    ALT_NAND_CFG_TFR_SPARE_REG_FLAG_CLR_MSK
+  );
+
+  // enable DMA
+  NandEnableDma (TRUE);
 
   // Clear Interrupt status register for this Bank
   MmioWrite32(IntStatRegOfst, MAX_UINT32);
@@ -611,16 +725,19 @@ NandDmaPageWrite (
   // Poll until DMA command completed or errored
   IntStat = NandPollForIntStat(
               IntStatRegOfst,
-              ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK |
-              ALT_NAND_STAT_INTR_STAT0_PROGRAM_FAIL_SET_MSK |
-              ALT_NAND_STAT_INTR_STAT0_LOCKED_BLK_SET_MSK
-              );
+              ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK);
 
   if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK) ) {
-    InfoPrint( "NAND: DMA WRITE ERROR! 0x%08X\r\n", IntStat );
+    InfoPrint("NAND: DMA write error! 0x%08X\r\n", IntStat );
     Status = EFI_DEVICE_ERROR;
   }
 
+  if (IntStat & ALT_NAND_STAT_INTR_STAT0_LOCKED_BLK_SET_MSK) {
+    InfoPrint("NAND: DMA write failed as write to locked block\n");
+    Status = EFI_DEVICE_ERROR;
+  }
+  // disable DMA
+  NandEnableDma (FALSE);
   return Status;
 }
 
@@ -639,7 +756,7 @@ NandDmaWriteCmdStructure (
 {
   UINT32  Map10CmdAddr;
 
-  Map10CmdAddr = NandComposeMap10CmdAddr (Bank, BlockAddr, PageAddr );
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr );
 
   // Multi-transaction DMA Command Transaction 1 of 4
   // Table 13-10: Command-Data Pair 1
@@ -688,26 +805,19 @@ NandDmaWriteCmdStructure (
 UINT32
 EFIAPI
 NandComposeMap10CmdAddr (
-  IN UINT32 Bank,
   IN UINT32 BlockAddr,
   IN UINT32 PageAddr
   )
 {
-  UINT32 bank_mask;
-  UINT32 block_addr_mask;
-  UINT32 page_addr_mask;
+  UINT32 BlockAddrMask;
+  UINT32 PageAddrMask;
   UINT32 Map10CmdAddr;
 
-  bank_mask       =  MAP10_CMD_BANK_SEL_MASK;
-  block_addr_mask = (1 << (MAP10_CMD_BLK_ADDR_MSB_INDEX - mFlash.BlockShift + 1)) - 1;
-  page_addr_mask  = (1 << mFlash.BlockShift) - 1;
+  BlockAddrMask = (1 << (MAP10_01_CMD_BLK_ADDR_MSB_INDEX - mFlash.BlockShift + 1)) - 1;
+  PageAddrMask  = (1 << mFlash.BlockShift) - 1;
   Map10CmdAddr    = MAP10_CMD |
-                   /*
-                      HPS System Technical Reference Manual said 25:24 is reserved for future, no Bank Sel
-                     ((Bank      & bank_mask)       << MAP10_CMD_BANK_SEL_LSB_INDEX) |
-                   */
-                   ((BlockAddr & block_addr_mask) << mFlash.BlockShift) |
-                    (PageAddr  & page_addr_mask);
+                   ((BlockAddr & BlockAddrMask) << mFlash.BlockShift) |
+                    (PageAddr  & PageAddrMask);
 
   return Map10CmdAddr;
 }
@@ -730,7 +840,7 @@ NandFlashBlockErase (
   Bank = ALT_NAND_FLASH_MEM_BANK_0;
   IntStatRegOfst = mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank];
   PageAddr = 0;
-  Map10CmdAddr = NandComposeMap10CmdAddr (Bank, BlockAddr, PageAddr);
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
 
   // Clear Interrupt status register for this Bank
   MmioWrite32(IntStatRegOfst, MAX_UINT32);
@@ -757,7 +867,7 @@ NandFlashBlockErase (
               );
 
   if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_ERASE_COMP_SET_MSK) ) {
-    InfoPrint( "NAND: BLOCK %d ERASE ERROR! 0x%08X\r\n", IntStat, BlockAddr);
+    InfoPrint("NAND: Block %d erase error! 0x%08X\r\n", BlockAddr, IntStat);
     Status = EFI_DEVICE_ERROR;
   }
 
