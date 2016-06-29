@@ -174,6 +174,9 @@
   ## QSPI Clock Frequency
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiClkFreq|54|UINT32|0xFEDC002a
 
+  ## Nand will not erase/read/write if more than this defined numbers of bad block are detected
+  gAlteraSocFpgaTokenSpaceGuid.PcdNandStopIfMoreThanThisNumberBadBlocks|1|UINT32|0xFEDC002B
+
   ## QSPI/NAND Flash Offset
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_PEIROM_ADDR |0x00000000|UINT64|0xFEDC0100
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_DXEROM_ADDR |0x00680000|UINT64|0xFEDC0101

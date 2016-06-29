@@ -132,6 +132,69 @@ NandUpdate (
   IN  UINT32  Size
   );
 
+EFI_STATUS
+EFIAPI
+NandReadSpareData(
+  OUT UINT32* Data,
+  IN  UINT32  BlockAddr,
+  IN  UINT32  PageAddr
+  );
+
+EFI_STATUS
+EFIAPI
+NandEraseSkipBadBlock (
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandReadSkipBadBlock (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandWriteSkipBadBlock (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandUpdateSkipBadBlock (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandReadRaw (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandDmaPageWriteRaw (
+  IN UINT32  Bank,
+  IN UINT32  BlockAddr,
+  IN UINT32  PageAddr,
+  IN UINT32  MemAddr
+  );
+
+VOID
+EFIAPI
+NandScanBadBlockWholeChip (
+  VOID
+  );
+
+// private functions
 VOID
 EFIAPI
 NandResetBank (
@@ -179,6 +242,12 @@ NandComposeMap10CmdAddr (
   IN UINT32 PageAddr
   );
 
+UINT32
+EFIAPI
+NandComposeMap01CmdAddr (
+  IN UINT32 BlockAddr,
+  IN UINT32 PageAddr
+  );
 
 EFI_STATUS
 EFIAPI

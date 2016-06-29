@@ -728,12 +728,12 @@ NandDmaPageWrite (
               ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK);
 
   if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK) ) {
-    InfoPrint("NAND: DMA write error! 0x%08X\r\n", IntStat );
+    InfoPrint("NAND: DMA write error with timeout at block 0x%x page 0x%x ! 0x%08X\r\n", BlockAddr, PageAddr, IntStat);
     Status = EFI_DEVICE_ERROR;
   }
 
   if (IntStat & ALT_NAND_STAT_INTR_STAT0_LOCKED_BLK_SET_MSK) {
-    InfoPrint("NAND: DMA write failed as write to locked block\n");
+    InfoPrint("NAND: DMA write failed as write to locked block\r\n");
     Status = EFI_DEVICE_ERROR;
   }
   // disable DMA
@@ -874,6 +874,801 @@ NandFlashBlockErase (
   return Status;
 }
 
+// Bad block management
+
+UINT32
+EFIAPI
+NandComposeMap01CmdAddr (
+  IN UINT32 BlockAddr,
+  IN UINT32 PageAddr
+  )
+{
+  UINT32 BlockAddrMask;
+  UINT32 PageAddrMask;
+  UINT32 Map01CmdAddr;
+
+  BlockAddrMask = (1 << (MAP10_01_CMD_BLK_ADDR_MSB_INDEX - mFlash.BlockShift + 1)) - 1;
+  PageAddrMask  = (1 << mFlash.BlockShift) - 1;
+  Map01CmdAddr    = MAP01_CMD |
+                   ((BlockAddr & BlockAddrMask) << mFlash.BlockShift) |
+                    (PageAddr  & PageAddrMask);
+
+  return Map01CmdAddr;
+}
 
 
+EFI_STATUS
+EFIAPI
+NandDmaPageReadRaw (
+  IN  UINT32  Bank,
+  IN  UINT32  BlockAddr,
+  IN  UINT32  PageAddr,
+  OUT UINT32  MemAddr
+  )
+{
+  EFI_STATUS  Status = EFI_SUCCESS;
+  UINT32      IntStat;
+  BOOLEAN     IsReadOp = TRUE;
+  UINT32      PageCount = 1;
+  UINT32      BurstLenInBytes = 64;
+  UINT32      IntStatRegOfst = mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank];
+  UINT32      MainAreaAddr[4096];
+  UINT32      SpareAreaAddr[128];
+  UINT32      Map10CmdAddr;
+
+  // Disable controller ECC capabilities
+  MmioAnd32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_ECC_EN_OFST,
+    ALT_NAND_CFG_ECC_EN_FLAG_CLR_MSK);
+
+  // Enable spare access
+  MmioWrite32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_TFR_SPARE_REG_OFST,
+    ALT_NAND_CFG_TFR_SPARE_REG_FLAG_SET_MSK
+  );
+  // Send Map10 command to access main + spare area
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, MAP10_CMD_MAIN_SPARE_AREA_ACCESS);
+
+  // Enable DMA
+  NandEnableDma (TRUE);
+
+  // Clear Interrupt status register for this Bank
+  MmioWrite32(IntStatRegOfst, MAX_UINT32);
+
+  // DMA READ PageCount amount of data from SRC = Flash (Bank, BlockAddr, PageAddr) to DST = MemAddr.
+  NandDmaWriteCmdStructure (Bank, BlockAddr, PageAddr, PageCount, MemAddr, IsReadOp, BurstLenInBytes);
+
+  // Poll until DMA command completed or errored
+  IntStat = NandPollForIntStat(
+              IntStatRegOfst,
+              ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK
+              );
+
+  if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK) ) {
+    InfoPrint( "NAND: DMA read raw command cannot be completed with timeout\r\n");
+    Status = EFI_DEVICE_ERROR;
+  }
+  // If ECC_UNCORRECTABLE error then delay 100us before disable DMA
+  if(IntStat & ALT_NAND_STAT_INTR_STAT0_ECC_UNCOR_ERR_SET_MSK) {
+    InfoPrint("NAND: DMA read ecc uncorrectable error\r\n");
+    MicroSecondDelay(100);
+    Status = EFI_DEVICE_ERROR;
+  }
+
+  // Disable DMA
+  NandEnableDma (FALSE);
+
+  // seperate data to spare and main data
+  CopyMem ((VOID*) MainAreaAddr, (VOID*) MemAddr, mFlash.PageSize);
+  CopyMem ((VOID*) SpareAreaAddr, (VOID*) (MemAddr + mFlash.PageSize), mFlash.SpareSize);
+  return Status;
+}
+
+
+EFI_STATUS
+EFIAPI
+NandDmaPageWriteRaw (
+  IN UINT32  Bank,
+  IN UINT32  BlockAddr,
+  IN UINT32  PageAddr,
+  IN UINT32  MemAddr
+  )
+{
+  EFI_STATUS  Status = EFI_SUCCESS;
+  UINT32      IntStat;
+  BOOLEAN     IsReadOp = FALSE;
+  UINT32      PageCount = 1;
+  UINT32      BurstLenInBytes = 64;
+  UINT32      IntStatRegOfst = mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank];
+  UINT32      Map10CmdAddr;
+
+  // Disable controller ECC capabilities
+  MmioAnd32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_ECC_EN_OFST,
+    ALT_NAND_CFG_ECC_EN_FLAG_CLR_MSK);
+
+  // Send Map10 command to access main + spare area
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, MAP10_CMD_MAIN_SPARE_AREA_ACCESS);
+
+  // Enable DMA
+  NandEnableDma (TRUE);
+
+  // Clear Interrupt status register for this Bank
+  MmioWrite32(IntStatRegOfst, MAX_UINT32);
+
+  // DMA Write PageCount amount of data from SRC = MemAddr to DST = Flash (Bank, BlockAddr, PageAddr)
+  NandDmaWriteCmdStructure (Bank, BlockAddr, PageAddr, PageCount, MemAddr, IsReadOp, BurstLenInBytes);
+
+  // Poll until DMA command completed or errored
+  IntStat = NandPollForIntStat(
+              IntStatRegOfst,
+              ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK |
+              ALT_NAND_STAT_INTR_STAT0_PROGRAM_FAIL_SET_MSK |
+              ALT_NAND_STAT_INTR_STAT0_LOCKED_BLK_SET_MSK
+              );
+
+  if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_DMA_CMD_COMP_SET_MSK) ) {
+    InfoPrint( "NAND: DMA write raw command cannot be completed with timeout\r\n");
+    Status = EFI_DEVICE_ERROR;
+  }
+  // Disable DMA
+  NandEnableDma (FALSE);
+  return Status;
+}
+
+
+EFI_STATUS
+EFIAPI
+NandReadSpareData(
+  OUT UINT32* Data,
+  IN  UINT32  BlockAddr,
+  IN  UINT32  PageAddr
+  )
+{
+  UINT32      IntStatRegOfst;
+  UINT32      IntStat;
+  UINT32      Bank;
+  UINT32      Map10CmdAddr;
+  UINT32      Map01CmdAddr;
+  BOOLEAN     IsReadOp = TRUE;
+  UINT32      PageCount = 1;
+  UINTN       i;
+  UINT32*     SpareData;
+
+  Bank = ALT_NAND_FLASH_MEM_BANK_0;
+  IntStatRegOfst = mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank];
+  SpareData = Data;
+
+  // Clear Interrupt status register for this Bank
+  MmioWrite32(IntStatRegOfst, MAX_UINT32);
+
+  // Disable controller ECC capabilities
+  MmioAnd32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_ECC_EN_OFST,
+    ALT_NAND_CFG_ECC_EN_FLAG_CLR_MSK);
+
+  // Enable spare access
+  MmioWrite32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_TFR_SPARE_REG_OFST,
+    ALT_NAND_CFG_TFR_SPARE_REG_FLAG_SET_MSK
+  );
+
+  // Disable DMA as CM01 operation requirement
+  NandEnableDma (FALSE);
+
+  // 1. Set spare area access operation.
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, MAP10_CMD_SPARE_AREA_ACCESS);
+
+  // 2. Setup the read pipeline command
+  // Command: 31:28 = 0, 27:26 = 2 - MAP10_CMD, 25:24 = 0, 23:<M> Block address, (<M> – 1):0 Page address
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  // Data: 31:16 = 0, 15:12 = 2, 11:8 = 0-Read/1-Write, 7:0 = Number of pages
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST,
+              0x2000 | ((IsReadOp ? 0 : 1) << 8) | PageCount);
+
+  // 3. Set up command 01
+  Map01CmdAddr = NandComposeMap01CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map01CmdAddr);
+
+  // Poll until command completed
+  IntStat = NandPollForIntStat(
+              IntStatRegOfst,
+              ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK
+              );
+
+  if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK) ) {
+    InfoPrint( "NAND: Spare read command cannot be completed with timeout\r\n");
+    return EFI_DEVICE_ERROR;
+  }
+
+  // Read data
+  for (i = 0; i < (mFlash.SpareSize / 4); i++)
+    *SpareData++ = MmioRead32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST);
+
+  // Poll until command completed
+  IntStat = NandPollForIntStat(
+              IntStatRegOfst,
+              ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK
+              );
+
+  if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK) ) {
+    InfoPrint( "NAND: Spare read command cannot be completed with timeout\r\n");
+    return EFI_DEVICE_ERROR;
+  }
+  // Set device back to main area access operation.
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, MAP10_CMD_MAIN_AREA_ACCESS);
+
+  return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+EFIAPI
+NandWriteSpareData (
+  IN  UINT32  BlockAddr,
+  IN  UINT32  PageAddr,
+  IN  UINT32* Data
+  )
+{
+  UINT32      IntStatRegOfst;
+  UINT32      IntStat;
+  UINT32      Bank;
+  UINT32      Map10CmdAddr;
+  UINT32      Map01CmdAddr;
+  BOOLEAN     IsReadOp = FALSE;
+  UINT32      PageCount = 1;
+  UINTN       i;
+  UINT32*     SpareData;
+
+  Bank = ALT_NAND_FLASH_MEM_BANK_0;
+  IntStatRegOfst = mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank];
+  SpareData = Data;
+
+  // Clear Interrupt status register for this Bank
+  MmioWrite32(IntStatRegOfst, MAX_UINT32);
+
+  // Disable controller ECC capabilities
+  MmioAnd32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_ECC_EN_OFST,
+    ALT_NAND_CFG_ECC_EN_FLAG_CLR_MSK);
+
+  // Enable spare access
+  MmioWrite32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_TFR_SPARE_REG_OFST,
+    ALT_NAND_CFG_TFR_SPARE_REG_FLAG_SET_MSK
+  );
+
+  // Disable DMA as CM01 operation requirement
+  NandEnableDma (FALSE);
+
+  // 1. Set spare area access operation.
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, MAP10_CMD_SPARE_AREA_ACCESS);
+
+  // 2. Setup the read pipeline command
+  // Command: 31:28 = 0, 27:26 = 2 - MAP10_CMD, 25:24 = 0, 23:<M> Block address, (<M> – 1):0 Page address
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  // Data: 31:16 = 0, 15:12 = 2, 11:8 = 0-Read/1-Write, 7:0 = Number of pages
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST,
+              0x2000 |((IsReadOp ? 0 : 1) << 8) | PageCount);
+
+  // 3. Set up command 01
+  Map01CmdAddr = NandComposeMap01CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map01CmdAddr);
+
+  // Write data
+  for (i = 0; i < (mFlash.SpareSize / 4); i++)
+    MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, *SpareData++);
+
+  // Poll until command completed
+  IntStat = NandPollForIntStat(
+              IntStatRegOfst,
+              ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK
+              );
+
+  if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK) ) {
+    InfoPrint( "NAND: Write spare command cannot be completed with timeout\r\n");
+    return EFI_DEVICE_ERROR;
+  }
+  // Set device back to main area access operation.
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, MAP10_CMD_MAIN_AREA_ACCESS);
+
+  return EFI_SUCCESS;
+}
+
+
+EFI_STATUS
+EFIAPI
+NandReadRaw (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      Bank;
+  UINT32      Page;
+  UINT32      Block;
+  UINT8*      BufferPtr;
+  UINT32      NextReadOffset;
+  UINT32      NumberOfBytesLeftToRead;
+  UINT32      NumberOfBytesReadInThisLoop;
+  UINT8       TempReadBuffer[4096 + 128];
+  UINT32      FirstLoopUnAlignedOffsetAdjustment;
+
+  ASSERT_PLATFORM_INIT(mFlash.PageSize <= (4096 + 128));
+
+  Status = EFI_SUCCESS;
+  Bank = ALT_NAND_FLASH_MEM_BANK_0;
+  BufferPtr = (UINT8*) Buffer;
+  NextReadOffset = Offset;
+  NumberOfBytesLeftToRead = Size;
+  FirstLoopUnAlignedOffsetAdjustment = Offset % mFlash.PageSize;
+
+  do {
+    // Read a page of data into temporary buffer
+    Block  = NandBlockAddressGet(NextReadOffset);
+    Page   = NandPageAddressGet(NextReadOffset);
+    Status = NandDmaPageReadRaw (Bank, Block, Page, (UINT32) &TempReadBuffer[0]);
+    if (EFI_ERROR(Status)) return Status;
+
+    // Copy the data to caller's buffer
+    NumberOfBytesReadInThisLoop = MIN(NumberOfBytesLeftToRead, mFlash.PageSize + mFlash.SpareSize - FirstLoopUnAlignedOffsetAdjustment);
+    CopyMem ((VOID*) BufferPtr, (VOID*) &TempReadBuffer[FirstLoopUnAlignedOffsetAdjustment], NumberOfBytesReadInThisLoop);
+
+    // Setup the source flash offset and destination buffer pointer for next page of data
+    NextReadOffset += NumberOfBytesReadInThisLoop;
+    BufferPtr += NumberOfBytesReadInThisLoop;
+    NumberOfBytesLeftToRead -= NumberOfBytesReadInThisLoop;
+    FirstLoopUnAlignedOffsetAdjustment = 0;
+
+  } while (NumberOfBytesLeftToRead);
+
+  return Status;
+}
+
+
+BOOLEAN
+EFIAPI
+NandBlockIsBad (
+  IN UINT32 BlockAddr
+  )
+{
+  EFI_STATUS Status;
+  UINT8     ReadBuffer[128]; // max spare size
+  UINT8     FirstByteFirstPageSpare;
+  UINT8     FirstByteSecondPageSpare;
+  UINT8     FirstByteLastPageSpare;
+
+  // A block is bad if “1st byte at 1st page OOB” & “1st byte at 2nd page OOB” & “1st byte at last page OOB” != 0xFF
+  // Read 1st page spare data
+  Status = NandReadSpareData ((UINT32*)&ReadBuffer[0], BlockAddr, 0);
+  if (EFI_ERROR(Status)) {
+    InfoPrint("NAND: Error read 1st page oob\r\n");
+    return TRUE;
+  }
+
+  FirstByteFirstPageSpare = ReadBuffer[0];
+  // Read 2nd page spare data
+  Status = NandReadSpareData ((UINT32*)&ReadBuffer[0], BlockAddr, 1);
+  if (EFI_ERROR(Status)) {
+    InfoPrint("NAND: Error read 2nd page oob\r\n");
+    return TRUE;
+  }
+  FirstByteSecondPageSpare = ReadBuffer[0];
+  // Read last page spare data
+  Status = NandReadSpareData ((UINT32*)&ReadBuffer[0], BlockAddr, mFlash.PagesPerBlock - 1);
+  if (EFI_ERROR(Status)) {
+    InfoPrint("NAND: Error read last page oob\r\n");
+    return TRUE;
+  }
+
+  FirstByteLastPageSpare = ReadBuffer[0];
+
+  if ((FirstByteFirstPageSpare  != 0xFF) &&
+      (FirstByteSecondPageSpare != 0xFF) &&
+      (FirstByteLastPageSpare   != 0xFF))
+    return TRUE;
+  return FALSE;
+}
+
+
+EFI_STATUS
+EFIAPI
+NandEraseSkipBadBlock (
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      NextEraseOffset;
+  UINT32      NumberOfBytesLeftToErase;
+  UINT32      NumberOfBytesErasedInThisLoop;
+  UINT32      FirstLoopUnAlignedOffsetAdjustment;
+  UINT32      Block;
+  UINT32      NumberOfBadBlock;
+
+  Status = EFI_SUCCESS;
+  NextEraseOffset = Offset;
+  NumberOfBytesLeftToErase = Size;
+  FirstLoopUnAlignedOffsetAdjustment = Offset % mFlash.BlockSize;
+  NumberOfBadBlock = 0;
+
+  do {
+    // Erase a block of data
+    Block  = NandBlockAddressGet(NextEraseOffset);
+    // Check bad block
+    if (NandBlockIsBad (Block) == TRUE) {
+      InfoPrint ("NAND: Skip erase block %d as it is bad block\r\n", Block);
+      NumberOfBadBlock++;
+      if ((NumberOfBadBlock > PcdGet32 (PcdNandStopIfMoreThanThisNumberBadBlocks))) {
+        InfoPrint("NAND: More than %d block are bad, skip whole process\r\n", PcdGet32 (PcdNandStopIfMoreThanThisNumberBadBlocks));
+        return EFI_DEVICE_ERROR;
+      }
+      goto NextBlock;
+    }
+    InfoPrint("NAND: Erasing Block %d\r\n", Block);
+    Status = NandFlashBlockErase (Block);
+    if (EFI_ERROR(Status)) return Status;
+
+  NextBlock:
+    // Setup for next block of data
+    NumberOfBytesErasedInThisLoop = MIN(NumberOfBytesLeftToErase, mFlash.BlockSize - FirstLoopUnAlignedOffsetAdjustment);
+    NextEraseOffset += NumberOfBytesErasedInThisLoop;
+    NumberOfBytesLeftToErase -= NumberOfBytesErasedInThisLoop;
+    FirstLoopUnAlignedOffsetAdjustment = 0;
+
+  } while (NumberOfBytesLeftToErase);
+
+  return Status;
+}
+
+EFI_STATUS
+EFIAPI
+NandReadSkipBadBlock (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      Bank;
+  UINT32      Page;
+  UINT32      Block;
+  UINT8*      BufferPtr;
+  UINT32      NextReadOffset;
+  UINT32      NumberOfBytesLeftToRead;
+  UINT32      NumberOfBytesReadInThisLoop;
+  UINT8       TempReadBuffer[4096 + 128];
+  UINT32      FirstLoopUnAlignedOffsetAdjustment;
+  UINT32      NumberOfBadBlock;
+
+  ASSERT_PLATFORM_INIT(mFlash.PageSize <= (4096 + 128));
+
+  Status = EFI_SUCCESS;
+  Bank = ALT_NAND_FLASH_MEM_BANK_0;
+  BufferPtr = (UINT8*) Buffer;
+  NextReadOffset = Offset;
+  NumberOfBytesLeftToRead = Size;
+  FirstLoopUnAlignedOffsetAdjustment = Offset % mFlash.PageSize;
+  NumberOfBadBlock = 0;
+
+  do {
+    // Read a page of data into temporary buffer
+    Block  = NandBlockAddressGet(NextReadOffset);
+    Page   = NandPageAddressGet(NextReadOffset);
+    // check bad block
+    if (NandBlockIsBad (Block) == TRUE) {
+      InfoPrint ("NAND: Skip read block %d as it is bad block\r\n", Block);
+      NumberOfBadBlock++;
+      if ((NumberOfBadBlock > PcdGet32 (PcdNandStopIfMoreThanThisNumberBadBlocks))) {
+        InfoPrint("NAND: More than %d block are bad, skip whole process\r\n", PcdGet32 (PcdNandStopIfMoreThanThisNumberBadBlocks));
+        return EFI_DEVICE_ERROR;
+      }
+      // jump to next block
+      NextReadOffset = (Block + 1) * mFlash.BlockSize;
+      FirstLoopUnAlignedOffsetAdjustment = 0;
+      continue;
+    }
+    Status = NandDmaPageRead (Bank, Block, Page, (UINT32) &TempReadBuffer[0]);
+    if (EFI_ERROR(Status)) return Status;
+
+    // Copy the data to caller's buffer
+    NumberOfBytesReadInThisLoop = MIN(NumberOfBytesLeftToRead, mFlash.PageSize - FirstLoopUnAlignedOffsetAdjustment);
+    CopyMem ((VOID*) BufferPtr, (VOID*) &TempReadBuffer[FirstLoopUnAlignedOffsetAdjustment], NumberOfBytesReadInThisLoop);
+
+   // Setup the source flash offset and destination buffer pointer for next page of data
+    NextReadOffset += NumberOfBytesReadInThisLoop;
+    BufferPtr += NumberOfBytesReadInThisLoop;
+    NumberOfBytesLeftToRead -= NumberOfBytesReadInThisLoop;
+    FirstLoopUnAlignedOffsetAdjustment = 0;
+
+  } while (NumberOfBytesLeftToRead);
+
+  return Status;
+}
+
+
+EFI_STATUS
+EFIAPI
+NandWriteSkipBadBlock (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      Bank;
+  UINT32      Page;
+  UINT32      Block;
+  UINT8*      BufferPtr;
+  UINT32      NextWriteOffset;
+  UINT32      NumberOfBytesLeftToWrite;
+  UINT32      NumberOfBytesWriteInThisLoop;
+  UINT8       TempReadBuffer[4096 + 128];  // 4096 bytes data + 128 bytes spare for ECC + bad block marker
+  UINT32      FirstLoopUnAlignedOffsetAdjustment;
+  UINT32      NumberOfBadBlock;
+
+  ASSERT_PLATFORM_INIT(mFlash.PageSize <= (4096 + 128));
+
+  Status = EFI_SUCCESS;
+  Bank = ALT_NAND_FLASH_MEM_BANK_0;
+  BufferPtr = (UINT8*) Buffer;
+  NextWriteOffset = Offset;
+  NumberOfBytesLeftToWrite = Size;
+  FirstLoopUnAlignedOffsetAdjustment = Offset % mFlash.PageSize;
+  NumberOfBadBlock = 0;
+
+  do {
+    // Copy the data from caller's buffer into temporary buffer
+    SetMem ((VOID*) &TempReadBuffer[0], sizeof(TempReadBuffer), 0xFF);
+    NumberOfBytesWriteInThisLoop = MIN(NumberOfBytesLeftToWrite, mFlash.PageSize - FirstLoopUnAlignedOffsetAdjustment);
+    CopyMem ((VOID*) &TempReadBuffer[FirstLoopUnAlignedOffsetAdjustment], (VOID*) BufferPtr, NumberOfBytesWriteInThisLoop);
+
+    // Write a page of data into temporary buffer
+    Block  = NandBlockAddressGet(NextWriteOffset);
+    Page   = NandPageAddressGet(NextWriteOffset);
+    // check bad block
+    if (NandBlockIsBad (Block) == TRUE) {
+      InfoPrint ("NAND: Skip write block %d as it is bad block\r\n", Block);
+      NumberOfBadBlock++;
+      if ((NumberOfBadBlock > PcdGet32 (PcdNandStopIfMoreThanThisNumberBadBlocks))) {
+        InfoPrint("NAND: More than %d block are bad, skip whole process\r\n", PcdGet32 (PcdNandStopIfMoreThanThisNumberBadBlocks));
+        return EFI_DEVICE_ERROR;
+      }
+      NextWriteOffset = (Block + 1) * mFlash.BlockSize;
+      FirstLoopUnAlignedOffsetAdjustment = 0;
+      continue;
+    }
+    InfoPrint("NAND: Writing %d bytes to Block %d Page %d or offset 0x%x \r\n", NumberOfBytesWriteInThisLoop, Block, Page, NextWriteOffset);
+    Status = NandDmaPageWrite (Bank, Block, Page, (UINT32) &TempReadBuffer[0]);
+    if (EFI_ERROR(Status)) return Status;
+
+    // Setup for next page of data
+    NextWriteOffset += NumberOfBytesWriteInThisLoop;
+    BufferPtr += NumberOfBytesWriteInThisLoop;
+    NumberOfBytesLeftToWrite -= NumberOfBytesWriteInThisLoop;
+    FirstLoopUnAlignedOffsetAdjustment = 0;
+
+  } while (NumberOfBytesLeftToWrite);
+
+  return Status;
+}
+
+EFI_STATUS
+EFIAPI
+NandUpdateSkipBadBlock (
+  IN  VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  )
+{
+  EFI_STATUS Status = EFI_SUCCESS;;
+  Status = NandEraseSkipBadBlock (Offset, Size);
+  if (Status != EFI_SUCCESS) {
+    return Status;
+  }
+  return NandWriteSkipBadBlock (Buffer, Offset, Size);
+}
+
+// scan bad block for whole chip
+VOID
+EFIAPI
+NandScanBadBlockWholeChip (
+  VOID
+  )
+{
+  UINT32   Block;
+  UINT32   NumberOfBlocks;
+  UINT32   Count;
+
+  Count = 0;
+  NumberOfBlocks = mFlash.OnfiDeviceNoOfBlocksPerLun * mFlash.OnfiDeviceNoOfLuns;
+  for (Block = 0; Block < NumberOfBlocks; Block++) {
+    if (NandBlockIsBad (Block) == TRUE) {
+      InfoPrint ("NAND: Block %d is bad block\r\n", Block);
+      Count++;
+    }
+  }
+  InfoPrint("NAND: Total numbers of bad block : %d blocks\r\n", Count);
+}
+
+
+// pipeline read/write
+EFI_STATUS
+EFIAPI
+NandPipelinePageWrite (
+  IN UINT32  Bank,
+  IN UINT32  BlockAddr,
+  IN UINT32  PageAddr,
+  IN UINT32  MemAddr
+  )
+{
+  EFI_STATUS  Status = EFI_SUCCESS;
+  UINT32      IntStat;
+  BOOLEAN     IsReadOp = FALSE;
+  UINT32      PageCount = 1;
+  UINT32      IntStatRegOfst = mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank];
+  UINT32      Map10CmdAddr;
+  UINT32*     WriteData;
+  UINT32      Map01CmdAddr;
+  UINTN       i;
+
+  WriteData = (UINT32*) MemAddr;
+
+  // Enables controller ECC capabilities
+  MmioOr32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_ECC_EN_OFST,
+    ALT_NAND_CFG_ECC_EN_FLAG_SET_MSK);
+
+  // disable spare access
+  MmioAnd32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_TFR_SPARE_REG_OFST,
+    ALT_NAND_CFG_TFR_SPARE_REG_FLAG_CLR_MSK
+  );
+
+  // disble DMA
+  NandEnableDma (FALSE);
+
+  // Clear Interrupt status register for this Bank
+  MmioWrite32(IntStatRegOfst, MAX_UINT32);
+
+  // send Map10 command to access main area
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, MAP10_CMD_MAIN_AREA_ACCESS);
+
+  // 2. setup the read pipeline command
+  // Command: 31:28 = 0, 27:26 = 2 - MAP10_CMD, 25:24 = 0, 23:<M> Block address, (<M> – 1):0 Page address
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  // Data: 31:16 = 0, 15:12 = 2, 11:8 = 0-Read/1-Write, 7:0 = Number of pages
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST,
+              0x2000 | ((IsReadOp ? 0 : 1) << 8) | PageCount);
+
+  // 3. set up command 01
+  Map01CmdAddr = NandComposeMap01CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map01CmdAddr);
+
+  // write data
+  for (i = 0; i < (mFlash.PageSize / 4); i++)
+    MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, *WriteData++);
+
+ // Poll until command completed
+  IntStat = NandPollForIntStat(
+              IntStatRegOfst,
+              ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK
+              );
+
+  if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK) ) {
+    InfoPrint( "NAND: Pipeline write command cannot be completed with timeout\r\n");
+    return EFI_DEVICE_ERROR;
+  }
+
+  return Status;
+}
+
+EFI_STATUS
+EFIAPI
+NandPipelinePageRead (
+  IN UINT32  Bank,
+  IN UINT32  BlockAddr,
+  IN UINT32  PageAddr,
+  IN UINT32  MemAddr
+  )
+{
+  EFI_STATUS  Status = EFI_SUCCESS;
+  UINT32      IntStat;
+  BOOLEAN     IsReadOp = TRUE;
+  UINT32      PageCount = 1;
+  UINT32      IntStatRegOfst = mLUT_ALT_NAND_STAT_INTR_STATn_OFST[Bank];
+  UINT32      Map10CmdAddr;
+  UINT32*     ReadData;
+  UINT32      Map01CmdAddr;
+  UINTN       i;
+
+  ReadData = (UINT32*) MemAddr;
+
+  // Enables controller ECC capabilities
+  MmioOr32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_ECC_EN_OFST,
+    ALT_NAND_CFG_ECC_EN_FLAG_SET_MSK);
+
+  // disable spare access
+  MmioAnd32(
+    ALT_NAND_CFG_OFST +
+    ALT_NAND_CFG_TFR_SPARE_REG_OFST,
+    ALT_NAND_CFG_TFR_SPARE_REG_FLAG_CLR_MSK
+  );
+
+  // disable DMA
+  NandEnableDma (FALSE);
+
+  // Clear Interrupt status register for this Bank
+  MmioWrite32(IntStatRegOfst, MAX_UINT32);
+
+  // send Map10 command to access main area
+  Map10CmdAddr = NandComposeMap10CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST, MAP10_CMD_MAIN_AREA_ACCESS);
+
+  // 2. setup the read pipeline command
+  // Command: 31:28 = 0, 27:26 = 2 - MAP10_CMD, 25:24 = 0, 23:<M> Block address, (<M> – 1):0 Page address
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map10CmdAddr);
+  // Data: 31:16 = 0, 15:12 = 2, 11:8 = 0-Read/1-Write, 7:0 = Number of pages
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST,
+              0x2000 | ((IsReadOp ? 0 : 1) << 8) | PageCount);
+
+  // 3. set up command 01
+  Map01CmdAddr = NandComposeMap01CmdAddr (BlockAddr, PageAddr);
+  MmioWrite32(ALT_NANDDATA_OFST + ALT_NANDDATA_CTRL_OFST, Map01CmdAddr);
+
+ // Poll until command completed
+  IntStat = NandPollForIntStat(
+              IntStatRegOfst,
+              ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK
+              );
+
+  if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK) ) {
+    InfoPrint( "NAND: Pipeline read command cannot be completed with timeout\r\n");
+    return EFI_DEVICE_ERROR;
+  }
+
+  // read data
+  for (i = 0; i < (mFlash.SpareSize / 4); i++)
+    *ReadData++ = MmioRead32(ALT_NANDDATA_OFST + ALT_NANDDATA_DATA_OFST);
+
+ // Poll until command completed
+  IntStat = NandPollForIntStat(
+              IntStatRegOfst,
+              ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK
+              );
+
+  if ( !(IntStat & ALT_NAND_STAT_INTR_STAT0_LD_COMP_SET_MSK) ) {
+    InfoPrint( "NAND: Pipeline read command cannot be completed with timeout\r\n");
+    return EFI_DEVICE_ERROR;
+  }
+
+  return Status;
+}
 

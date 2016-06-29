@@ -113,6 +113,10 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiClkFreq|54
 
   #
+  # Nand will not erase/read/write if more than this defined numbers of bad block are detected
+  gAlteraSocFpgaTokenSpaceGuid.PcdNandStopIfMoreThanThisNumberBadBlocks|1
+
+  #
   # Semihosting Support
   # Semihosting is a mechanism that enables code running on an ARM target to communicate
   # and use the Input/Output facilities on a host computer that is running a debugger.

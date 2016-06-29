@@ -171,6 +171,7 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_CORE_RBF
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_CORE_RBF_ADDR
   gAlteraSocFpgaTokenSpaceGuid.PcdSdramBaseAddress_CORE_RBF
+  gAlteraSocFpgaTokenSpaceGuid.PcdNandStopIfMoreThanThisNumberBadBlocks
   gArmPlatformTokenSpaceGuid.PcdClusterCount
   gArmPlatformTokenSpaceGuid.PcdCoreCount
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
