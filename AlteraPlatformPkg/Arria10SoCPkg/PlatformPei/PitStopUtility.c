@@ -379,6 +379,8 @@ PitStopCmdLine (
 
         if (AsciiStrCmp((CHAR8*)Argument[5], "skip") == 0)
           Status = NandWriteSkipBadBlock((VOID *)Addr, Offset, Len);
+        else if (AsciiStrCmp((CHAR8*)Argument[5], "trimffs") == 0)
+          Status = NandWriteTrimFfsSkipBadBlock((VOID *)Addr, Offset, Len);
         else
           Status = NandWrite((VOID *)Addr, Offset, Len);
 
@@ -581,6 +583,7 @@ PitStopCmdLine (
       SerialPortPrint ("nand read addr block page spare\r\n");
       SerialPortPrint ("nand write addr offset len skip\r\n");
       SerialPortPrint ("nand write addr offset len noskip\r\n");
+      SerialPortPrint ("nand write addr offset len trimffs\r\n");
       SerialPortPrint ("nand erase offset len skip\r\n");
       SerialPortPrint ("nand erase offset len noskip\r\n");
       SerialPortPrint ("nand update addr offset len skip\r\n");
@@ -600,7 +603,7 @@ PitStopCmdLine (
       SerialPortPrint ("exit\r\n");
       SerialPortPrint ("Note: Use HEX format for number.  addr means memory address.\r\n");
       SerialPortPrint ("offset refer to flash device.  blockcnt is multiply of 512 bytes.\r\n");
-      SerialPortPrint ("rbftype value can be 'core' only for now.  flashtype value can be 'mmc','qspi'.\r\n");
+      SerialPortPrint ("rbftype value can be 'core, peripheral, combined'.  flashtype value can be 'mmc','qspi', 'nand'.\r\n");
 
     } else {
       SerialPortPrint("Invalid command\r\n");

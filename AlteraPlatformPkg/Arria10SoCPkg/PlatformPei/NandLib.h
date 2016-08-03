@@ -194,6 +194,14 @@ NandScanBadBlockWholeChip (
   VOID
   );
 
+EFI_STATUS
+EFIAPI
+NandWriteTrimFfsSkipBadBlock (
+  IN  VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
 // private functions
 VOID
 EFIAPI

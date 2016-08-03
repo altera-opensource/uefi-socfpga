@@ -1672,3 +1672,86 @@ NandPipelinePageRead (
   return Status;
 }
 
+UINT32
+EFIAPI
+TrimFfsAtEndOfBlock (
+  IN  UINT8*   Buffer,
+  IN  UINT32   BlockLength
+  )
+{
+  UINT32 Length;
+  INTN  i;
+  UINT32 AlignedPage;
+
+  for (i = BlockLength - 1; i >=0; i--)
+    if (Buffer[i] != 0xFF)
+        break;
+
+  Length = i + 1;
+
+  // Align with page size
+  AlignedPage = (Length + mFlash.PageSize - 1) / mFlash.PageSize;
+  Length = AlignedPage * mFlash.PageSize;
+
+  return Length;
+
+}
+
+EFI_STATUS
+EFIAPI
+NandWriteTrimFfsSkipBadBlock (
+  IN  VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  )
+{
+  EFI_STATUS   Status;
+  UINT32      NextWriteOffset;
+  UINT32      NumberOfBytesLeftToWrite;
+  UINT32      NumberOfBytesWritedInThisLoop;
+  UINT32      FirstLoopUnAlignedOffsetAdjustment;
+  UINT32      Block;
+  UINT32      NumberOfBadBlock;
+  UINT8*      BufferPtr;
+  UINT32      TruncatedWriteSize;
+
+  BufferPtr = (UINT8*) Buffer;
+  Status = EFI_SUCCESS;
+  NextWriteOffset = Offset;
+  NumberOfBytesLeftToWrite = Size;
+  FirstLoopUnAlignedOffsetAdjustment = Offset % mFlash.BlockSize;
+  NumberOfBadBlock = 0;
+
+  do {
+    NumberOfBytesWritedInThisLoop = MIN(NumberOfBytesLeftToWrite, mFlash.BlockSize - FirstLoopUnAlignedOffsetAdjustment);
+   // Write a block of data
+    Block  = NandBlockAddressGet(NextWriteOffset);
+    // Check bad block
+    if (NandBlockIsBad (Block) == TRUE) {
+      InfoPrint ("NAND: Skip write block %d as it is bad block\r\n", Block);
+      NumberOfBadBlock++;
+      if ((NumberOfBadBlock > PcdGet32 (PcdNandStopIfMoreThanThisNumberBadBlocks))) {
+        InfoPrint("NAND: More than %d block are bad, skip whole process\r\n", PcdGet32 (PcdNandStopIfMoreThanThisNumberBadBlocks));
+        return EFI_DEVICE_ERROR;
+      }
+    NextWriteOffset += NumberOfBytesWritedInThisLoop;
+    continue;
+    }
+     // Check 0xFF pages at the end of each block
+    TruncatedWriteSize = TrimFfsAtEndOfBlock (BufferPtr, NumberOfBytesWritedInThisLoop);
+    if (TruncatedWriteSize < NumberOfBytesWritedInThisLoop)
+      InfoPrint("Empty papge found at Block %d, TruncatedWriteSize %d\r\n", Block, TruncatedWriteSize);
+
+    Status = NandWrite (BufferPtr,NextWriteOffset, TruncatedWriteSize);
+    if (EFI_ERROR(Status)) return Status;
+
+    // Update for next loop
+    NextWriteOffset += NumberOfBytesWritedInThisLoop;
+    NumberOfBytesLeftToWrite -= NumberOfBytesWritedInThisLoop;
+    BufferPtr += NumberOfBytesWritedInThisLoop;
+    FirstLoopUnAlignedOffsetAdjustment = 0;
+  } while (NumberOfBytesLeftToWrite);
+
+  return Status;
+}
+
