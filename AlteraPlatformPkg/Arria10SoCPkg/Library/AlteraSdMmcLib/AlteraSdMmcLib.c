@@ -869,6 +869,10 @@ ReadFifoData (
     {
       return EFI_DEVICE_ERROR;
     }
+    else {
+      // Add in some delay if FIFO is not ready
+      MicroSecondDelay (1000);
+    }
   }
 
   if(BufSize==0)
