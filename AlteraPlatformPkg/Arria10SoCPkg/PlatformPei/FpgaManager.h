@@ -186,13 +186,17 @@ GeneratesDclkPulses (
 EFI_STATUS
 EFIAPI
 FpgaProgramWrite (
-  IN UINTN  RbfSize
+  IN BOOT_SOURCE_TYPE  BootSourceType,
+  IN UINT32            RbfSize,
+  IN UINT32            Checksum
   );
 
 EFI_STATUS
 EFIAPI
 FpgaProgramWriteCore (
-  IN UINTN  RbfSize
+  IN BOOT_SOURCE_TYPE  BootSourceType,
+  IN UINT32            RbfSize,
+  IN UINT32            Checksum
   );
 
 BOOLEAN

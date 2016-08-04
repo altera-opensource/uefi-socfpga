@@ -44,6 +44,7 @@
 #include "DeviceTree.h"
 #include "FpgaManager.h"
 #include "PitStopUtility.h"
+#include "MkimageHeader.h"
 
 #if (FixedPcdGet32(PcdDebugMsg_FpgaManager) == 0)
   //#define ProgressPrint(FormatString, ...)    /* do nothing */
@@ -74,6 +75,12 @@
 #define CRLUT_CFGWIDTH   2
 #define CRLUT_ENCRYPTED  2
 #define CRLUT_COMPRESSED 2
+
+UINT32
+PeiCrc32GuidedSectionExtractLibReverseBits (
+  UINT32  Value
+  );
+
 static const UINT32 CdRatioLookUpTable[CRLUT_CFGWIDTH][CRLUT_ENCRYPTED][CRLUT_COMPRESSED] =
 {
   { // 16-bit configuration data width
@@ -301,11 +308,76 @@ GeneratesDclkPulses (
   return EFI_TIMEOUT;
 }
 
+UINT32
+EFIAPI
+CalculateCrc32 (
+  IN  VOID    *Data,
+  IN  UINTN   DataSize,
+  IN  UINT32   Crc
+  )
+{
+  UINT32  CrcTable[256];
+  UINTN   TableEntry;
+  UINTN   Index;
+  UINT32  Value;
+  UINT8   *Ptr;
+  UINT32   CrcOut;
+
+  if (Data == NULL || DataSize == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Initialize CRC32 table.
+  //
+  for (TableEntry = 0; TableEntry < 256; TableEntry++) {
+    Value = PeiCrc32GuidedSectionExtractLibReverseBits ((UINT32) TableEntry);
+    for (Index = 0; Index < 8; Index++) {
+      if ((Value & 0x80000000) != 0) {
+        Value = (Value << 1) ^ 0x04c11db7;
+      } else {
+        Value = Value << 1;
+      }
+    }
+    CrcTable[TableEntry] = PeiCrc32GuidedSectionExtractLibReverseBits (Value);
+  }
+
+  //
+  // Compute CRC
+  //
+  Crc = Crc ^ 0xffffffff;
+  for (Index = 0, Ptr = Data; Index < DataSize; Index++, Ptr++) {
+    Crc = (Crc >> 8) ^ CrcTable[(UINT8) Crc ^ *Ptr];
+  }
+
+  CrcOut = Crc ^ 0xffffffff;
+  return CrcOut;
+}
+
+EFI_STATUS
+EFIAPI
+ValidateChecksumImage (
+  IN UINT8* Buffer,
+  IN UINT32 BufferLength,
+  IN UINT32 Checksum
+  )
+{
+  UINT32 Crc32 = 0;
+
+  Crc32 = CalculateCrc32 (Buffer, (UINTN)BufferLength, Crc32);
+  if (Crc32 != Checksum) {
+    InfoPrint("Invalid CRC(0x%x != 0x%x)\r\n", Crc32, Checksum);
+    return EFI_DEVICE_ERROR;
+  }
+  return EFI_SUCCESS;
+}
 
 EFI_STATUS
 EFIAPI
 FpgaProgramWrite (
-  IN UINTN  RbfSize
+  IN BOOT_SOURCE_TYPE  BootSourceType,
+  IN UINT32            RbfSize,
+  IN UINT32            Checksum
   )
 {
   UINTN       i;
@@ -318,12 +390,16 @@ FpgaProgramWrite (
   UINT8       RbfData[RBF_BUFFER_SIZE];
   UINTN       Percentage;
   UINTN       BytesReadCounter;
+  UINT32      Crc32;
+  UINT32      Length;
 
   BytesReadCounter = 0;
   Percentage = 0;
   TotalLength = RbfSize;
   Offset = 0;
   DstDataPtr = (UINT32 *)ALT_FPGAMGRDATA_OFST;
+  Crc32 = 0;
+  Length = 0;
 
   while (TotalLength) {
     // Reading a block of Data
@@ -336,9 +412,21 @@ FpgaProgramWrite (
       return Status;
     }
 
-    // Sending block of Data to FPGA
-    SrcDataPtr = (UINT32 *)(&RbfData[0]);
-    for (i = 0; i < (NumOfBytesToRead/4); i++)
+    Length = NumOfBytesToRead;
+    SrcDataPtr = (UINT32 *)(RbfData);
+
+    // Calculate CRC32 if enable check FPGA image
+    if (PcdGet32 (PcdCheckFpgaImage) == 1) {
+       // 1st block data include mkimage header
+       if ((BootSourceType == BOOT_SOURCE_SDMMC) && (Offset == 0)) {
+        Length = NumOfBytesToRead - sizeof(MKIMG_HEADER);
+        SrcDataPtr = (UINT32 *)(RbfData + sizeof(MKIMG_HEADER));
+      }
+      Crc32 = CalculateCrc32 (SrcDataPtr, (UINTN)Length, Crc32);
+    }
+
+    // Program a block of data
+    for (i = 0; i < (Length/4); i++)
     {
       *DstDataPtr = *SrcDataPtr++;
     }
@@ -356,29 +444,61 @@ FpgaProgramWrite (
       ProgressPrint ("\r%2d%% ", Percentage);
     }
   }
-  ProgressPrint ("\rDone.\r\n");
+
+  ProgressPrint("\n");
+
+  // Validate checksum image
+  if (PcdGet32 (PcdCheckFpgaImage) == 1) {
+    InfoPrint ("Enable validate checksum for RBF image\r\n");
+    if (Crc32 != Checksum) {
+      InfoPrint("Rbf image has invalid CRC(0x%x != 0x%x)\r\n", Crc32, Checksum);
+      return EFI_DEVICE_ERROR;
+    }
+  }
+  ProgressPrint ("Done.\r\n");
   return EFI_SUCCESS;
 }
 
 EFI_STATUS
 EFIAPI
 FpgaProgramWriteCore (
-  IN UINTN  RbfSize
+  IN BOOT_SOURCE_TYPE  BootSourceType,
+  IN UINT32            RbfSize,
+  IN UINT32            Checksum
   )
 {
   UINTN       i;
   UINT32*     SrcDataPtr;
   UINT32*     DstDataPtr;
   UINTN       SdramBaseAddress;
+  EFI_STATUS  Status;
+  UINT32      Length;
 
   DstDataPtr = (UINT32 *)ALT_FPGAMGRDATA_OFST;
   SdramBaseAddress = (UINTN)PcdGet64(PcdSdramBaseAddress_CORE_RBF);
 
   LoadCoreRbfImageToRam (SdramBaseAddress, RbfSize);
+  SrcDataPtr = (UINT32*)(SdramBaseAddress);
+  Length = RbfSize;
+
+  // Validate checksum image
+  if (PcdGet32 (PcdCheckFpgaImage) == 1) {
+    InfoPrint ("Enable validate checksum for RBF image\r\n");
+    SrcDataPtr = (UINT32*)(SdramBaseAddress + sizeof(MKIMG_HEADER)) ;
+    // For sdmmc RbfSize = Filesize which include mkimage header
+    // For nand/qspi, RbfSize = ImgHdr.DataSize, not include mkimage header
+    if (BootSourceType == BOOT_SOURCE_SDMMC)
+      Length = RbfSize - sizeof(MKIMG_HEADER);
+
+    Status = ValidateChecksumImage ((UINT8*)(SrcDataPtr), Length , Checksum);
+    if (EFI_ERROR(Status)) {
+      InfoPrint("Incorrect CRC value!\r\n");
+      return Status;
+    }
+  }
 
   // Sending block of Data to FPGA
-  SrcDataPtr = (UINT32*)SdramBaseAddress;
-  for (i = 0; i < (RbfSize/4); i++)
+  for (i = 0; i < (Length/4); i++)
   {
     *DstDataPtr = *SrcDataPtr++;
   }
@@ -454,7 +574,7 @@ FpgaFullConfiguration (
   UINT32      CdRatio;
   UINT32      CfgWidth;
   UINT32      RbfSize;
-
+  UINT32      Checksum;
 
   //
   // DEBUG NOTE:
@@ -477,17 +597,17 @@ FpgaFullConfiguration (
   // open core rbf only if FPGA is in early user mode
   if (CalledFromPitStop) {
     InfoPrint ("Open Rbf from PitStop\r\n");
-    Status = OpenRawBinaryFile(NULL, BootSourceType, &RbfSize, TRUE);
+    Status = OpenRawBinaryFile(NULL, BootSourceType, &RbfSize, &Checksum, TRUE);
   } else if (RbfType == CORE_RBF) {
     if (FpgaIsInEarlyUserMode () == FALSE) {
       InfoPrint ("Fpga is Not In Early User Mode\r\n");
       return EFI_DEVICE_ERROR;
     }
     InfoPrint ("Open Core Rbf defined by PCD\r\n");
-    Status = OpenRawBinaryFile(NULL, BootSourceType, &RbfSize, FALSE);
+    Status = OpenRawBinaryFile(NULL, BootSourceType, &RbfSize, &Checksum, FALSE);
   } else {
     InfoPrint ("Open peri/combined Rbf defined by DTB\r\n");
-    Status = OpenRawBinaryFile(Fdt, BootSourceType, &RbfSize, FALSE);
+    Status = OpenRawBinaryFile(Fdt, BootSourceType, &RbfSize, &Checksum, FALSE);
   }
 
   if ((Status != EFI_SUCCESS) ||
@@ -694,10 +814,10 @@ FpgaFullConfiguration (
 
 WriteData:
   if (RbfType == CORE_RBF) {
-    Status = FpgaProgramWriteCore (RbfSize);
+    Status = FpgaProgramWriteCore (BootSourceType, RbfSize, Checksum);
     if (EFI_ERROR(Status)) return Status;
   } else {
-    Status = FpgaProgramWrite (RbfSize);
+    Status = FpgaProgramWrite (BootSourceType, RbfSize, Checksum);
     if (EFI_ERROR(Status)) return Status;
   }
 

@@ -64,10 +64,11 @@ FlashRead (
 EFI_STATUS
 EFIAPI
 OpenRawBinaryFile(
-  IN  VOID*             Fdt,
-  IN  BOOT_SOURCE_TYPE  BootSourceType,
-  OUT UINT32*           RbfSize,
-  IN  BOOLEAN           CalledFromPitStop
+  IN   VOID*             Fdt,
+  IN   BOOT_SOURCE_TYPE  BootSourceType,
+  OUT  UINT32*           RbfSize,
+  OUT  UINT32*           Checksum,
+  IN   BOOLEAN           CalledFromPitStop
   );
 
 EFI_STATUS

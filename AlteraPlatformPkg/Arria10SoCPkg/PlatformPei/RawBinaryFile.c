@@ -39,6 +39,8 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/SerialPortPrintLib.h>
+#include <Guid/Crc32GuidedSectionExtraction.h>
+
 #include "AlteraSdMmcPei/AlteraSdMmcPei.h"
 #include "Assert.h"
 #include "BootSource.h"
@@ -142,6 +144,7 @@ OpenRawBinaryFile(
   IN  VOID*             Fdt,
   IN  BOOT_SOURCE_TYPE  BootSourceType,
   OUT UINT32*           RbfSize,
+  OUT  UINT32*          Checksum,
   IN  BOOLEAN           CalledFromPitStop
   )
 {
@@ -176,10 +179,12 @@ OpenRawBinaryFile(
         return Status;
       }
       *RbfSize = ImgHdr.DataSize;
+      *Checksum = ImgHdr.DataCrc;
       break;
 
     case BOOT_SOURCE_SDMMC:
       *RbfSize = 0;
+      *Checksum = 0;
       GetRbfFileCfg (Fdt, &RbfCfg, CalledFromPitStop);
       mFdtRbfCfg = RbfCfg;
       if (mFdtRbfCfg.NumOfRbfFileParts == 0) {
@@ -196,6 +201,27 @@ OpenRawBinaryFile(
         *RbfSize += mFdtRbfCfg.FileHandler[i].FileSize;
       }
       InfoPrint ("Total RBF size = %d\r\n", *RbfSize);
+
+      if ((PcdGet32 (PcdCheckFpgaImage) == 1)) {
+        // Get mkimage header
+        // Read first block of data
+        // Make sure we are at the begining of the file
+        OpenFileByCluster (mFdtRbfCfg.FileHandler[0].FileFirstCluster);
+        Status = ReadFileNextCluster ();
+        // Copy to caller's buffer
+        CopyMem (&ImgHdr, (mFdtRbfCfg.FileHandler[0].FileData), sizeof(ImgHdr));
+        MmioHexDumpEx((UINTN)(&ImgHdr), sizeof(ImgHdr)/4, 0);
+        // Reset file pointer to the begining of the file
+        OpenFileByCluster (mFdtRbfCfg.FileHandler[0].FileFirstCluster);
+
+        Status = ValidateMkimageHeader(&ImgHdr);
+        if (EFI_ERROR(Status)) {
+          InfoPrint("Mkimage header for RBF not found!\r\n");
+          MmioHexDumpEx((UINTN)(&ImgHdr), sizeof(ImgHdr)/4, 0);
+          return Status;
+        }
+        *Checksum = ImgHdr.DataCrc;
+      }
       Status = EFI_SUCCESS;
       break;
 
@@ -256,7 +282,10 @@ ReadRawBinaryFile(
         Status = ReadFileNextCluster ();
 
         // Copy to caller's buffer
-        CopyMem (DestBuffer, (mFdtRbfCfg.FileHandler[0].FileData + Offset), ReadSize);
+        if ((PcdGet32 (PcdCheckFpgaImage) == 1))
+          CopyMem (DestBuffer, (mFdtRbfCfg.FileHandler[0].FileData + Offset + sizeof(MKIMG_HEADER)), ReadSize);
+        else
+          CopyMem (DestBuffer, (mFdtRbfCfg.FileHandler[0].FileData + Offset), ReadSize);
 
         // Reset file pointer to the begining of the file
         OpenFileByCluster (mFdtRbfCfg.FileHandler[0].FileFirstCluster);
@@ -363,6 +392,8 @@ LoadCoreRbfImageToRam (
       break;
     case BOOT_SOURCE_NAND:
     case BOOT_SOURCE_QSPI:
+      RbfSize += sizeof(MKIMG_HEADER);
+
       // Print message that we are going to read core RBF from QSPI or NAND flash
       ProgressPrint ("Copying Core RBF from Flash Offset 0x%08lx to RAM Address 0x%08lx with image size 0x%08x\r\n",
         (UINT64) mQspiNandRbfOffset,
@@ -438,7 +469,11 @@ GetRbfFileCfg (
   } else if (PcdGet32 (PcdAutoProgramCoreRbf) == 1) {
     // Get core rbf filename from PCD
     RbfCfg->NumOfRbfFileParts = 1;
-    RbfCfg->RBF_FileName[0] = (CHAR8*) PcdGetPtr (PcdFileName_CORE_RBF);
+    if (PcdGet32 (PcdCheckFpgaImage) == 1)
+      RbfCfg->RBF_FileName[0] = (CHAR8*) PcdGetPtr (PcdFileName_CORE_RBF_MKIMAGE);
+    else
+      RbfCfg->RBF_FileName[0] = (CHAR8*) PcdGetPtr (PcdFileName_CORE_RBF);
+
   } else {
     // Should not get here
     RbfCfg->NumOfRbfFileParts = 0;

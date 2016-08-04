@@ -225,3 +225,9 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_CORE_RBF                |"ghrd_10as066n2.core.rbf"|VOID*|0xFEDC0405
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_CORE_RBF_ADDR         |0x00820000|UINT32|0xFEDC0406
   gAlteraSocFpgaTokenSpaceGuid.PcdSdramBaseAddress_CORE_RBF        |0x40|UINT64|0xFEDC0407
+
+  ## FPGA Image Checksum
+  gAlteraSocFpgaTokenSpaceGuid.PcdCheckFpgaImage                   |0x0|UINT32|0xFEDC0408
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_CORE_RBF_MKIMAGE        |"ghrd_10as066n2.core.rbf.mkimage"|VOID*|0xFEDC0409
+
+  

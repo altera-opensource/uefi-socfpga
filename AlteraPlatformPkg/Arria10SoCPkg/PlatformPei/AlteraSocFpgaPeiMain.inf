@@ -102,6 +102,7 @@
   SerialPortLib
   SerialPortPrintLib
   TimerLib
+  PeiCrc32GuidedSectionExtractLib
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
@@ -172,6 +173,8 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_CORE_RBF_ADDR
   gAlteraSocFpgaTokenSpaceGuid.PcdSdramBaseAddress_CORE_RBF
   gAlteraSocFpgaTokenSpaceGuid.PcdNandStopIfMoreThanThisNumberBadBlocks
+  gAlteraSocFpgaTokenSpaceGuid.PcdCheckFpgaImage
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_CORE_RBF_MKIMAGE
   gArmPlatformTokenSpaceGuid.PcdClusterCount
   gArmPlatformTokenSpaceGuid.PcdCoreCount
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
