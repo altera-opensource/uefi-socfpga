@@ -61,6 +61,8 @@
   OUTPUT_DIRECTORY               = Build/Arria10SoCPkg
   USE_ARM_BDS                    = FALSE
   SECURE_BOOT_ENABLE             = FALSE
+  ALT_DEVICE_FAMILY              = soc_a10
+  HWLIBS_ROOT                    = $(SOCEDS_DEST_ROOT)/ip/altera/hps/altera_hps/hwlib
 
 ################################################################################
 #
@@ -867,10 +869,10 @@
   #-------------------------------
   # AlteraPlatformPkg/...
   #-------------------------------
-  RVCT:*_*_ARM_PLATFORM_FLAGS      == --cpu Cortex-A9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include
-  GCC:DEBUG_*_ARM_PLATFORM_FLAGS   == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -DMDEPKG_NDEBUG -Wno-unused-but-set-variable
-  GCC:RELEASE_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include
-  XCODE:*_*_ARM_PLATFORM_FLAGS     == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include
+  RVCT:*_*_ARM_PLATFORM_FLAGS      == --cpu Cortex-A9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(HWLIBS_ROOT)/include -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY)
+  GCC:DEBUG_*_ARM_PLATFORM_FLAGS   == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(HWLIBS_ROOT)/include -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY) -DMDEPKG_NDEBUG -Wno-unused-but-set-variable
+  GCC:RELEASE_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(HWLIBS_ROOT)/include -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY)
+  XCODE:*_*_ARM_PLATFORM_FLAGS     == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(HWLIBS_ROOT)/include -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY)
 
 [BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
