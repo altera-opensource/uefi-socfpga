@@ -38,12 +38,8 @@
   ENTRY_POINT                    = ShellCEntryLib
 
 [Sources]
-# EXAMPLE_SRC
   main.c
   leds_a10.c
-# HWLIBS_SRC
-  ../../hwlib/src/hwmgr/soc_a10/alt_clock_manager.c
-  ../../hwlib/src/hwmgr/alt_spi.c
 
 [Packages]
   StdLib/StdLib.dec
@@ -59,9 +55,10 @@
   ShellCEntryLib
   UefiBootServicesTableLib
   UefiLib
+  HwLib
 
 [BuildOptions]
-   RVCT:*_*_*_CC_FLAGS = -DALT_INT_PROVISION_STACK_SUPPORT=0 -DALT_INT_PROVISION_CPU_COUNT=0 -DALT_FPGA_ENABLE_DMA_SUPPORT=1 -Wno-error=format
-    GCC:*_*_*_CC_FLAGS = -DALT_INT_PROVISION_STACK_SUPPORT=0 -DALT_INT_PROVISION_CPU_COUNT=0 -DALT_FPGA_ENABLE_DMA_SUPPORT=1 -Wno-error=format
+  RVCT:*_*_*_CC_FLAGS = -DALT_INT_PROVISION_STACK_SUPPORT=0 -DALT_INT_PROVISION_CPU_COUNT=0 -DALT_FPGA_ENABLE_DMA_SUPPORT=1 -Wno-error=format
+  GCC:*_*_*_CC_FLAGS = -DALT_INT_PROVISION_STACK_SUPPORT=0 -DALT_INT_PROVISION_CPU_COUNT=0 -DALT_FPGA_ENABLE_DMA_SUPPORT=1 -Wno-error=format
 
 

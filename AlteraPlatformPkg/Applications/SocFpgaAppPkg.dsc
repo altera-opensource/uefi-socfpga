@@ -59,7 +59,7 @@
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   ALT_DEVICE_FAMILY              = soc_a10
-  HWLIBS_ROOT                    = $(SOCEDS_DEST_ROOT)/ip/altera/hps/altera_hps/hwlib
+  HWLIBS_ROOT                    = $(WORKSPACE)/AlteraPlatformPkg/HwLib
 
 #
 #  Debug output control
@@ -120,6 +120,7 @@
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
 
   TimerLib|AlteraPlatformPkg/Library/AlteraHpsTimerLib/AlteraHpsTimerLib.inf
+  HwLib|AlteraPlatformPkg/HwLib/HwLib.inf
 
 ###################################################################################################
 #
@@ -169,7 +170,7 @@
 
 [BuildOptions]
   GCC:*_GCC48_ARM_ARCHCC_FLAGS ==
-  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A9 -I$(HWLIBS_ROOT)/include -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY) -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY)/socal -D$(ALT_DEVICE_FAMILY) -I$(WORKSPACE)/StdLib/Include/Ipf/machine/int_fmtio.h
-  GCC:*_*_ARM_PLATFORM_FLAGS  == -mcpu=cortex-a9 -I$(HWLIBS_ROOT)/include -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY) -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY)/socal -D$(ALT_DEVICE_FAMILY) -include $(WORKSPACE)/StdLib/Include/Ipf/machine/int_fmtio.h -Wno-error=unused-variable
+  RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu Cortex-A9 -I$(HWLIBS_ROOT)/include -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY) -D$(ALT_DEVICE_FAMILY) -include $(WORKSPACE)/StdLib/Include/Ipf/machine/int_fmtio.h
+  GCC:*_*_ARM_PLATFORM_FLAGS  == -mcpu=cortex-a9 -I$(HWLIBS_ROOT)/include -I$(HWLIBS_ROOT)/include/$(ALT_DEVICE_FAMILY) -D$(ALT_DEVICE_FAMILY) -include $(WORKSPACE)/StdLib/Include/Ipf/machine/int_fmtio.h -Wno-error=unused-variable
 
 
