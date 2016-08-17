@@ -1,0 +1,82 @@
+#/** @file
+#
+#  Copyright (c) 2016, Intel Corporation. All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without modification,
+#  are permitted provided that the following conditions are met:
+#
+#  1. Redistributions of source code must retain the above copyright notice, this
+#  list of conditions and the following disclaimer.
+#
+#  2. Redistributions in binary form must reproduce the above copyright notice, this
+#  list of conditions and the following disclaimer in the documentation and/or other
+#  materials provided with the distribution.
+#
+#  3. Neither the name of the copyright holder nor the names of its contributors may
+#  be used to endorse or promote products derived from this software without specific
+#  prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+#  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+#  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+#  SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+#  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+#  TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+#  BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+#  DAMAGE.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = HwLib
+  FILE_GUID                      = 4C73597D-9458-4f6b-92BB-093D714E99E0
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 0.1
+  LIBRARY_CLASS                  = HwLib
+  HWLIBS_ROOT                    = AlteraPlatformPkg/hwlib
+  ALT_DEVICE_FAMILY              = soc_a10
+[Sources]
+  # common sources
+  src/hwmgr/alt_16550_uart.c
+  src/hwmgr/alt_address_space.c
+  src/hwmgr/alt_cache.c
+  src/hwmgr/alt_can.c
+  src/hwmgr/alt_dma.c
+  src/hwmgr/alt_dma_program.c
+  src/hwmgr/alt_generalpurpose_io.c
+  src/hwmgr/alt_globaltmr.c
+  src/hwmgr/alt_i2c.c
+  src/hwmgr/alt_interrupt.c
+  src/hwmgr/alt_interrupt_armcc.s       | RVCT
+  src/hwmgr/alt_mmu.c
+  src/hwmgr/alt_nand.c
+  src/hwmgr/alt_qspi.c
+  src/hwmgr/alt_sdmmc.c
+  src/hwmgr/alt_spi.c
+  src/hwmgr/alt_timers.c
+  src/hwmgr/alt_watchdog.c
+  # utils
+  src/utils/alt_p2uart.c
+  src/utils/alt_printf.c
+  # device specific
+  src/hwmgr/soc_a10/alt_bridge_manager.c
+  src/hwmgr/soc_a10/alt_clock_manager.c
+  src/hwmgr/soc_a10/alt_ecc.c
+  src/hwmgr/soc_a10/alt_fpga_manager.c
+  src/hwmgr/soc_a10/alt_reset_manager.c
+  src/hwmgr/soc_a10/alt_system_manager.c
+
+[Packages]
+  StdLib/StdLib.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  LibC
+  LibStdio
+
+[BuildOptions]
+  RVCT:*_*_*_CC_FLAGS = -DALT_INT_PROVISION_STACK_SUPPORT=0 -DALT_INT_PROVISION_CPU_COUNT=0 -DALT_FPGA_ENABLE_DMA_SUPPORT=1 -Wno-error=format
+  GCC:*_*_*_CC_FLAGS  = -DALT_INT_PROVISION_STACK_SUPPORT=0 -DALT_INT_PROVISION_CPU_COUNT=0 -DALT_FPGA_ENABLE_DMA_SUPPORT=1 -Wno-error=format
