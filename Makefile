@@ -55,9 +55,12 @@ SED_DEL_TMP_FILE := del sed*.
 DTC              := dtc
 CP               := copy /y
 RM               := del /f
+CPDIR            := xcopy /s /q
 RMDIR            := rmdir /s /q
+MKDIR            := mkdir
 MAKE_BUILD_TOOL  :=
 CAT_TYPE         := type
+EXIST            := exist
 else
 # Linux
 NEXT_CMD         :=;
@@ -72,9 +75,12 @@ SED_DEL_TMP_FILE :=
 DTC              := dtc
 CP               := cp -f
 RM               := rm -f
+CPDIR            := cp -Rf
 RMDIR            := rm -Rf
+MKDIR            := mkdir
 MAKE_BUILD_TOOL  := $(MAKE) -C $(EDK_TOOLS_PATH)
 CAT_TYPE         := cat
+EXIST            := test -d
 endif
 
 ifdef ComSpec
@@ -310,6 +316,22 @@ FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSE
 FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
 FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
 
+
+HWLIB_SOCEDS_PATH := $(SOCEDS_DEST_ROOT)$(PATHSEP)ip$(PATHSEP)altera$(PATHSEP)hps$(PATHSEP)altera_hps$(PATHSEP)hwlib$(PATHSEP)*
+HWLIB_UEFI_PATH   := AlteraPlatformPkg$(PATHSEP)HwLib
+HWLIB_INCLUDE_PATH := $(HWLIB_UEFI_PATH)$(PATHSEP)include
+HWLIB_SRC_PATH := $(HWLIB_UEFI_PATH)$(PATHSEP)src
+
+ifdef ComSpec
+REMOVE_HWLIB_INCLUDE := if $(EXIST) $(HWLIB_INCLUDE_PATH) $(RMDIR) $(HWLIB_INCLUDE_PATH)
+REMOVE_HWLIB_SRC     := if $(EXIST) $(HWLIB_SRC_PATH)     $(RMDIR) $(HWLIB_SRC_PATH)
+else
+REMOVE_HWLIB_INCLUDE := $(EXIST) $(HWLIB_INCLUDE_PATH) || $(RMDIR) $(HWLIB_INCLUDE_PATH)
+REMOVE_HWLIB_SRC     := $(EXIST) $(HWLIB_SRC_PATH)     || $(RMDIR) $(HWLIB_SRC_PATH)
+endif
+
+COPY_HWLIB_FROM_SOCEDS := $(CPDIR) $(HWLIB_SOCEDS_PATH) $(HWLIB_UEFI_PATH)
+
 #-----------------------------------------------------------------------------
 # when user type "make help"
 #-----------------------------------------------------------------------------
@@ -416,7 +438,12 @@ build_setup_app:
 	@$(ECHO_START) EDK2_BUILD     : $(EDK2_BUILD)$(ECHO_END)
 	@$(ECHO_START) EDK2_MACROS    : $(EDK2_MACROS)$(ECHO_END)
 	@$(ECHO_START) EDK2_TOOLCHAIN : $(EDK2_TOOLCHAIN)$(ECHO_END)
-
+	@$(ECHO_START) ---------------------- $(ECHO_END)
+	@$(ECHO_START) Copy HwLib from SOCEDS $(ECHO_END)
+	@$(ECHO_START) -----------------------$(ECHO_END)
+	$(REMOVE_HWLIB_INCLUDE)
+	$(REMOVE_HWLIB_SRC)
+	$(COPY_HWLIB_FROM_SOCEDS)
 
 #-----------------------------------------------------------------------------
 # Shell Scripts: build_tool
