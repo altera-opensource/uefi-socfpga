@@ -160,6 +160,9 @@
 # 16x2 LCD application
   AlteraPlatformPkg/Applications/OnboardLCD_A10SoCDevKit/Lcd.inf
 
+# Accessing EEPROM using I2C Controller application
+  AlteraPlatformPkg/Applications/AccessingEEPROM_A10SoCDevKit/Eeprom.inf
+
 ##############################################################################
 #
 #  Include Boilerplate text required for building with the Standard Libraries.
