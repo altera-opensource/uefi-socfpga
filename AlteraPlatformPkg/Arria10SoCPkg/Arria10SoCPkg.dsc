@@ -191,7 +191,7 @@
 
   ## Various Filename in root directory of the SD/MMC FAT32 partition
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_DXE_ROM                 |"DXE.ROM"
-  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_LINUX_DTB               |"socfpga_arria10_socdk.dtb"
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_LINUX_DTB               |"socfpga_arria10_socdk_sdmmc.dtb"
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_BOOTIMAGE_BIN           |"bootimage.bin"
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_ZIMAGE                  |"zImage"
 
