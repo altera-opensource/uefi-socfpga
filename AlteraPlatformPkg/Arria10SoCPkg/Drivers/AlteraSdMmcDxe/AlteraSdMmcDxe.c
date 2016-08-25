@@ -218,15 +218,24 @@ SdMmcWriteBlockData (
   IN UINT32*                   Buffer
   )
 {
-  EFI_TPL Tpl;
+  EFI_TPL       Tpl;
   EFI_STATUS    Status;
 
-  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  if (PcdGet32 (PcdSdmmcBlockUseInternalDMA) != 0)  {
+    ArmCleanDataCache ();
+    ArmInvalidateDataCache ();
+    ArmDisableDataCache ();
 
-  Status = WriteFifoData(Length, Buffer);
+    Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    Status = WriteData(Length, Buffer);
+    gBS->RestoreTPL (Tpl);
 
-  gBS->RestoreTPL (Tpl);
-
+    ArmEnableDataCache ();
+  } else {
+    Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    Status = WriteData(Length, Buffer);
+    gBS->RestoreTPL (Tpl);
+  }
   return Status;
 }
 

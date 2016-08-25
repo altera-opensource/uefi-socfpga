@@ -841,6 +841,21 @@ ReadData (
     return ReadFifoData(Length, Buffer);
   }
 }
+
+EFI_STATUS
+EFIAPI
+WriteData (
+  IN  UINTN     Length,
+  IN  UINT32*   Buffer
+  )
+{
+  if (PcdGet32 (PcdSdmmcBlockUseInternalDMA) != 0)  {
+    return WriteDmaData(Length, Buffer);
+  } else {
+    return WriteFifoData(Length, Buffer);
+  }
+}
+
 EFI_STATUS
 EFIAPI
 ReadFifoData (
@@ -1054,6 +1069,52 @@ ReadDmaData (
   // Timeout
   if (PcdGet32 (PcdDebugMsg_SdMmc) != 0)
     SerialPortPrint ("\tSDMMC iDMA RX Timeout\n\r");
+  return EFI_TIMEOUT;
+}
+
+EFI_STATUS
+EFIAPI
+WriteDmaData (
+  IN  UINTN     Length,
+  IN  UINT32*   Buffer
+  )
+{
+  UINTN   WaitCount;
+  UINT32  Des0_flags;
+  UINT32  Des1_Bs1;
+  UINT32  Des2_Bap1;
+  UINT32  Des3_Next;
+
+  // Construct Internal DMA Descriptor
+  Des0_flags = (IDMAC_OWN | IDMAC_DIC | IDMAC_FS | IDMAC_LD);
+  Des1_Bs1   = Length;
+  Des2_Bap1  = (UINT32)(UINT32*)Buffer;
+  Des3_Next  = (UINT32)(IDMA_DES*)&mDmaDes;
+
+  mDmaDes.des0 = Des0_flags;
+  mDmaDes.des1 = Des1_Bs1;
+  mDmaDes.des2 = Des2_Bap1;
+  mDmaDes.des3 = Des3_Next;
+
+  // Clear Poll Demand Register
+  MmioWrite32 (
+    ALT_SDMMC_OFST +
+    ALT_SDMMC_PLDMND_OFST,
+    ALT_SDMMC_PLDMND_RESET
+    );
+
+  // Wait for DMA to finish transfering the data
+  WaitCount = 0;
+  do {
+    if ((mDmaDes.des0 & IDMAC_OWN) == 0)
+    {
+      return EFI_SUCCESS;
+    }
+  } while ( (WaitCount++ < DATA_BUSY_TIMEOUT) );
+
+  // Timeout
+  if (PcdGet32 (PcdDebugMsg_SdMmc) != 0)
+    SerialPortPrint ("\tSDMMC iDMA TX Timeout\n\r");
   return EFI_TIMEOUT;
 }
 

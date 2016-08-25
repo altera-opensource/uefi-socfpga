@@ -172,8 +172,6 @@ SdMmcWriteBlockData (
   IN UINT32*                   Buffer
   )
 {
-  EFI_STATUS    Status;
-  Status = WriteFifoData(Length, Buffer);
-  return Status;
+  return WriteData(Length, Buffer);
 }
 

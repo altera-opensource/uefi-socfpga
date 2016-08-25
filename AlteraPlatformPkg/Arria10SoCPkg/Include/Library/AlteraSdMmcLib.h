@@ -251,5 +251,19 @@ ReadDmaData (
   OUT UINT32*   Buffer
   );
 
+EFI_STATUS
+EFIAPI
+WriteDmaData (
+  IN  UINTN     Length,
+  IN  UINT32*   Buffer
+  );
+
+EFI_STATUS
+EFIAPI
+WriteData (
+  IN  UINTN     Length,
+  IN  UINT32*   Buffer
+  );
+
 #endif
 
