@@ -62,6 +62,6 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSweepAllDrvselAndSmplselValues
   gAlteraSocFpgaTokenSpaceGuid.PcdDebugMsg_SdMmc
   gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSupport4BitMode
-  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockReadUseInternalDMA
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockUseInternalDMA
   gAlteraSocFpgaTokenSpaceGuid.PcdIsAlteraSoCFPGADevelopmentBoards
 

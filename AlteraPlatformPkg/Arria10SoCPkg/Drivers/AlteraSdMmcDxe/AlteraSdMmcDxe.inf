@@ -59,8 +59,11 @@
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   AlteraPlatformPkg/AlteraPlatformPkg.dec
+  AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkg.dec
+  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
+  ArmLib
   BaseLib
   BaseMemoryLib
   DebugLib
@@ -73,6 +76,9 @@
 [Protocols]
   gEfiDevicePathProtocolGuid
   gEfiMmcHostProtocolGuid
+
+[FixedPcd]
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockUseInternalDMA
 
 [Depex]
   TRUE

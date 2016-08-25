@@ -830,6 +830,19 @@ ReceiveCommandResponse(
 
 EFI_STATUS
 EFIAPI
+ReadData (
+  IN  UINTN     Length,
+  OUT UINT32*   Buffer
+  )
+{
+  if (PcdGet32 (PcdSdmmcBlockUseInternalDMA) != 0)  {
+    return ReadDmaData(Length, Buffer);
+  } else {
+    return ReadFifoData(Length, Buffer);
+  }
+}
+EFI_STATUS
+EFIAPI
 ReadFifoData (
   IN  UINTN     Length,
   OUT UINT32*   Buffer
@@ -977,7 +990,7 @@ InitInternalDMAC(
     (UINT32) &mDmaDes
     );
 
-  if (PcdGet32 (PcdSdmmcBlockReadUseInternalDMA) != 0)
+  if (PcdGet32 (PcdSdmmcBlockUseInternalDMA) != 0)
   {
     // Enable the DMA at SDMMC CTRL
     MmioAndThenOr32 (

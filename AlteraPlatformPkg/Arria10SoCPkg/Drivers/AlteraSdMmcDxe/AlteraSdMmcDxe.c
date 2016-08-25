@@ -45,6 +45,8 @@
 **/
 
 #include "AlteraSdMmcDxe.h"
+#include <Library/PcdLib.h>
+#include <Library/ArmLib.h>
 
 BOOLEAN
 SdMmcIsCardPresent (
@@ -175,12 +177,21 @@ SdMmcReadBlockData (
   EFI_TPL       Tpl;
   EFI_STATUS    Status;
 
-  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  if (PcdGet32 (PcdSdmmcBlockUseInternalDMA) != 0)  {
+    ArmCleanDataCache ();
+    ArmInvalidateDataCache ();
+    ArmDisableDataCache ();
 
-  Status = ReadFifoData(Length, Buffer);
+    Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    Status = ReadData(Length, Buffer);
+    gBS->RestoreTPL (Tpl);
 
-  gBS->RestoreTPL (Tpl);
-
+    ArmEnableDataCache ();
+  } else {
+    Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    Status = ReadData(Length, Buffer);
+    gBS->RestoreTPL (Tpl);
+  }
   return Status;
 }
 

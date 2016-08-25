@@ -89,7 +89,7 @@
   #
   # Platform Init Features Enable / Disable
   #
-  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockReadUseInternalDMA|1
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockUseInternalDMA|1
   gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSweepAllDrvselAndSmplselValues|0
   gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcDrvSel|3
   gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSmplSel|2
