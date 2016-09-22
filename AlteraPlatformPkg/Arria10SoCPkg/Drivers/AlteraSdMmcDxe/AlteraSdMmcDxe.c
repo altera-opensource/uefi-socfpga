@@ -179,8 +179,8 @@ SdMmcReadBlockData (
 
   if (PcdGet32 (PcdSdmmcBlockUseInternalDMA) != 0)  {
     ArmCleanDataCache ();
-    ArmInvalidateDataCache ();
     ArmDisableDataCache ();
+    ArmInvalidateDataCache ();
 
     Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
     Status = ReadData(Length, Buffer);
@@ -223,8 +223,8 @@ SdMmcWriteBlockData (
 
   if (PcdGet32 (PcdSdmmcBlockUseInternalDMA) != 0)  {
     ArmCleanDataCache ();
-    ArmInvalidateDataCache ();
     ArmDisableDataCache ();
+    ArmInvalidateDataCache ();
 
     Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
     Status = WriteData(Length, Buffer);
