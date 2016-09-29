@@ -23,3 +23,12 @@ ArmSecArchTrustzoneInit (
   // Do not trap any access to Floating Point and Advanced SIMD in EL3.
   ArmWriteCptr (0);
 }
+
+VOID
+EFIAPI
+ArmDiableL2CacheFoz (
+  VOID
+  )
+{
+  // todo:
+}

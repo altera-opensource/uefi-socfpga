@@ -13,6 +13,8 @@
 **/
 
 #include <Chipset/ArmV7.h>
+#include <Chipset/ArmCortexA9.h>
+#include <Library/ArmLib.h>
 
 VOID
 EFIAPI
@@ -22,4 +24,12 @@ ArmSecArchTrustzoneInit (
 {
   // Write to CP15 Non-secure Access Control Register
   ArmWriteNsacr (PcdGet32 (PcdArmNsacr));
+}
+VOID
+EFIAPI
+ArmDiableL2CacheFoz(
+  VOID
+  )
+{
+  ArmUnsetAuxCrBit (A9_FEATURE_FOZ);
 }

@@ -73,6 +73,15 @@ ASM_PFX(enter_monitor_mode):
 // We may need to do some config before we change to another Mode.
 ASM_PFX(return_from_exception):
    msr     elr_el3, x0
+// configure scr_el3
+   mov	x0, #0x30			// RES1
+   orr	x0, x0, #(1 << 0)		// Non-secure bit
+   orr	x0, x0, #(1 << 1)		// IRQ
+   orr	x0, x0, #(1 << 2)		// FIQ
+   orr	x0, x0, #(1 << 3)		// EA
+   orr	x0, x0, #(1 << 8)		// HVC enable
+   orr	x0, x0, #(1 << 10)		// 64-bit EL2
+   msr	scr_el3 , x0
    eret
 
 // For AArch64 we need to construct the spsr we want from individual bits and pieces.

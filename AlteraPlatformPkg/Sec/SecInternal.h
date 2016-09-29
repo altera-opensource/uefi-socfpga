@@ -80,4 +80,9 @@ ArmSecArchTrustzoneInit (
   VOID
   );
 
+VOID
+EFIAPI
+ArmDiableL2CacheFoz (
+  VOID
+  );
 #endif

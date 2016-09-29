@@ -50,7 +50,6 @@
 #include <Library/SerialPortLib.h>
 #include <Library/ArmGicLib.h>
 #include <Library/ArmPlatformLib.h>
-#include <Chipset/ArmCortexA9.h>
 
 #include "SecInternal.h"
 
@@ -66,7 +65,7 @@ CEntryPoint (
   ArmDisableMmu();
 
   // Make sure PL310 cache write full line of zeros mode is turned off.
-  ArmUnsetAuxCrBit (A9_FEATURE_FOZ);
+  ArmDiableL2CacheFoz();
 
   // Invalidate the data cache. Doesn't have to do the Data cache clean.
   ArmInvalidateDataCache ();
