@@ -157,6 +157,10 @@
   GCC:DEBUG_*_ARM_PLATFORM_FLAGS   == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -DMDEPKG_NDEBUG -Wno-unused-but-set-variable
   GCC:RELEASE_*_ARM_PLATFORM_FLAGS == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include
   XCODE:*_*_ARM_PLATFORM_FLAGS     == -mcpu=cortex-a9 -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Arria10SoCPkg/Include
+  RVCT:*_*_AARCH64_PLATFORM_FLAGS      == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include
+  GCC:DEBUG_*_AARCH64_PLATFORM_FLAGS   == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -DMDEPKG_NDEBUG -Wno-unused-but-set-variable
+  GCC:RELEASE_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include
+  XCODE:*_*_AARCH64_PLATFORM_FLAGS     == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include
 
 [BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000
