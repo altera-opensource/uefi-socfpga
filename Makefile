@@ -88,6 +88,7 @@ ifdef ComSpec
 else
 # Linux
 export GCC48_ARM_PREFIX=arm-linux-gnueabihf-
+export GCC48_AARCH64_PREFIX=aarch64-linux-gnu-
 endif
 
 #-----------------------------------------------------------------------------
@@ -206,18 +207,6 @@ ifeq ("$(target)$(T)$(t)","")
 # Set Default DEVICE when user do not specify via command-line argument
 TARGET?=$(DEFAULT_MAKE_TARGET)
 endif
-# Override the default value based on command-line argument
-ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "A10"))
-  ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","bootloader" "BOOTLOADER"))
-  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dsc
-  else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
-  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
-  else
-  $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
-  endif
-else
-$(error ERROR: No .DSC for unsupported device in command-line argument DEVICE="$(DEVICE)$(device)$(D)$(d))"
-endif
 
 
 # Set Default COMPILER when user do not specify via command-line argument
@@ -332,6 +321,77 @@ endif
 
 COPY_HWLIB_FROM_SOCEDS := $(CPDIR) $(HWLIB_SOCEDS_PATH) $(HWLIB_UEFI_PATH)
 
+# Override the default value based on command-line argument
+ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "A10"))
+  ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","bootloader" "BOOTLOADER"))
+  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dsc
+
+  # Processor architecture which is ARM for SOCFPGA
+  export EDK2_ARCH=ARM
+
+  # DTB path as defined in .FDF
+  # (do no change, it must match the on in .FDF file)
+  export FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dtb
+
+  # DTS path
+  export FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dts
+
+  # ENTRY_MINUS_40HEX = 0x188 (SEC EntryPoint) - 0x40
+  ENTRY_MINUS_40HEX := 328
+
+  # Build full path of the .FD files
+  PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
+  DXE_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(DXE_FD_FILENAME)
+
+  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
+  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
+  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
+
+  # DS5 script path
+  DS5_SCRIPT_PATH            := AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.ds5
+
+  else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
+  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
+  else
+  $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
+  endif
+else ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","s10" "S10"))
+  ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","bootloader" "BOOTLOADER"))
+  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dsc
+
+  # Processor architecture which is AARCH64 for SOCFPGA
+  export EDK2_ARCH=AARCH64
+
+  # DTB path as defined in .FDF
+  # (do no change, it must match the on in .FDF file)
+  export FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dtb
+  # DTS path
+  export FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dts
+
+  # ENTRY_MINUS_40HEX = 0x188 (SEC EntryPoint) - 0x40
+  ENTRY_MINUS_40HEX := 328
+
+  # Build full path of the .FD files
+  PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
+  DXE_FD_FILENAME_FULLPATH := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(DXE_FD_FILENAME)
+
+  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
+  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
+  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
+
+  # DS5 script path
+  DS5_SCRIPT_PATH            := AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.ds5
+
+  else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
+  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
+  else
+  $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
+  endif
+else
+$(error ERROR: No .DSC for unsupported device in command-line argument DEVICE="$(DEVICE)$(device)$(D)$(d))"
+endif
+
+
 #-----------------------------------------------------------------------------
 # when user type "make help"
 #-----------------------------------------------------------------------------
@@ -339,7 +399,7 @@ COPY_HWLIB_FROM_SOCEDS := $(CPDIR) $(HWLIB_SOCEDS_PATH) $(HWLIB_UEFI_PATH)
 help:
 	@$(ECHO_NEWLINE)
 	@$(ECHO_START) +---------------------------------------------------------+$(ECHO_END)
-	@$(ECHO_START) +   Makefile to build Altera Arria 10 SoC UEFI Firmware   +$(ECHO_END)
+	@$(ECHO_START) +   Makefile to build Altera SoC UEFI Firmware   +$(ECHO_END)
 	@$(ECHO_START) +---------------------------------------------------------+$(ECHO_END)
 	@$(ECHO_NEWLINE)
 	@$(ECHO_START) USAGE:$(ECHO_END)
@@ -351,7 +411,7 @@ help:
 	@$(ECHO_NEWLINE)
 	@$(ECHO_START)     DEVICE      - Device type$(ECHO_END)
 	@$(ECHO_START)                   a10 for Arria 10$(ECHO_END)
-	@$(ECHO_START)                   ca9_rtsm for Cortex-A9 RTSM$(ECHO_END)
+	@$(ECHO_START)                   s10 for Stratix 10$(ECHO_END)
 	@$(ECHO_START)     COMPILER    - Compiler selection$(ECHO_END)
 	@$(ECHO_START)                   armcc for ARMCC$(ECHO_END)
 	@$(ECHO_START)                   gcc for Linaro GCC$(ECHO_END)
@@ -476,7 +536,7 @@ build_mkpimage:
 #-----------------------------------------------------------------------------
 build_ds_script:
 	@$(ECHO_START) Creating DS-5 script : $(DS_SCRIPT)$(ECHO_END)
-	@$(CP) AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.ds5 $(DS_SCRIPT)
+	@$(CP) $(DS5_SCRIPT_PATH) $(DS_SCRIPT)
 	@sed -i "s%$(SNR_ENTRY_ArmPlatformSec)%$(ENTRY_ArmPlatformSec)%g" $(DS_SCRIPT)
 	@sed -i "s%$(SNR_ENTRY_ArmPlatformPrePeiCore)%$(ENTRY_ArmPlatformPrePeiCore)%g" $(DS_SCRIPT)
 	@sed -i "s%$(SNR_ENTRY_AlteraSocFpgaPeiMain)%$(ENTRY_AlteraSocFpgaPeiMain)%g" $(DS_SCRIPT)
@@ -524,6 +584,12 @@ program_flash_using_quartus_hps_256:
 # make DEVICE=A10 COMPILER=ARMCC
 # make device=a10 compiler=gcc
 # make device=a10 compiler=armcc
+# make DEVICE=s10
+# make DEVICE=s10 COMPILER=GCC
+# make DEVICE=S10 COMPILER=GCC
+# make device=s10
+# make device=s10 COMPILER=GCC
+# make device=S10 COMPILER=GCC
 # make DEVICE=invalid COMPILER=invalid
 # make device=invalid compiler=invalid
 # make DEVICE=A10 COMPILER=GCC HANDOFF_DTS=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkgSdmmc.dts
