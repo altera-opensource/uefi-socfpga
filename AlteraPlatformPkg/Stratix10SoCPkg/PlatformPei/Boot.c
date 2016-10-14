@@ -36,6 +36,7 @@
 #include <libfdt.h>
 #include <Library/ArmGicLib.h>
 #include <Library/ArmLib.h>
+#include <Library/ArmCpuLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
@@ -45,6 +46,7 @@
 #include <Library/SerialPortPrintLib.h>
 #include <Library/TimerLib.h>
 #include <Chipset/ArmArchTimer.h>
+#include <Chipset/ArmCortexA5x.h>
 
 #include "AlteraSdMmcPei/AlteraSdMmcPei.h"
 #include "Assert.h"
@@ -65,6 +67,8 @@
   #define InfoPrint     SerialPortPrint
   #define MmioHexDump   SerialPortMmioHexDump
 #endif
+typedef VOID (*LINUX_KERNEL64)(UINTN ParametersBase, UINTN Reserved0,
+                               UINTN Reserved1, UINTN Reserved2);
 //
 // Functions
 //
@@ -120,9 +124,6 @@ PreparePlatformHardwareToBoot (
   // Disable Gic Distributor
   ArmGicDisableDistributor (PcdGet32 (PcdGicDistributorBase));
 
-  // Make sure CP15.ACTRL SMP bit is turned off, this is required to boot Linux.
-  //ArmUnsetCpuActlrBit (1<<6);
-  ArmWriteCntFrq (0x01800000);
   // Clean before Disable else the Stack gets corrupted with old data.
   ArmCleanDataCache ();
   ArmDisableDataCache ();
@@ -143,9 +144,9 @@ VOID
 EFIAPI
 JumpToEntry (
   IN UINTN    EntryMemoryAddr,
-  IN UINTN    R0,
-  IN UINTN    R1,
-  IN UINTN    R2
+  IN UINTN    X0,
+  IN UINTN    X1,
+  IN UINTN    X2
   )
 {
 
@@ -157,11 +158,11 @@ JumpToEntry (
   // Jump to entry point
   EntryPoint = (BOOTIMAGE_ENTRY_POINT)(UINTN) EntryMemoryAddr;
   ProgressPrint ("Control transfered to 0x%08x with "
-                 "R0 = 0x%08x "
-                 "R1 = 0x%08x "
-                 "R2 = 0x%08x\r\n\r\n\r\n",
-                 EntryMemoryAddr, R0, R1, R2);
-  EntryPoint (R0, R1, R2);
+                 "X0 = 0x%08x "
+                 "X1 = 0x%08x "
+                 "X2 = 0x%08x\r\n\r\n\r\n",
+                 EntryMemoryAddr, X0, X1, X2);
+  EntryPoint (X0, X1, X2);
   InfoPrint ("\r\nControl returned to UEFI");
   ASSERT_PLATFORM_INIT(0);
 }
@@ -238,27 +239,22 @@ LoadBootImageAndTransferControl (
   IN  CHAR8*            LinuxDtbFilename
   )
 {
-  EFI_STATUS        Status;
-  MKIMG_HEADER      ImgHdr;
-  UINT64            FlashOffset;
-  UINTN             LoadAddr;
-  UINTN             EntryPoint;
-  UINT32             DataSize;
-  UINTN             R0;
-  UINTN             R1;
-  UINTN             R2;
-  UINT32            OriginalFdtOffset;
-  UINT32            OriginalFdtSize;
-  UINT32            RelocatedFdtOffset;
-  UINT32            RelocatedFdtSize;
-  //UINT32            *zImageSignaturePtr;
+  EFI_STATUS               Status;
+  MKIMG_HEADER             ImgHdr;
+  UINT64                   FlashOffset;
+  UINTN                    LoadAddr;
+  UINTN                    EntryPoint;
+  UINT32                   DataSize;
+  UINT32                   OriginalFdtOffset;
+  UINT32                   OriginalFdtSize;
+  UINT32                   RelocatedFdtOffset;
+  UINT32                   RelocatedFdtSize;
+  EFI_PHYSICAL_ADDRESS     LinuxImage;
+  UINTN                    LinuxImageSize;
 
   LoadAddr = PcdGet32 (PcdBoot_BOOTIMAGE_MEM_LOAD_ADDR);
   EntryPoint = PcdGet32 (PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR);
   DataSize = 0;
-  R0 = 0;
-  R1 = 0;
-  R2 = 0;
 
   // Open and Load Boot Image
   // Objective:
@@ -274,8 +270,8 @@ LoadBootImageAndTransferControl (
       {
         // Read linux-socfpga zImage file into memory
         // linux-socfpga zImage entry is fixed address at 0x8000
-        LoadAddr   = LINUX_ZIMAGE_LOAD_ADDR;
-        EntryPoint = LINUX_ZIMAGE_LOAD_ADDR;
+        LoadAddr   = LINUX_IMAGE_LOAD_ADDR;
+        EntryPoint = LINUX_IMAGE_LOAD_ADDR;
         Status = LoadFileToMemory (
           (CHAR8*) PcdGetPtr (PcdFileName_ZIMAGE),
           LoadAddr,
@@ -415,23 +411,34 @@ LoadBootImageAndTransferControl (
     Status = UpdateBootImageDtbWithMemoryInfoAndBootArgs (BootSourceType, RelocatedFdtOffset);
     ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
 
-    // Make sure a valide zImage file is loaded prior to transfer control
-	// to do: In ARCH64, linux image is Image, not zImage
-    //zImageSignaturePtr = (UINT32*)(UINTN)(LINUX_ZIMAGE_LOAD_ADDR + LINUX_ZIMAGE_SIGNATURE_OFFSET);
-    //if (*zImageSignaturePtr != LINUX_ZIMAGE_SIGNATURE) {
-    //  InfoPrint ("Error! Invalid zImage header.");
-    //  ASSERT_PLATFORM_INIT(0);
-    //  EFI_DEADLOOP();
-    //}
+    LinuxImage                    = LINUX_IMAGE_LOAD_ADDR;
+    LINUX_KERNEL64  LinuxKernel   = (LINUX_KERNEL64)LinuxImage;
+    // Check if the Linux Image is a uImage
+    if (*(UINTN*)LinuxKernel == LINUX_UIMAGE_SIGNATURE) {
+	  // Assume the Image Entry Point is just after the uImage header (64-byte size)
+      LinuxKernel = (LINUX_KERNEL64)((UINTN)LinuxKernel + 64);
+      LinuxImageSize -= 64;
+	}
+    // Transfer control
+    ProgressPrint ("Booting Linux...\r\n");
+    // Prepare hardware
+    PreparePlatformHardwareToBoot ();
+    // ARM32 and AArch64 kernel handover differ.
+    // x0 is set to FDT base.
+    // x1-x3 are reserved for future use and should be set to zero.
 
-    // Parameters to pass into zImage via CPU registers
-    R0 = LINUX_ENTRY_R0_VALUE;
-    R1 = LINUX_ENTRY_R1_VALUE;
-    R2 = RelocatedFdtOffset;
+    ProgressPrint ("Control transfered to 0x%08x with "
+                 "X0 = 0x%08x "
+                 "X1 = 0x%08x "
+                 "X2 = 0x%08x "
+                 "X3 = 0x%08x\r\n\r\n\r\n",
+                 (UINTN)LinuxImage, RelocatedFdtOffset, 0, 0, 0);
+
+    LinuxKernel ((UINTN)RelocatedFdtOffset, 0, 0, 0);
   }
 
   // Transfer control
-  JumpToEntry (EntryPoint, R0, R1, R2 );
+  JumpToEntry (EntryPoint, 0, 0, 0 );
 
 }
 
@@ -441,21 +448,14 @@ BootLinuxFromRam (
   VOID
   )
 {
-  EFI_STATUS        Status;
-  UINTN             EntryPoint;
-  UINTN             R0;
-  UINTN             R1;
-  UINTN             R2;
-  UINT32            OriginalFdtOffset;
-  UINT32            OriginalFdtSize;
-  UINT32            RelocatedFdtOffset;
-  UINT32            RelocatedFdtSize;
+  EFI_PHYSICAL_ADDRESS    LinuxImage;
+  UINTN                   LinuxImageSize;
+  UINT32                  OriginalFdtOffset;
+  UINT32                  OriginalFdtSize;
+  UINT32                  RelocatedFdtOffset;
+  UINT32                  RelocatedFdtSize;
+  EFI_STATUS              Status;
 
-  R0 = 0;
-  R1 = 0;
-  R2 = 0;
-
-  EntryPoint = LINUX_ZIMAGE_LOAD_ADDR;
   OriginalFdtOffset = LINUX_DTB_ORIGINAL_OFFSET;
   OriginalFdtSize = 0x34ce;
   // Relocate the Linux FDT blob and allocate more space for additional entries
@@ -463,17 +463,40 @@ BootLinuxFromRam (
   Status = RelocateFdt (OriginalFdtOffset, OriginalFdtSize, RelocatedFdtOffset, (UINTN*)&RelocatedFdtSize);
   ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
 
-   // and then patch the "memory" node and "chosen" node with runtime detected info
-  Status = UpdateBootImageDtbWithMemoryInfoAndBootArgs (BOOT_SOURCE_RSVD, RelocatedFdtOffset);
+   // Patch the "memory" node and "chosen" node with runtime detected info
+  Status = UpdateBootImageDtbWithMemoryInfoAndBootArgs (BOOT_SOURCE_SDMMC, RelocatedFdtOffset);
   ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
 
-  // Parameters to pass into zImage via CPU registers
-  R0 = RelocatedFdtOffset;
-  R1 = 0;
-  R2 = 0;
+  LinuxImage                        = LINUX_IMAGE_LOAD_ADDR;
+  LINUX_KERNEL64        LinuxKernel = (LINUX_KERNEL64)LinuxImage;
+  // If the Linux Image is an uImage
+  if (*(UINTN*)LinuxKernel == LINUX_UIMAGE_SIGNATURE) {
+    // Assume the Image Entry Point is just after the uImage header (64-byte size)
+    LinuxKernel = (LINUX_KERNEL64)((UINTN)LinuxKernel + 64);
+    LinuxImageSize -= 64;
+  }
   // Transfer control
   InfoPrint ("Booting Linux...\r\n");
-  JumpToEntry (EntryPoint, RelocatedFdtOffset, 0, 0 );
+  // Prepare hardware
+  PreparePlatformHardwareToBoot ();
+  // ARM32 and AArch64 kernel handover differ.
+  // x0 is set to FDT base.
+  // x1-x3 are reserved for future use and should be set to zero.
+  ProgressPrint ("Control transfered to 0x%08x with "
+                 "X0 = 0x%08x "
+                 "X1 = 0x%08x "
+                 "X2 = 0x%08x "
+                 "X3 = 0x%08x\r\n\r\n\r\n",
+                 (UINTN)LinuxImage, RelocatedFdtOffset, 0, 0, 0);
+  // x1-x3 are reserved (set to zero) for future use.
+  LinuxKernel ((UINTN)RelocatedFdtOffset, 0, 0, 0);
+
+  // Kernel should never exit
+  // After Life services are not provided
+  ASSERT_PLATFORM_INIT(0);
+
+  // We cannot recover the execution at this stage
+  while (1);
 }
 
 
@@ -601,7 +624,7 @@ UpdateBootImageDtbWithMemoryInfoAndBootArgs (
     default:
       // BootArgs for RAM boot
       length = AsciiSPrint (NewBootArgsPtr, 1024,
-        "console=ttyS0,%d printk.time=1 debug mem=0x2000000 lpj=3977216",
+        "rdinit=/sbin/init ip=dhcp mem=2048M",
         PcdGet32 (PcdSerialBaudRate));
       break;
   }

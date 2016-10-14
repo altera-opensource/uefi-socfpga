@@ -74,6 +74,7 @@
   PeiCoreEntryPoint
   AlteraSdMmcLib
   ArmGicLib
+  ArmCpuLib
   ArmLib
   BaseLib
   BaseMemoryLib

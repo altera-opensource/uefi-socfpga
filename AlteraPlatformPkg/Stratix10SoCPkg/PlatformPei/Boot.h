@@ -33,13 +33,10 @@
 #define __BOOT_H__
 
 
-#define LINUX_ZIMAGE_LOAD_ADDR           0x80000
-#define LINUX_ZIMAGE_SIGNATURE_OFFSET    0x00000024
-#define LINUX_ZIMAGE_SIGNATURE           0x016f2818
-#define LINUX_ENTRY_R0_VALUE             0x00000000
-#define LINUX_ENTRY_R1_VALUE             0xAFFDCE9A
+#define LINUX_IMAGE_LOAD_ADDR           0x80000
+#define LINUX_UIMAGE_SIGNATURE           0x56190527
 #define LINUX_DTB_ORIGINAL_OFFSET        0x08000000
-#define LINUX_DTB_RELOCATED_OFFSET       0x01FF7000
+#define LINUX_DTB_RELOCATED_OFFSET       0x3FFF7000
 // Additional size that could be used for FDT entries added by the UEFI OS Loader
 // Estimation based on: EDID (300bytes) + bootargs (200bytes) + initrd region (20bytes)
 //                      + system memory region (20bytes) + mp_core entries (200 bytes)

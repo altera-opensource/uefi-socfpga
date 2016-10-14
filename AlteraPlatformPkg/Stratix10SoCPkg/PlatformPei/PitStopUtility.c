@@ -490,6 +490,8 @@ PitStopCmdLine (
         1,
         (CHAR8*)TextFileName
         );
+    } else if (AsciiStrCmp((CHAR8*)Argument[0], "bootr") == 0) {
+	  BootLinuxFromRam ();
     // exit
     } else if (AsciiStrCmp((CHAR8*)Argument[0], "exit") == 0) {
 
