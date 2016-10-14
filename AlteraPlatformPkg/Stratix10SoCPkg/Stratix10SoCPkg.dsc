@@ -266,6 +266,12 @@
   # The Primary Core is ClusterId[0] & CoreId[0]
   gArmTokenSpaceGuid.PcdArmPrimaryCore|0
 
+  # Arm Architectural Timer
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|24000000
+
+  # Trustzone Enable
+  gArmTokenSpaceGuid.PcdTrustzoneSupport|TRUE
+
   #-------------------------------
   # gEfiMdeModulePkgTokenSpaceGuid
   #-------------------------------
@@ -486,7 +492,7 @@
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   AlteraSdMmcLib|AlteraPlatformPkg/Stratix10SoCPkg/Library/AlteraSdMmcLib/AlteraSdMmcLib.inf
-  ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexAEMv8Lib/ArmCortexAEMv8Lib.inf
+  ArmCpuLib|ArmPkg/Drivers/ArmCpuLib/ArmCortexA5xLib/ArmCortexA5xLib.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
 
