@@ -2,7 +2,7 @@
   Altera SNP DXE driver
 
   Portions of the code modified by Altera to support SoC devices are licensed as follows:
-  Copyright (c) 2015, Altera Corporation. All rights reserved.
+  Copyright (c) 2015-2016, Altera Corporation. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without modification,
   are permitted provided that the following conditions are met:
@@ -47,6 +47,8 @@
 #include "AlteraSnpDxe.h"
 #include "EmacDxeUtil.h"
 #include "PhyDxeUtil.h"
+#include "EepromDxeUtil.h"
+
 #include <Library/UncachedMemoryAllocationLib.h>
 
 #include <Library/SerialPortPrintLib.h>
@@ -192,16 +194,26 @@ AlteraSnpDxeEntry (
   // Set broadcast address
   SetMem (&SnpMode->BroadcastAddress, sizeof (EFI_MAC_ADDRESS), 0xFF);
 
+
   // Set current address
-  DefaultMacAddress = FixedPcdGet64 (PcdDefaultMacAddress);
-  // Swap PCD human readable form to correct endianess
-  SwapMacAddressPtr = (EFI_MAC_ADDRESS *) &DefaultMacAddress;
-  SnpMode->CurrentAddress.Addr[0] = SwapMacAddressPtr->Addr[5];
-  SnpMode->CurrentAddress.Addr[1] = SwapMacAddressPtr->Addr[4];
-  SnpMode->CurrentAddress.Addr[2] = SwapMacAddressPtr->Addr[3];
-  SnpMode->CurrentAddress.Addr[3] = SwapMacAddressPtr->Addr[2];
-  SnpMode->CurrentAddress.Addr[4] = SwapMacAddressPtr->Addr[1];
-  SnpMode->CurrentAddress.Addr[5] = SwapMacAddressPtr->Addr[0];
+
+  Status = EepromMacRead(&SnpMode->CurrentAddress);
+  if (EFI_ERROR(Status)){
+     //read from PCD if fail to read from EEPROM 
+     DefaultMacAddress = FixedPcdGet64 (PcdDefaultMacAddress); 
+     // Swap PCD human readable form to correct endianess
+     SwapMacAddressPtr = (EFI_MAC_ADDRESS *) &DefaultMacAddress;
+     SnpMode->CurrentAddress.Addr[0] = SwapMacAddressPtr->Addr[5];
+     SnpMode->CurrentAddress.Addr[1] = SwapMacAddressPtr->Addr[4];
+     SnpMode->CurrentAddress.Addr[2] = SwapMacAddressPtr->Addr[3];
+     SnpMode->CurrentAddress.Addr[3] = SwapMacAddressPtr->Addr[2];
+     SnpMode->CurrentAddress.Addr[4] = SwapMacAddressPtr->Addr[1];
+     SnpMode->CurrentAddress.Addr[5] = SwapMacAddressPtr->Addr[0];	
+  }
+
+
+  
+
 
   // Assign fields for device path
   CopyMem (&DevicePath->MacAddrDP.MacAddress, &Snp->Mode->CurrentAddress, NET_ETHER_ADDR_LEN);
@@ -1437,4 +1449,5 @@ SnpReceive (
 
   return EFI_SUCCESS;
 }
+
 
