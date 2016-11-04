@@ -141,7 +141,7 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdMaxFAT32ClusterSize
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiMode
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiClkFreq
-  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockReadUseInternalDMA
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockUseInternalDMA
   gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSweepAllDrvselAndSmplselValues
   gAlteraSocFpgaTokenSpaceGuid.PcdRemapOnChipRamTo1stOneMB
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTLOADER_PEIROM_ADDR

@@ -154,7 +154,7 @@
   # If you do want to turn on SDMMC IDMA mode, it is tested working, but take note:
   #  1. beaware of CPU Data Cache, PEI phase is already default to off
   #  2. beaware of SoC architecture limit eg. CV SoC IDMA limit is 2GB (case:225558)
-  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockReadUseInternalDMA|1|UINT32|0xFEDC0027
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockUseInternalDMA|1|UINT32|0xFEDC0027
 
   ## Is this Altera SoC FPGA Development Boards?
   # @Prompt Enable Altera SoC FPGA Development Boards specific code

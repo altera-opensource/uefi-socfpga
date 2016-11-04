@@ -161,7 +161,7 @@ SdMmcReadBlockData (
   )
 {
   EFI_STATUS    Status;
-  if (PcdGet32 (PcdSdmmcBlockReadUseInternalDMA) != 0)
+  if (PcdGet32 (PcdSdmmcBlockUseInternalDMA) != 0)
   {
     Status = ReadDmaData(Length, Buffer);
   } else {

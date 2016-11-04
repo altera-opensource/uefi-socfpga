@@ -219,6 +219,12 @@ ChangeDataBusMode (
 
 EFI_STATUS
 EFIAPI
+ReadData (
+  IN  UINTN     Length,
+  OUT UINT32*   Buffer
+  );
+EFI_STATUS
+EFIAPI
 ReadFifoData (
   IN  UINTN     Length,
   OUT UINT32*   Buffer
@@ -244,5 +250,17 @@ ReadDmaData (
   OUT UINT32*   Buffer
   );
 
+EFI_STATUS
+EFIAPI
+WriteDmaData (
+  IN  UINTN     Length,
+  IN  UINT32*   Buffer
+  );
+EFI_STATUS
+EFIAPI
+WriteData (
+  IN  UINTN     Length,
+  IN  UINT32*   Buffer
+  );
 #endif
 
