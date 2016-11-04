@@ -58,6 +58,26 @@ ARM_MEMORY_REGION_DESCRIPTOR  gVirtualMemoryTable[MAX_VIRTUAL_MEMORY_MAP_DESCRIP
 #define DDR_ATTRIBUTES_CACHED           ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK
 #define DDR_ATTRIBUTES_UNCACHED         ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED
 
+#define DRAM_BASE                0x0
+#define DRAM_SIZE                0x80000000
+
+#define FPGA_SLAVES_BASE         0x80000000
+#define FPGA_SLAVES_SIZE         0x60000000
+
+#define PERIPHERAL_BASE          0xF7000000
+#define PERIPHERAL_SIZE          0x08E00000
+
+#define OCRAM_BASE               0xFFE00000
+#define OCRAM_SIZE               0x00100000
+
+#define GIC_BASE                 0xFFFC0000
+#define GIC_SIZE                 0x00008000
+
+#define MEM64_BASE               0x0100000000
+#define MEM64_SIZE               0x1F00000000
+
+#define DEVICE64_BASE            0x2000000000
+#define DEVICE64_SIZE            0x0100000000
 /**
   Return the Virtual Memory Map of your platform
 
@@ -90,52 +110,45 @@ ArmPlatformGetVirtualMemoryMap (
   // Our goal is to a simple 1:1 mapping where virtual==physical address
 
    // DDR SDRAM
-  VirtualMemoryTable[Index].PhysicalBase = GetMpuWindowDramBaseAddr();
+  VirtualMemoryTable[Index].PhysicalBase = DRAM_BASE;
   VirtualMemoryTable[Index].VirtualBase  = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length       = GetMpuWindowDramSize();
+  VirtualMemoryTable[Index].Length      = DRAM_SIZE;
   VirtualMemoryTable[Index++].Attributes = CacheAttributes;
 
-  // Unused DDR SDRAM Window
-  VirtualMemoryTable[Index].PhysicalBase = GetMpuWindowDramBaseAddr() + GetMpuWindowDramSize();
+  // FPGA
+  VirtualMemoryTable[Index].PhysicalBase = FPGA_SLAVES_BASE;
   VirtualMemoryTable[Index].VirtualBase  = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length       = 0x80000000 - (UINTN) VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index++].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
-
-  // FPGA Bridge
-  VirtualMemoryTable[Index].PhysicalBase = 0x80000000;
-  VirtualMemoryTable[Index].VirtualBase  = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length       = 0xE0000000 - (UINTN) VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length       = FPGA_SLAVES_SIZE;
   VirtualMemoryTable[Index++].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
-  // CCU_NOC
-  VirtualMemoryTable[Index].PhysicalBase = 0xF7000000;
+  // DEVICE 142MB
+  VirtualMemoryTable[Index].PhysicalBase = PERIPHERAL_BASE;
   VirtualMemoryTable[Index].VirtualBase  = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length       = 0xF8000000 - (UINTN) VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length       = PERIPHERAL_SIZE;
   VirtualMemoryTable[Index++].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
-
-  // Light Weight FPGA Bridge
-  VirtualMemoryTable[Index].PhysicalBase = 0xF9000000;
+  // OCRAM 1MB but available 256KB
+  VirtualMemoryTable[Index].PhysicalBase = OCRAM_BASE;
   VirtualMemoryTable[Index].VirtualBase  = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length       = 0xF9200000 - (UINTN) VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length       = OCRAM_SIZE;
+  VirtualMemoryTable[Index++].Attributes = CacheAttributes;
+
+   // DEVICE 32KB
+  VirtualMemoryTable[Index].PhysicalBase = GIC_BASE;
+  VirtualMemoryTable[Index].VirtualBase  = VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length       = GIC_SIZE;
   VirtualMemoryTable[Index++].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
-  // Undefined
-  VirtualMemoryTable[Index].PhysicalBase = (UINTN) 0xF9200000;
+  // MEM 124GB
+  VirtualMemoryTable[Index].PhysicalBase = MEM64_BASE;
   VirtualMemoryTable[Index].VirtualBase  = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length       = 0xFF800000 - (UINTN) VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index++].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
+  VirtualMemoryTable[Index].Length       = MEM64_SIZE;
+  VirtualMemoryTable[Index++].Attributes = CacheAttributes;
 
-  // Peripherals Region
-  VirtualMemoryTable[Index].PhysicalBase = 0xFF800000;
+   // DEVICE 4GB
+  VirtualMemoryTable[Index].PhysicalBase = DEVICE64_BASE;
   VirtualMemoryTable[Index].VirtualBase  = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length       = 0x600000;
-  VirtualMemoryTable[Index++].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-
-  // GIC
-  VirtualMemoryTable[Index].PhysicalBase = 0xFFFC1000;
-  VirtualMemoryTable[Index].VirtualBase  = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length       = 0x7000;
+  VirtualMemoryTable[Index].Length       = DEVICE64_SIZE;
   VirtualMemoryTable[Index++].Attributes = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
   // End of Table

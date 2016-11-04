@@ -58,8 +58,7 @@ GetPhysicalDramSize (
   VOID
 )
 {
-  // Assume is 1GB DDR SDRAM
-  return 0x40000000;
+  return 0x80000000;
 }
 
 
