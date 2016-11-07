@@ -307,12 +307,12 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
   #
   # Platform Specific Init for DXE phase
   #
-  #INF AlteraPlatformPkg/Stratix10SoCPkg/Drivers/AlteraPlatformDxe/AlteraPlatformDxe.inf
+  INF AlteraPlatformPkg/Stratix10SoCPkg/Drivers/AlteraPlatformDxe/AlteraPlatformDxe.inf
 
   #
   # Platform Specific Networking stack
   #
-  #INF AlteraPlatformPkg/Stratix10SoCPkg/Drivers/AlteraSnpDxe/AlteraSnpDxe.inf
+  INF AlteraPlatformPkg/Stratix10SoCPkg/Drivers/AlteraSnpDxe/AlteraSnpDxe.inf
 
   #
   # Universal Networking stack

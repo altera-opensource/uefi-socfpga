@@ -161,7 +161,7 @@
   # Suggest set to value 0 for RELEASE build
   # Suggest set to value 1 to always enable
   # Suggest set to value 2+ for timeout if no key pressed
-  gAlteraSocFpgaTokenSpaceGuid.PcdEnablePitStopUtility|0
+  gAlteraSocFpgaTokenSpaceGuid.PcdEnablePitStopUtility|5
 
   # On-Chip-Memory Serial Log Base address and Size
   # Come in handy for PlatformInit debug as alternative
@@ -195,7 +195,7 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR      |0x100000
 
   # Extra Boot Option for PEI Phase
-  gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_ZIMAGE_AT_PEI_PHASE     |1
+  gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_ZIMAGE_AT_PEI_PHASE     |0
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_UEFI_DXE_PHASE          |0
 
 
