@@ -1283,8 +1283,8 @@ NandBlockIsBad (
 
   FirstByteLastPageSpare = ReadBuffer[0];
 
-  if ((FirstByteFirstPageSpare  != 0xFF) &&
-      (FirstByteSecondPageSpare != 0xFF) &&
+  if ((FirstByteFirstPageSpare  != 0xFF) ||
+      (FirstByteSecondPageSpare != 0xFF) ||
       (FirstByteLastPageSpare   != 0xFF))
     return TRUE;
   return FALSE;
