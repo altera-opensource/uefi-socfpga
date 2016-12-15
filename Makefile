@@ -98,9 +98,7 @@ endif
 # Default when user just type make
 DEFAULT_MAKE_DEVICE := a10
 DEFAULT_MAKE_COMPILER := gcc
-
-# Processor architecture which is ARM for SOCFPGA
-export EDK2_ARCH=ARM
+DEFAULT_MAKE_TARGET := bootloader
 
 # Build option whether RELEASE or DEBUG. For SOCFPGA, please only use 'RELEASE'
 export EDK2_BUILD=RELEASE
@@ -108,23 +106,218 @@ export EDK2_BUILD=RELEASE
 # Additional build macros
 export EDK2_MACROS= -y report.log -j build.log -Y PCD -Y LIBRARY -Y FLASH -Y DEPEX -Y BUILD_FLAGS -Y FIXED_ADDRESS
 
-# DTB path as defined in .FDF
-# (do no change, it must match the on in .FDF file)
-export FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dtb
-# DTS path
-export FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dts
-
 MKPIMAGE_HEADER_VERSION := 1
-# 0x164 = 0x164 - 0x40
-ENTRY_MINUS_40HEX := 292
 
 PEI_FD_FILENAME := ALTERA_HPS_OCRAM_EFI_PART1.fd
 DXE_FD_FILENAME := ALTERA_HPS_DRAM_EFI_PART2.fd
 
 PEI_FLASH_ADDR := 0x00000000
-PEI_SMALLER_x1_ROM := Build$(PATHSEP)PEI.256
-PEI_FINAL_ROM := Build$(PATHSEP)PEI.ROM
-DXE_FINAL_ROM := Build$(PATHSEP)DXE.ROM
+
+#-----------------------------------------------------------------------------
+# Process the Command-line Arguments
+#-----------------------------------------------------------------------------
+
+ifeq ("$(device)$(D)$(d)","")
+# Set Default DEVICE when user do not specify via command-line argument
+DEVICE?=$(DEFAULT_MAKE_DEVICE)
+endif
+
+ifeq ("$(target)$(T)$(t)","")
+# Set Default DEVICE when user do not specify via command-line argument
+TARGET?=$(DEFAULT_MAKE_TARGET)
+endif
+
+# If the first argument is "app"...
+ifeq (app,$(firstword $(MAKECMDGOALS)))
+TARGET := app
+endif
+
+# Set Default COMPILER when user do not specify via command-line argument
+# Support upper and lower case 'COMPILER' in command-line argument
+ifeq ("$(compiler)$(C)$(c)","")
+COMPILER?=$(DEFAULT_MAKE_COMPILER)
+endif
+
+# Type of Compiler toolchain
+ifeq ("$(COMPILER)$(compiler)$(C)$(c)",$(filter "$(COMPILER)$(compiler)$(C)$(c)","armcc" "ARMCC"))
+export EDK2_TOOLCHAIN=RVCTLINUX
+# RVCT_TOOLS_PATH not needed as proper environment setup by SOCEDS
+#export RVCT_TOOLS_PATH=$(SOCEDS_DEST_ROOT)$(PATHSEP)ds-5$(PATHSEP)sw$(PATHSEP)ARMCompiler5.05u1$(PATHSEP)bin$(PATHSEP)
+else ifeq ("$(COMPILER)$(compiler)$(C)$(c)",$(filter "$(COMPILER)$(compiler)$(C)$(c)","gcc" "GCC"))
+export EDK2_TOOLCHAIN=GCC48
+else
+$(error ERROR: Unsupported Compiler in command-line argument COMPILER=""$(COMPILER)$(compiler)$(C)$(c))
+endif
+
+
+# Override the default value based on command-line argument
+ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "A10"))
+  # Processor architecture which is ARM for SOCFPGA
+  export EDK2_ARCH=ARM
+
+  # DTB path as defined in .FDF
+  # (do no change, it must match the on in .FDF file)
+  FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dtb
+
+  # DTS path
+  FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dts
+
+  # ENTRY_MINUS_40HEX
+  ENTRY_MINUS_40HEX := 292
+
+  # Build full path of the .FD files
+  PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
+  DXE_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(DXE_FD_FILENAME)
+  PEI_SMALLER_x1_ROM       := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)PEI.256
+  PEI_FINAL_ROM            := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)PEI.ROM
+  DXE_FINAL_ROM            := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)DXE.ROM
+
+  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
+  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
+  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
+
+  # DS5 script path
+  DS5_SCRIPT_PATH            := AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.ds5
+  DS_SCRIPT                  := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)load_uefi_fw.ds
+
+  ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","bootloader" "BOOTLOADER"))
+  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dsc
+  else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
+  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
+  EFIAPP_FILENAME_FULLPATH := Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)*.efi
+  else
+  $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
+  endif
+else ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","s10" "S10"))
+  # Processor architecture which is AARCH64 for SOCFPGA
+  export EDK2_ARCH=AARCH64
+
+  # DTB path as defined in .FDF
+  # (do no change, it must match the on in .FDF file)
+  FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dtb
+  # DTS path
+  FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dts
+
+  # ENTRY_MINUS_40HEX = 0x188 (SEC EntryPoint) - 0x40
+  ENTRY_MINUS_40HEX := 328
+
+  # Build full path of the .FD files
+  PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
+  DXE_FD_FILENAME_FULLPATH := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(DXE_FD_FILENAME)
+  PEI_SMALLER_x1_ROM       := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)PEI.256
+  PEI_FINAL_ROM            := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)PEI.ROM
+  DXE_FINAL_ROM            := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)DXE.ROM
+
+  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
+  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
+  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
+
+  # DS5 script path
+  DS5_SCRIPT_PATH            := AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.ds5
+  DS_SCRIPT                  := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)load_uefi_fw.ds
+
+  ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","bootloader" "BOOTLOADER"))
+  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dsc
+  else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
+  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
+  EFIAPP_FILENAME_FULLPATH := Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)*.efi
+  else
+  $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
+  endif
+else
+$(error ERROR: No .DSC for unsupported device in command-line argument DEVICE="$(DEVICE)$(device)$(D)$(d))"
+endif
+
+#-----------------------------------------------------------------------------
+# Device Tree
+#-----------------------------------------------------------------------------
+# Update handoff DTB ?
+# Check error: Same file?
+ifeq ($(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb), $(FDF_LINK_DTB_PATH))
+$(error ERROR: Same file (HANDOFF_DTB == default .FDF DTB) plese remove the HANDOFF_DTB arguement)
+endif
+ifneq ("$(wildcard $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))","")
+# FILE_EXISTS = 1
+export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(ECHO_END)
+export CMD_UPDATE_HANDOFF_DTB_1=$(CP) $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(FDF_LINK_DTB_PATH)
+export CMD_UPDATE_HANDOFF_DTB_2=$(CMD_UPDATE_HANDOFF_DTB_1) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts -o $(FDF_LINK_DTS_PATH)
+export CMD_UPDATE_HANDOFF_DTB_3=$(CMD_UPDATE_HANDOFF_DTB_2) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
+export CMD_UPDATE_HANDOFF_DTB=$(CMD_UPDATE_HANDOFF_DTB_3)
+else ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
+# FILE_EXISTS = 0
+export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(FDF_LINK_DTB_PATH)$(ECHO_END)
+export CMD_UPDATE_HANDOFF_DTB=@$(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
+else
+export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : ERROR! FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)$(ECHO_END)
+export CMD_UPDATE_HANDOFF_DTB=
+$(error ERROR: FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))
+endif
+
+# If no DTB but got DTS, help to compile the DTS and copy to replace default DTB
+ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
+    ifneq ("$(wildcard $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts))","")
+    # FILE_EXISTS = 1
+	export CMD_ECHO_HANDOFF_DTS=$(ECHO_START) HANDOFF_DTS    : $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
+	export CMD_COMPILE_HANDOFF_DTS_1=$(CAT_TYPE) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)
+	export CMD_COMPILE_HANDOFF_DTS_2=$(CMD_COMPILE_HANDOFF_DTS_1) $(NEXT_CMD) $(DTC) --space 16384 -I dts $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) -O dtb -o $(FDF_LINK_DTB_PATH)
+	export CMD_COMPILE_HANDOFF_DTS_3=$(CMD_COMPILE_HANDOFF_DTS_2) $(NEXT_CMD) $(CP) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) $(FDF_LINK_DTS_PATH)
+	export CMD_COMPILE_HANDOFF_DTS=$(CMD_COMPILE_HANDOFF_DTS_3)
+	# Make sure CMD_UPDATE_HANDOFF_DTB is clear to avoid dump DTC twice
+	export CMD_UPDATE_HANDOFF_DTB=
+    else ifeq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
+    # FILE_EXISTS = 0
+	export CMD_ECHO_HANDOFF_DTS=
+    export CMD_COMPILE_HANDOFF_DTS=
+    else
+	export CMD_ECHO_HANDOFF_DTS=
+    export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) HANDOFF_DTS    : ERROR! FILE NOT FOUND - $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
+    endif
+else
+   ifneq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
+   #export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) ERROR! You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.  In this case HANDOFF_DTS will be ignored and only HANDOFF_DTB will be used.$(ECHO_END)
+   $(error ERROR: You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.)
+   endif
+endif
+
+#-----------------------------------------------------------------------------
+# DS-5 Script Setup
+#-----------------------------------------------------------------------------
+
+SNR_BUILD_PEI  := $(SED_START)Build/PEI.256$(SED_END)
+FILE_BUILD_PEI := $(mkfile_path)$(PEI_SMALLER_x1_ROM)
+
+SNR_ENTRY_ArmPlatformSec        := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformSec_entrypoint$(SED_END)
+SNR_ENTRY_ArmPlatformPrePeiCore := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_entrypoint$(SED_END)
+SNR_ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_entrypoint$(SED_END)
+
+SNR_FILE_ArmPlatformSec        := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformSec_dll$(SED_END)
+SNR_FILE_ArmPlatformPrePeiCore := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_dll$(SED_END)
+SNR_FILE_AlteraSocFpgaPeiMain  := $(SED_START)SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_dll$(SED_END)
+
+
+ENTRY_ArmPlatformSec        := $(SED_START)0x00ffe00164$(SED_END)
+ENTRY_ArmPlatformPrePeiCore := $(SED_START)0x00ffe01164$(SED_END)
+ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)0x00ffe041ad$(SED_END)
+
+FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
+FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
+FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
+
+
+HWLIB_SOCEDS_PATH := $(SOCEDS_DEST_ROOT)$(PATHSEP)ip$(PATHSEP)altera$(PATHSEP)hps$(PATHSEP)altera_hps$(PATHSEP)hwlib$(PATHSEP)*
+HWLIB_UEFI_PATH   := AlteraPlatformPkg$(PATHSEP)HwLib
+HWLIB_INCLUDE_PATH := $(HWLIB_UEFI_PATH)$(PATHSEP)include
+HWLIB_SRC_PATH := $(HWLIB_UEFI_PATH)$(PATHSEP)src
+
+ifdef ComSpec
+REMOVE_HWLIB_INCLUDE := if $(EXIST) $(HWLIB_INCLUDE_PATH) $(RMDIR) $(HWLIB_INCLUDE_PATH)
+REMOVE_HWLIB_SRC     := if $(EXIST) $(HWLIB_SRC_PATH)     $(RMDIR) $(HWLIB_SRC_PATH)
+else
+REMOVE_HWLIB_INCLUDE := $(EXIST) $(HWLIB_INCLUDE_PATH) || $(RMDIR) $(HWLIB_INCLUDE_PATH)
+REMOVE_HWLIB_SRC     := $(EXIST) $(HWLIB_SRC_PATH)     || $(RMDIR) $(HWLIB_SRC_PATH)
+endif
+
+COPY_HWLIB_FROM_SOCEDS := $(CPDIR) $(HWLIB_SOCEDS_PATH) $(HWLIB_UEFI_PATH)
 
 #-----------------------------------------------------------------------------
 # Default Behavior when just type "make"
@@ -183,213 +376,8 @@ program_nand_256: program_flash_using_quartus_hps_256
 #-----------------------------------------------------------------------------
 # when user type "make app"
 #-----------------------------------------------------------------------------
-DEFAULT_MAKE_TARGET := bootloader
-# If the first argument is "app"...
-ifeq (app,$(firstword $(MAKECMDGOALS)))
-TARGET := app
-endif
-
 .PHONY: app
 app: build_setup_app build_tool build_firmware build_app_post build_done
-
-
-#-----------------------------------------------------------------------------
-# Process the Command-line Arguments
-#-----------------------------------------------------------------------------
-
-# The location of platform description file (DSC)
-# Support upper and lower case 'DEVICE' in command-line argument
-ifeq ("$(device)$(D)$(d)","")
-# Set Default DEVICE when user do not specify via command-line argument
-DEVICE?=$(DEFAULT_MAKE_DEVICE)
-endif
-ifeq ("$(target)$(T)$(t)","")
-# Set Default DEVICE when user do not specify via command-line argument
-TARGET?=$(DEFAULT_MAKE_TARGET)
-endif
-
-
-# Set Default COMPILER when user do not specify via command-line argument
-# Support upper and lower case 'COMPILER' in command-line argument
-ifeq ("$(compiler)$(C)$(c)","")
-COMPILER?=$(DEFAULT_MAKE_COMPILER)
-endif
-# Type of Compiler toolchain
-ifeq ("$(COMPILER)$(compiler)$(C)$(c)",$(filter "$(COMPILER)$(compiler)$(C)$(c)","armcc" "ARMCC"))
-export EDK2_TOOLCHAIN=RVCTLINUX
-# RVCT_TOOLS_PATH not needed as proper environment setup by SOCEDS
-#export RVCT_TOOLS_PATH=$(SOCEDS_DEST_ROOT)$(PATHSEP)ds-5$(PATHSEP)sw$(PATHSEP)ARMCompiler5.05u1$(PATHSEP)bin$(PATHSEP)
-else ifeq ("$(COMPILER)$(compiler)$(C)$(c)",$(filter "$(COMPILER)$(compiler)$(C)$(c)","gcc" "GCC"))
-export EDK2_TOOLCHAIN=GCC48
-else
-$(error ERROR: Unsupported Compiler in command-line argument COMPILER=""$(COMPILER)$(compiler)$(C)$(c))
-endif
-
-# Build full path of the .FD files
-PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
-DXE_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(DXE_FD_FILENAME)
-EFIAPP_FILENAME_FULLPATH := Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)*.efi
-
-# Update handoff DTB ?
-# Check error: Same file?
-ifeq ($(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb), $(FDF_LINK_DTB_PATH))
-$(error ERROR: Same file (HANDOFF_DTB == default .FDF DTB) plese remove the HANDOFF_DTB arguement)
-endif
-ifneq ("$(wildcard $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))","")
-# FILE_EXISTS = 1
-export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(ECHO_END)
-export CMD_UPDATE_HANDOFF_DTB_1=$(CP) $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(FDF_LINK_DTB_PATH)
-export CMD_UPDATE_HANDOFF_DTB_2=$(CMD_UPDATE_HANDOFF_DTB_1) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts -o $(FDF_LINK_DTS_PATH)
-export CMD_UPDATE_HANDOFF_DTB_3=$(CMD_UPDATE_HANDOFF_DTB_2) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
-export CMD_UPDATE_HANDOFF_DTB=$(CMD_UPDATE_HANDOFF_DTB_3)
-else ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
-# FILE_EXISTS = 0
-export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(FDF_LINK_DTB_PATH)$(ECHO_END)
-export CMD_UPDATE_HANDOFF_DTB=@$(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
-else
-export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : ERROR! FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)$(ECHO_END)
-export CMD_UPDATE_HANDOFF_DTB=
-$(error ERROR: FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))
-endif
-
-# If no DTB but got DTS, help to compile the DTS and copy to replace default DTB
-ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
-    ifneq ("$(wildcard $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts))","")
-    # FILE_EXISTS = 1
-	export CMD_ECHO_HANDOFF_DTS=$(ECHO_START) HANDOFF_DTS    : $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
-	export CMD_COMPILE_HANDOFF_DTS_1=$(CAT_TYPE) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)
-	export CMD_COMPILE_HANDOFF_DTS_2=$(CMD_COMPILE_HANDOFF_DTS_1) $(NEXT_CMD) $(DTC) --space 16384 -I dts $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) -O dtb -o $(FDF_LINK_DTB_PATH)
-	export CMD_COMPILE_HANDOFF_DTS_3=$(CMD_COMPILE_HANDOFF_DTS_2) $(NEXT_CMD) $(CP) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) $(FDF_LINK_DTS_PATH)
-	export CMD_COMPILE_HANDOFF_DTS=$(CMD_COMPILE_HANDOFF_DTS_3)
-	# Make sure CMD_UPDATE_HANDOFF_DTB is clear to avoid dump DTC twice
-	export CMD_UPDATE_HANDOFF_DTB=
-    else ifeq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
-    # FILE_EXISTS = 0
-	export CMD_ECHO_HANDOFF_DTS=
-    export CMD_COMPILE_HANDOFF_DTS=
-    else
-	export CMD_ECHO_HANDOFF_DTS=
-    export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) HANDOFF_DTS    : ERROR! FILE NOT FOUND - $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
-    endif
-else
-   ifneq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
-   #export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) ERROR! You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.  In this case HANDOFF_DTS will be ignored and only HANDOFF_DTB will be used.$(ECHO_END)
-   $(error ERROR: You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.)
-   endif
-endif
-
-
-#-----------------------------------------------------------------------------
-# DS-5 Script Setup
-#-----------------------------------------------------------------------------
-
-DS_SCRIPT := Build$(PATHSEP)load_uefi_fw.ds
-
-SNR_BUILD_PEI  := $(SED_START)Build/PEI.256$(SED_END)
-FILE_BUILD_PEI := $(mkfile_path)$(PEI_SMALLER_x1_ROM)
-
-SNR_ENTRY_ArmPlatformSec        := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformSec_entrypoint$(SED_END)
-SNR_ENTRY_ArmPlatformPrePeiCore := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_entrypoint$(SED_END)
-SNR_ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_entrypoint$(SED_END)
-
-SNR_FILE_ArmPlatformSec        := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformSec_dll$(SED_END)
-SNR_FILE_ArmPlatformPrePeiCore := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_dll$(SED_END)
-SNR_FILE_AlteraSocFpgaPeiMain  := $(SED_START)SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_dll$(SED_END)
-
-
-ENTRY_ArmPlatformSec        := $(SED_START)0x00ffe00164$(SED_END)
-ENTRY_ArmPlatformPrePeiCore := $(SED_START)0x00ffe01164$(SED_END)
-ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)0x00ffe041ad$(SED_END)
-
-FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
-FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
-FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
-
-
-HWLIB_SOCEDS_PATH := $(SOCEDS_DEST_ROOT)$(PATHSEP)ip$(PATHSEP)altera$(PATHSEP)hps$(PATHSEP)altera_hps$(PATHSEP)hwlib$(PATHSEP)*
-HWLIB_UEFI_PATH   := AlteraPlatformPkg$(PATHSEP)HwLib
-HWLIB_INCLUDE_PATH := $(HWLIB_UEFI_PATH)$(PATHSEP)include
-HWLIB_SRC_PATH := $(HWLIB_UEFI_PATH)$(PATHSEP)src
-
-ifdef ComSpec
-REMOVE_HWLIB_INCLUDE := if $(EXIST) $(HWLIB_INCLUDE_PATH) $(RMDIR) $(HWLIB_INCLUDE_PATH)
-REMOVE_HWLIB_SRC     := if $(EXIST) $(HWLIB_SRC_PATH)     $(RMDIR) $(HWLIB_SRC_PATH)
-else
-REMOVE_HWLIB_INCLUDE := $(EXIST) $(HWLIB_INCLUDE_PATH) || $(RMDIR) $(HWLIB_INCLUDE_PATH)
-REMOVE_HWLIB_SRC     := $(EXIST) $(HWLIB_SRC_PATH)     || $(RMDIR) $(HWLIB_SRC_PATH)
-endif
-
-COPY_HWLIB_FROM_SOCEDS := $(CPDIR) $(HWLIB_SOCEDS_PATH) $(HWLIB_UEFI_PATH)
-
-# Override the default value based on command-line argument
-ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "A10"))
-  ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","bootloader" "BOOTLOADER"))
-  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dsc
-
-  # Processor architecture which is ARM for SOCFPGA
-  export EDK2_ARCH=ARM
-
-  # DTB path as defined in .FDF
-  # (do no change, it must match the on in .FDF file)
-  export FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dtb
-
-  # DTS path
-  export FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dts
-
-  # ENTRY_MINUS_40HEX = 0x188 (SEC EntryPoint) - 0x40
-  ENTRY_MINUS_40HEX := 328
-
-  # Build full path of the .FD files
-  PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
-  DXE_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(DXE_FD_FILENAME)
-
-  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
-  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
-  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
-
-  # DS5 script path
-  DS5_SCRIPT_PATH            := AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.ds5
-
-  else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
-  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
-  else
-  $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
-  endif
-else ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","s10" "S10"))
-  ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","bootloader" "BOOTLOADER"))
-  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dsc
-
-  # Processor architecture which is AARCH64 for SOCFPGA
-  export EDK2_ARCH=AARCH64
-
-  # DTB path as defined in .FDF
-  # (do no change, it must match the on in .FDF file)
-  export FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dtb
-  # DTS path
-  export FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dts
-
-  # ENTRY_MINUS_40HEX = 0x188 (SEC EntryPoint) - 0x40
-  ENTRY_MINUS_40HEX := 328
-
-  # Build full path of the .FD files
-  PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
-  DXE_FD_FILENAME_FULLPATH := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(DXE_FD_FILENAME)
-
-  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
-  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
-  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
-
-  # DS5 script path
-  DS5_SCRIPT_PATH            := AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.ds5
-
-  else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
-  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
-  else
-  $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
-  endif
-else
-$(error ERROR: No .DSC for unsupported device in command-line argument DEVICE="$(DEVICE)$(device)$(D)$(d))"
-endif
 
 
 #-----------------------------------------------------------------------------
@@ -550,7 +538,7 @@ build_ds_script:
 # Shell Scripts: build_app_post
 #-----------------------------------------------------------------------------
 build_app_post:
-	@$(CP) $(EFIAPP_FILENAME_FULLPATH) Build
+	@$(CP) $(EFIAPP_FILENAME_FULLPATH) Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)
 
 #-----------------------------------------------------------------------------
 # Shell Scripts: build_done
