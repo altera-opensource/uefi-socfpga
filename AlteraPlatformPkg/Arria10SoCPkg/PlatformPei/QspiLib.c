@@ -1627,3 +1627,16 @@ QspiUpdate (
   return QspiWrite (Buffer, Offset, Size);
 }
 
+VOID
+EFIAPI
+QspiReset (
+  VOID
+  )
+{
+  //only MICRON N25Q supported  
+  QspiStigCmd(ALT_QSPI_STIG_OPCODE_RESET_EN, 0);
+
+  QspiStigCmd(ALT_QSPI_STIG_OPCODE_RESET_MEM, 0);    
+
+}
+

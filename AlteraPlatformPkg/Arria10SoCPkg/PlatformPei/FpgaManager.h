@@ -136,6 +136,17 @@ DisplayFpgaManagerInfo (
   VOID
   );
 
+VOID
+EFIAPI
+WarmResetAfterFpgaProgram (
+  IN BOOT_SOURCE_TYPE  BootSourceType
+  );
+
+EFI_BOOT_MODE
+EFIAPI
+CheckForFpgaProgramIndicator (
+  VOID
+  );
 //
 // Private Functions
 //

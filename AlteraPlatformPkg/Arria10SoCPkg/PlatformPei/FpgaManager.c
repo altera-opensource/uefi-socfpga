@@ -45,6 +45,7 @@
 #include "FpgaManager.h"
 #include "PitStopUtility.h"
 #include "MkimageHeader.h"
+#include "QspiLib.h"
 
 #if (FixedPcdGet32(PcdDebugMsg_FpgaManager) == 0)
   //#define ProgressPrint(FormatString, ...)    /* do nothing */
@@ -575,6 +576,7 @@ FpgaFullConfiguration (
   UINT32      CfgWidth;
   UINT32      RbfSize;
   UINT32      Checksum;
+  EFI_BOOT_MODE   BootMode;
 
   //
   // DEBUG NOTE:
@@ -764,36 +766,39 @@ FpgaFullConfiguration (
   Status = WaitForNconfigAndNstatusToGoesHigh ();
   if (EFI_ERROR(Status)) return Status;
 
-  // InfoPrint ("Step 8\r\n");
-  //
-  // Step 8
-  // Reset configuration
-  // Write S2F_NCONFIG=0
-  // Wait till you read F2S_NSTATUS_PIN=0
-  // Write S2F_NCONFIG=1
-  // Wait till you read F2S_NSTATUS_PIN=1 and
-  // Read and confirm F2S_CONDONE_PIN=0, F2S_CONDONE_OE=1
-  //
-  MmioAnd32 (ALT_FPGAMGR_OFST +
+  BootMode= CheckForFpgaProgramIndicator();
+  if (BootMode == BOOT_WITH_FULL_CONFIGURATION) {
+    // InfoPrint ("Step 8\r\n");
+    //
+    // Step 8
+    // Reset configuration
+    // Write S2F_NCONFIG=0
+    // Wait till you read F2S_NSTATUS_PIN=0
+    // Write S2F_NCONFIG=1
+    // Wait till you read F2S_NSTATUS_PIN=1 and
+    // Read and confirm F2S_CONDONE_PIN=0, F2S_CONDONE_OE=1
+    //
+    MmioAnd32 (ALT_FPGAMGR_OFST +
+               ALT_FPGAMGR_IMGCFG_CTL_00_OFST,
+               ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_CLR_MSK);
+
+    Status = WaitForF2sNstatus(0);
+    if (EFI_ERROR(Status)) return Status;
+
+    MmioOr32(ALT_FPGAMGR_OFST +
              ALT_FPGAMGR_IMGCFG_CTL_00_OFST,
-             ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_CLR_MSK);
+             ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK);
 
-  Status = WaitForF2sNstatus(0);
-  if (EFI_ERROR(Status)) return Status;
+    Status = WaitForF2sNstatus(1);
+    if (EFI_ERROR(Status)) return Status;
 
-  MmioOr32(ALT_FPGAMGR_OFST +
-           ALT_FPGAMGR_IMGCFG_CTL_00_OFST,
-           ALT_FPGAMGR_IMGCFG_CTL_00_S2F_NCFG_SET_MSK);
+    if (GET_F2S_CONDONE_PIN != 0)
+      return EFI_DEVICE_ERROR;
 
-  Status = WaitForF2sNstatus(1);
-  if (EFI_ERROR(Status)) return Status;
+    if (GET_F2S_CONDONE_OE == 0)
+      return EFI_DEVICE_ERROR;
 
-  if (GET_F2S_CONDONE_PIN != 0)
-    return EFI_DEVICE_ERROR;
-
-  if (GET_F2S_CONDONE_OE == 0)
-    return EFI_DEVICE_ERROR;
-
+  }
   // InfoPrint ("Step 9\r\n");
   //
   // Step 9:
@@ -817,8 +822,11 @@ WriteData:
     Status = FpgaProgramWriteCore (BootSourceType, RbfSize, Checksum);
     if (EFI_ERROR(Status)) return Status;
   } else {
-    Status = FpgaProgramWrite (BootSourceType, RbfSize, Checksum);
-    if (EFI_ERROR(Status)) return Status;
+      BootMode= CheckForFpgaProgramIndicator();
+      if (BootMode == BOOT_WITH_FULL_CONFIGURATION) {  
+        Status = FpgaProgramWrite (BootSourceType, RbfSize, Checksum);
+        if (EFI_ERROR(Status)) return Status;
+      }
   }
 
   // for IO release peripheral core
@@ -1055,6 +1063,58 @@ DisplayFpgaManagerInfo (
      ALT_FPGAMGR_IMGCFG_STAT_F2S_CRC_ERROR_GET(Data32));
 }
 
+VOID
+EFIAPI
+WarmResetAfterFpgaProgram (
+  IN BOOT_SOURCE_TYPE  BootSourceType
+  )
+{
+  UINT32  Data32;
 
+  //Warm reset for once after peripheral RBF done
+  Data32 = MmioRead32 (ALT_SYSMGR_ROM_OFST +
+                       ALT_SYSMGR_ROM_ISW_HANDOFF_OFST +
+                       ISW_HANDOFF_SLOT7_WARMRESET_SCRATCHPAD_OFST);
+  if (Data32 == ALT_WARMRESET_STATUS_INDICATOR) {
+    MmioWrite32 (ALT_SYSMGR_ROM_OFST +
+                 ALT_SYSMGR_ROM_ISW_HANDOFF_OFST + 
+                 ISW_HANDOFF_SLOT7_WARMRESET_SCRATCHPAD_OFST,
+                 0);
 
+  } else {
 
+    InfoPrint ("Warm Reset After FPGA Programming\r\n");
+    MmioWrite32 (ALT_SYSMGR_ROM_OFST +
+                 ALT_SYSMGR_ROM_ISW_HANDOFF_OFST + 
+                 ISW_HANDOFF_SLOT7_WARMRESET_SCRATCHPAD_OFST,
+                 ALT_WARMRESET_STATUS_INDICATOR);
+    //QSPI software reset command, for the case where no HPS reset connected to QSPI reset
+    if (BootSourceType == BOOT_SOURCE_QSPI) {
+      QspiReset();
+    }
+    //10ms delay before triggering warm reset according to EMIF SME
+    MicroSecondDelay (10000);
+    //Trigger HPS warm reset pin
+    MmioOr32 (ALT_RSTMGR_OFST + ALT_RSTMGR_CTL_OFST, ALT_RSTMGR_CTL_SWWARMRSTREQ_SET_MSK);
+
+  }
+}
+
+EFI_BOOT_MODE
+EFIAPI
+CheckForFpgaProgramIndicator (
+  VOID
+  )
+{
+  UINT32  Data32;
+  
+  //Check for warm reset indicator
+  Data32 = MmioRead32 (ALT_SYSMGR_ROM_OFST +
+                       ALT_SYSMGR_ROM_ISW_HANDOFF_OFST +
+                       ISW_HANDOFF_SLOT7_WARMRESET_SCRATCHPAD_OFST);
+  if (Data32 == ALT_WARMRESET_STATUS_INDICATOR) {
+    return BOOT_WITH_MINIMAL_CONFIGURATION;
+  }
+  return BOOT_WITH_FULL_CONFIGURATION;
+
+}

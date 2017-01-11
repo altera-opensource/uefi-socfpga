@@ -547,5 +547,11 @@ QspiUpdate (
   IN UINT32 Offset,
   IN UINT32 Size
   );
+
+VOID
+EFIAPI
+QspiReset (
+  VOID
+  );
 #endif
 

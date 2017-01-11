@@ -201,6 +201,10 @@
 #define ALT_SEC_MGR_SEC_FPGACHK_OFST                                       0x8c
 #define ALT_SEC_MGR_SEC_HPSCHK_OFST                                        0x90
 
+// Warm Reset Status Scratchpad
+#define ISW_HANDOFF_SLOT7_WARMRESET_SCRATCHPAD_OFST  (sizeof(UINT32) * 6)
+#define ALT_WARMRESET_STATUS_INDICATOR               0xd15ea5e
+
 //
 // Clock Manager
 //

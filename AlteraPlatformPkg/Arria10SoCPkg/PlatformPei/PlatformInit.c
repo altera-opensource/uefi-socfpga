@@ -184,6 +184,8 @@ PeiStagePlatformInit (
     Status = FpgaFullConfiguration (Fdt, BootSourceType, RbfType, FALSE);
     ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
   }
+  //Warm Reset after FPGA Program and before Memory Clock Calibration
+  WarmResetAfterFpgaProgram(BootSourceType);
 
   // Start Talking if FPGA ready and UART is not yet init
   // (if Dediacted IO then it is init above before caling GetBootSourceType)
@@ -201,6 +203,8 @@ PeiStagePlatformInit (
     InfoPrint ("FPGA not in User Mode or Early Use Mode, cannot begin HMC init!\r\n");
     EFI_DEADLOOP();
   }
+
+
 
   // Configure Memory Controller
   Status = InitHardMemoryController (Fdt);
