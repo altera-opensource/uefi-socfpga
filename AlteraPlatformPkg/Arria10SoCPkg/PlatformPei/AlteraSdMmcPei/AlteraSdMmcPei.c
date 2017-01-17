@@ -977,7 +977,7 @@ FindFileInDirectory (
                FileNameSearchUpper[j] = (FileNameSearchUpper[j] - ('a' - 'A'));
             }
             j++;
-            if (j >= sizeof(FileNameSearchUpper)) break;
+            if (j == sizeof(FileNameSearchUpper) - 1) break;
           }
           FileNameSearchUpper[j] = 0;
 

@@ -248,6 +248,7 @@ LoadBootImageAndTransferControl (
   LoadAddr = PcdGet32 (PcdBoot_BOOTIMAGE_MEM_LOAD_ADDR);
   EntryPoint = PcdGet32 (PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR);
   DataSize = 0;
+  OriginalFdtSize = 0;
   R0 = 0;
   R1 = 0;
   R2 = 0;

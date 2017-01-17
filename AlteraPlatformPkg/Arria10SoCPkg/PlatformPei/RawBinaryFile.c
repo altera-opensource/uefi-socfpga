@@ -158,6 +158,7 @@ OpenRawBinaryFile(
 
   mBootSourceType = BootSourceType;
   Status = EFI_UNSUPPORTED;
+  SetMem (&RbfCfg, sizeof(RbfCfg), 0);
 
   switch (mBootSourceType)
   {
