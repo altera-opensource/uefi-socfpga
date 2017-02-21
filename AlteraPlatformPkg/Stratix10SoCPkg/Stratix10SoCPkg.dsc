@@ -405,7 +405,7 @@
   #gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|L"ConOutSetupVar"|gArmGlobalVariableGuid|0x0|132
   #gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|L"ConOutSetupVar"|gArmGlobalVariableGuid|0x4|43
 
-  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|5
 
   # RunAxf support via Dynamic Shell Command protocol
   # We want to use the Shell Libraries but don't want it to initialise
@@ -776,7 +776,7 @@
   }
 
   AlteraPlatformPkg/Bds/Bds.inf
-  AlteraPlatformPkg/Drivers/AlteraHpsTimerDxe/TimerDxe.inf
+  ArmPkg/Drivers/TimerDxe/TimerDxe.inf
 
   ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   ArmPkg/Drivers/CpuDxe/CpuDxe.inf
