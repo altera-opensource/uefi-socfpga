@@ -416,14 +416,14 @@ EmacSetupTxdesc (
 
   for (Index = 0; Index < CONFIG_TX_DESCR_NUM; Index++) {
     TxDescriptor = &EmacDriver->TxdescRing[Index];
-    TxDescriptor->Addr = &EmacDriver->TxBuffer[Index * CONFIG_ETH_BUFSIZE];
-    TxDescriptor->AddrNext = &EmacDriver->TxdescRing[Index + 1];
+    TxDescriptor->Addr = (UINT32)(UINTN) &EmacDriver->TxBuffer[Index * CONFIG_ETH_BUFSIZE];
+    TxDescriptor->AddrNext = (UINT32)(UINTN) &EmacDriver->TxdescRing[Index + 1];
     TxDescriptor->Tdes0 = TDES0_TXCHAIN;
     TxDescriptor->Tdes1 = 0;
   }
 
   // Correcting the last pointer of the chain
-  TxDescriptor->AddrNext = &EmacDriver->TxdescRing[0];
+  TxDescriptor->AddrNext = (UINT32)(UINTN) &EmacDriver->TxdescRing[0];
 
   // Write the address of tx descriptor list
   MmioWrite32(mALT_EMAC_OFST +
@@ -450,14 +450,14 @@ EmacSetupRxdesc (
 
   for (Index = 0; Index < CONFIG_RX_DESCR_NUM; Index++) {
     RxDescriptor = &EmacDriver->RxdescRing[Index];
-    RxDescriptor->Addr = &EmacDriver->RxBuffer[Index * CONFIG_ETH_BUFSIZE];
-    RxDescriptor->AddrNext = &EmacDriver->RxdescRing[Index + 1];
+    RxDescriptor->Addr = (UINT32)(UINTN) &EmacDriver->RxBuffer[Index * CONFIG_ETH_BUFSIZE];
+    RxDescriptor->AddrNext = (UINT32)(UINTN) &EmacDriver->RxdescRing[Index + 1];
     RxDescriptor->Tdes0 = RDES0_OWN;
     RxDescriptor->Tdes1 = RDES1_CHAINED | RX_MAX_PACKET;
   }
 
   // Correcting the last pointer of the chain
-  RxDescriptor->AddrNext = &EmacDriver->RxdescRing[0];
+  RxDescriptor->AddrNext = (UINT32)(UINTN) &EmacDriver->RxdescRing[0];
 
   // Write the address of tx descriptor list
   MmioWrite32(mALT_EMAC_OFST +

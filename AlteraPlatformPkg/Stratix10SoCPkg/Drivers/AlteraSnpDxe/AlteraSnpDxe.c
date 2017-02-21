@@ -1201,7 +1201,7 @@ SnpTransmit (
   //InfoPrint ("SNP:DXE:\nTransmit Data:\r\n");
   //SerialPortMmioHexDump ((UINTN)EthernetPacket, BuffSize /4 + 1);
 
-  CopyMem (TxDescriptor->Addr, EthernetPacket, BuffSize);
+  CopyMem((VOID*)(UINTN)TxDescriptor->Addr, EthernetPacket, BuffSize);
 
   TxDescriptor->Tdes1 = (BuffSize << TDES1_SIZE1SHFT) &
                          TDES1_SIZE1MASK;
@@ -1398,7 +1398,7 @@ SnpReceive (
   if (HdrSize != NULL)
     *HdrSize = Snp->Mode->MediaHeaderSize;
 
-  CopyMem (RawData, RxDescriptor->Addr, *BuffSize);
+  CopyMem (RawData, (VOID*)(UINTN) RxDescriptor->Addr, *BuffSize);
 
   if (DstAddr != NULL) {
     Dst.Addr[0] = RawData[0];

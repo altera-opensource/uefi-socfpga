@@ -126,8 +126,8 @@
 typedef struct {
   UINT32 Tdes0;
   UINT32 Tdes1;
-  VOID   *Addr;
-  VOID   *AddrNext;
+  UINT32 Addr;
+  UINT32 AddrNext;
 } DESIGNWARE_HW_DESCRIPTOR;
 
 typedef struct {
