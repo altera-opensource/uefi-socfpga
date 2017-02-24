@@ -185,7 +185,7 @@ PeiStagePlatformInit (
     ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
   }
   //Warm Reset after FPGA Program and before Memory Clock Calibration
-  WarmResetAfterFpgaProgram(BootSourceType);
+  WarmResetAfterFpgaProgram(BootSourceType, RbfType);
 
   // Start Talking if FPGA ready and UART is not yet init
   // (if Dediacted IO then it is init above before caling GetBootSourceType)

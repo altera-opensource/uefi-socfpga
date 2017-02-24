@@ -1066,7 +1066,8 @@ DisplayFpgaManagerInfo (
 VOID
 EFIAPI
 WarmResetAfterFpgaProgram (
-  IN BOOT_SOURCE_TYPE  BootSourceType
+  IN BOOT_SOURCE_TYPE  BootSourceType,
+  IN RBF_TYPE          RbfType
   )
 {
   UINT32  Data32;
@@ -1080,7 +1081,12 @@ WarmResetAfterFpgaProgram (
                  ALT_SYSMGR_ROM_ISW_HANDOFF_OFST + 
                  ISW_HANDOFF_SLOT7_WARMRESET_SCRATCHPAD_OFST,
                  0);
-
+    if (RbfType == COMBINE_RBF) {
+      //Clear Reset mask as default value is 1
+      MmioOr32 (ALT_RSTMGR_OFST +
+                ALT_RSTMGR_SYSWARMMSK_OFST,
+                ALT_RSTMGR_SYSWARMMSK_S2F_SET_MSK);
+    }
   } else {
 
     InfoPrint ("Warm Reset After FPGA Programming\r\n");
@@ -1088,6 +1094,12 @@ WarmResetAfterFpgaProgram (
                  ALT_SYSMGR_ROM_ISW_HANDOFF_OFST + 
                  ISW_HANDOFF_SLOT7_WARMRESET_SCRATCHPAD_OFST,
                  ALT_WARMRESET_STATUS_INDICATOR);
+    if (RbfType == COMBINE_RBF) {
+      //Set Reset mask due to default value is 1
+      MmioAnd32 (ALT_RSTMGR_OFST +
+                 ALT_RSTMGR_SYSWARMMSK_OFST,
+                 ALT_RSTMGR_SYSWARMMSK_S2F_CLR_MSK);
+    }
     //QSPI software reset command, for the case where no HPS reset connected to QSPI reset
     if (BootSourceType == BOOT_SOURCE_QSPI) {
       QspiReset();

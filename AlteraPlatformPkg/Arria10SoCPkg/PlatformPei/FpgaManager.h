@@ -139,7 +139,8 @@ DisplayFpgaManagerInfo (
 VOID
 EFIAPI
 WarmResetAfterFpgaProgram (
-  IN BOOT_SOURCE_TYPE  BootSourceType
+  IN BOOT_SOURCE_TYPE  BootSourceType,
+  IN RBF_TYPE          RbfType
   );
 
 EFI_BOOT_MODE
