@@ -196,7 +196,7 @@
 
   # Extra Boot Option for PEI Phase
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_ZIMAGE_AT_PEI_PHASE     |0
-  gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_UEFI_DXE_PHASE          |0
+  gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_UEFI_DXE_PHASE          |1
 
 
   ##------------------------------------------------------------------------------
