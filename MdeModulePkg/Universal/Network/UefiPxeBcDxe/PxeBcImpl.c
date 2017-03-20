@@ -2776,7 +2776,7 @@ EfiPxeLoadFile (
   UINT64                      TmpBufSize;
   BOOLEAN                     MediaPresent;
 
-  if (FilePath == NULL || !IsDevicePathEnd (FilePath)) {
+  if (FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
   
