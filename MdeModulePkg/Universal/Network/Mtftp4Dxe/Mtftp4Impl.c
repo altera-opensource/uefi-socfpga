@@ -677,11 +677,11 @@ EfiMtftp4Configure (
       return EFI_INVALID_PARAMETER;
     }
 
-    if ((Gateway != 0) &&
-        (!IP4_NET_EQUAL (Gateway, Ip, Netmask) || !NetIp4IsUnicast (Gateway, Netmask))) {
+    //if ((Gateway != 0) &&
+    //    (!IP4_NET_EQUAL (Gateway, Ip, Netmask) || !NetIp4IsUnicast (Gateway, Netmask))) {
 
-      return EFI_INVALID_PARAMETER;
-    }
+    //  return EFI_INVALID_PARAMETER;
+    //}
 
     OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
