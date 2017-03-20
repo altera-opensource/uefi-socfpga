@@ -292,7 +292,7 @@ MmcIdentificationMode (
       // Note: The first time CmdArg will be zero
       CmdArg = ((UINTN *) &(MmcHostInstance->CardInfo.OCRData))[0];
       if (IsHCS) {
-        CmdArg |= BIT30;
+        CmdArg |= BIT30 | BIT23;
       }
       Status = MmcHost->SendCommand (MmcHost, MMC_ACMD41, CmdArg);
       if (!EFI_ERROR (Status)) {
