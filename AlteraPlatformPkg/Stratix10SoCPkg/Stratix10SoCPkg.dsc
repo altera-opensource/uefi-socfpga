@@ -856,6 +856,9 @@
   # Legacy Linux Loader
   AlteraPlatformPkg/Applications/LinuxLoader/LinuxLoader.inf
 
+  # Standard EFI HelloWorld Application
+  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+
 [BuildOptions]
   #-------------------------------
   # Common
