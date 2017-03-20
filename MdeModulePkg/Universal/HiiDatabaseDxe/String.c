@@ -317,6 +317,8 @@ FindStringBlock (
   BlockHdr  = StringPackage->StringBlock;
   BlockSize = 0;
   Offset    = 0;
+  StringSize = 0;
+
   while (*BlockHdr != EFI_HII_SIBT_END) {
     switch (*BlockHdr) {
     case EFI_HII_SIBT_STRING_SCSU:
