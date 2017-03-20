@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #define PXEBC_DHCP4_S_PORT                 67
 #define PXEBC_DHCP4_C_PORT                 68
-#define PXEBC_BS_DOWNLOAD_PORT             69
+#define PXEBC_BS_DOWNLOAD_PORT             70     // workaround for socvp, orginal value is 69
 #define PXEBC_BS_DISCOVER_PORT             4011
 
 #define PXEBC_DHCP4_OPCODE_REQUEST         1
