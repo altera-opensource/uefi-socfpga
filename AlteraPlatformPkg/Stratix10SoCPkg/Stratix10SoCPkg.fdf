@@ -59,10 +59,10 @@
 
 [FD.ALTERA_HPS_OCRAM_EFI_PART1]
 BaseAddress   = 0xffe00000  # The base address of the Firmware in OCRAM.
-Size          = 0x00020000  # The size in bytes
+Size          = 0x00026000  # The size in bytes
 ErasePolarity = 1
 BlockSize     = 0x00000001
-NumBlocks     = 0x00020000
+NumBlocks     = 0x00026000
 
 ################################################################################
 #
@@ -83,11 +83,11 @@ NumBlocks     = 0x00020000
 gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvSize
 FV = FV_SEC_UNCOMPRESSED
 
-0x00002000|106496
+0x00002000|131072
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = FV_PEI_UNCOMPRESSED
 
-0x0001c000|16384
+0x00022000|16384
 gAlteraHpsTokenSpaceGuid.PcdFvDtbBaseAddress|gAlteraHpsTokenSpaceGuid.PcdDtbFvSize
 FILE = AlteraPlatformPkg/Stratix10SoCPkg/Stratix10SoCPkg.dtb
 

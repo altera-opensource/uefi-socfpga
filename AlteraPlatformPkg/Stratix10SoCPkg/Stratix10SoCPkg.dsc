@@ -864,7 +864,8 @@
   # Common
   #-------------------------------
   CLANG35:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
-  GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
+  GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG -fstack-protector -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security
+  GCC:RELEASE_*_*_DLINK_FLAGS  = -z noexecstack -z relro -z now
 
   #-------------------------------
   # AlteraPlatformPkg/...
