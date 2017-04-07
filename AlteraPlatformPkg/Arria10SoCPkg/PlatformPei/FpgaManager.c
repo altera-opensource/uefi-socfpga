@@ -663,16 +663,6 @@ FpgaFullConfiguration (
                    ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_CLR_MSK,
                    ALT_FPGAMGR_IMGCFG_CTL_02_CDRATIO_SET(CdRatio));
 
-  ProgressPrint ("Programming FPGA......\r\n");
-  // The following InfoPrint matter only if UART is using shared IO and on Warm reset flow
-  // Flush the UART FIFO, fill the UART 128-byte transmit and receive FIFO buffers
-  // So that any remaining message get printed before Pin Mux get interfere during programming
-  ProgressPrint ("\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r"
-                 "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r"
-                 "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r"
-                 "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r"
-                 "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r");
-
   // InfoPrint ("Step 3\r\n");
   //
   // Step 3:
@@ -823,9 +813,20 @@ WriteData:
     if (EFI_ERROR(Status)) return Status;
   } else {
       BootMode= CheckForFpgaProgramIndicator();
-      if (BootMode == BOOT_WITH_FULL_CONFIGURATION) {  
+      if (BootMode == BOOT_WITH_FULL_CONFIGURATION) {
+        ProgressPrint ("Programming FPGA......\r\n");
+        // The following InfoPrint matter only if UART is using shared IO and on Warm reset flow
+        // Flush the UART FIFO, fill the UART 128-byte transmit and receive FIFO buffers
+        // So that any remaining message get printed before Pin Mux get interfere during programming
+        ProgressPrint ("\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r"
+                       "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r"
+                       "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r"
+                       "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r"
+                       "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r");
         Status = FpgaProgramWrite (BootSourceType, RbfSize, Checksum);
         if (EFI_ERROR(Status)) return Status;
+      } else {
+        ProgressPrint ("Skip Programming FPGA......\r\n");
       }
   }
 
