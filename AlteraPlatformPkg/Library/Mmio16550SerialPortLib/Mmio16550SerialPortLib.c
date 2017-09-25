@@ -207,7 +207,15 @@ SerialPortInitialize (
   BOOLEAN        Initialized;
   UINT32         SerialClockRateInHz;
 
-  SerialClockRateInHz = PcdGet32 (PcdSerialClockRate);
+  if (MmioRead32 (ALT_SYSMGR_OFST + ALT_SYSMGR_SILICONID1_OFST) == ALT_SYSMGR_SILICONID1_ES1)
+  {
+    // For A10 get l4_sp clock frequency and convert the unit from MHz to Hz
+    SerialClockRateInHz =  MmioRead32 (ALT_SYSMGR_ROM_OFST +
+                           ALT_SYSMGR_ROM_ISW_HANDOFF_OFST +
+                           ISW_HANDOFF_SLOT8_L4_SP_CLK_IN_MHZ_OFST)*1000000;
+  } else {
+    SerialClockRateInHz = PcdGet32 (PcdSerialClockRate);
+  }
   //
   // Calculate divisor for baud generator
   //    Ref_Clk_Rate / (Baud_Rate * 16)
