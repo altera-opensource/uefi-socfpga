@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.
+  Copyright (c) 2015, Altera Corporation. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without modification,
   are permitted provided that the following conditions are met:
@@ -35,9 +35,31 @@
 #define ALT_NANDDATA_CTRL_OFST              0x00
 #define ALT_NANDDATA_DATA_OFST              0x10
 
-#define NAND_POLL_FOR_INT_STAT_TIMEOUT     (100000)
-#define NAND_NUMBER_OF_BANK                 4
+#define NAND_POLL_FOR_INT_STAT_TIMEOUT     (1000000)
+#define NAND_NUMBER_OF_BANK                 1
 #define NAND_SPARE_AREA_SKIP_BYTES          2
+
+#define NandBlockAddressGet(Addr)                (Addr >> (mFlash.BlockShift + mFlash.PageShift))
+#define NandPageAddressGet(Addr)                 (Addr >> mFlash.PageShift & ((1 << mFlash.BlockShift) - 1))
+#define NandFlashAddrCompose(BlockNum, PageNum) ((BlockNum << (mFlash.BlockShift + mFlash.PageShift)) + \
+                                                 (PageNum  <<  mFlash.PageShift))
+
+#define ALT_NAND_FLASH_MEM_BANK_0                (0)
+#define ALT_NAND_FLASH_MEM_BANK_1                (1)
+#define ALT_NAND_FLASH_MEM_BANK_2                (2)
+#define ALT_NAND_FLASH_MEM_BANK_3                (3)
+
+#define MAP00_CMD                                (0 << 26)  // MAP 00 Buff Access
+#define MAP01_CMD                                (1 << 26)  // MAP 01 Array Access
+#define MAP10_CMD                                (2 << 26)  // MAP 10 Control Access
+#define MAP11_CMD                                (3 << 26)  // MAP 11 Direct Access
+
+#define MAP10_01_CMD_BLK_ADDR_MSB_INDEX          (23)
+
+#define MAP10_CMD_ERASE_BLOCK                    (0x01)
+#define MAP10_CMD_SPARE_AREA_ACCESS              (0x41)
+#define MAP10_CMD_MAIN_AREA_ACCESS               (0x42)
+#define MAP10_CMD_MAIN_SPARE_AREA_ACCESS         (0x43)
 
 //
 // NAND Flash Characteristic
@@ -72,28 +94,7 @@ typedef struct
 } NAND_FLASH_CHARACTERISTIC;
 
 
-#define NandBlockAddressGet(Addr)                (Addr >> (mFlash.BlockShift + mFlash.PageShift))
-#define NandPageAddressGet(Addr)                 (Addr >> mFlash.PageShift & ((1 << mFlash.BlockShift) - 1))
-#define NandFlashAddrCompose(BlockNum, PageNum) ((BlockNum << (mFlash.BlockShift + mFlash.PageShift)) + \
-                                                 (PageNum  <<  mFlash.PageShift))
-
-#define ALT_NAND_FLASH_MEM_BANK_0                (0)
-#define ALT_NAND_FLASH_MEM_BANK_1                (1)
-#define ALT_NAND_FLASH_MEM_BANK_2                (2)
-#define ALT_NAND_FLASH_MEM_BANK_3                (3)
-
-#define MAP00_CMD                                (0 << 26)  // MAP 00 Buff Access
-#define MAP01_CMD                                (1 << 26)  // MAP 01 Array Access
-#define MAP10_CMD                                (2 << 26)  // MAP 10 Control Access
-#define MAP11_CMD                                (3 << 26)  // MAP 11 Direct Access
-
-#define MAP10_CMD_BANK_SEL_LSB_INDEX             (24)
-#define MAP10_CMD_BANK_SEL_MASK                  (3)
-#define MAP10_CMD_BLK_ADDR_MSB_INDEX             (23)
-#define MAP10_CMD_PAGE_ADDR_LSB_INDEX            (0)
-
-#define MAP10_CMD_ERASE_BLOCK                    (0x01)
-
+// public functions
 EFI_STATUS
 EFIAPI
 NandInit (
@@ -131,6 +132,77 @@ NandUpdate (
   IN  UINT32  Size
   );
 
+EFI_STATUS
+EFIAPI
+NandReadSpareData(
+  OUT UINT32* Data,
+  IN  UINT32  BlockAddr,
+  IN  UINT32  PageAddr
+  );
+
+EFI_STATUS
+EFIAPI
+NandEraseSkipBadBlock (
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandReadSkipBadBlock (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandWriteSkipBadBlock (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandUpdateSkipBadBlock (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandReadRaw (
+  OUT VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+EFI_STATUS
+EFIAPI
+NandDmaPageWriteRaw (
+  IN UINT32  Bank,
+  IN UINT32  BlockAddr,
+  IN UINT32  PageAddr,
+  IN UINT32  MemAddr
+  );
+
+VOID
+EFIAPI
+NandScanBadBlockWholeChip (
+  VOID
+  );
+
+EFI_STATUS
+EFIAPI
+NandWriteTrimFfsSkipBadBlock (
+  IN  VOID*   Buffer,
+  IN  UINT32  Offset,
+  IN  UINT32  Size
+  );
+
+// private functions
 VOID
 EFIAPI
 NandResetBank (
@@ -174,11 +246,16 @@ NandDmaWriteCmdStructure (
 UINT32
 EFIAPI
 NandComposeMap10CmdAddr (
-  IN UINT32 Bank,
   IN UINT32 BlockAddr,
   IN UINT32 PageAddr
   );
 
+UINT32
+EFIAPI
+NandComposeMap01CmdAddr (
+  IN UINT32 BlockAddr,
+  IN UINT32 PageAddr
+  );
 
 EFI_STATUS
 EFIAPI

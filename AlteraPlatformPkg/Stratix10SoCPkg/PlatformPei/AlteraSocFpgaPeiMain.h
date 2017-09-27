@@ -40,17 +40,6 @@ AlteraSocFpgaPeiMainEntry (
   IN VOID                              *Data
   );
 
-VOID
-EFIAPI
-MemorySerialLogInit (
-  VOID
-  );
-
-VOID
-EFIAPI
-PrintModuleEntryPointAndMemoryMapInfoToMemorySerialLogOrSemihostingConsoleIfEnabled (
-  IN CONST EFI_SEC_PEI_HAND_OFF        *SecCoreData
-  );
 
 VOID
 EFIAPI

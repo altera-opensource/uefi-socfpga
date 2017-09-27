@@ -41,8 +41,7 @@
 #include <Library/SerialPortPrintLib.h>
 
 #if (FixedPcdGet32(PcdDebugMsg_BoardInit) == 0)
-  //#define ProgressPrint(FormatString, ...)  /* do nothing */
-  #define ProgressPrint                       SerialPortPrint
+  #define ProgressPrint(FormatString, ...)  /* do nothing */
   #define InfoPrint(FormatString, ...)        /* do nothing */
 #else
   #define ProgressPrint SerialPortPrint
@@ -53,18 +52,10 @@
 VOID
 EFIAPI
 BoardSpecificInitialization (
-  IN  CONST VOID*  Fdt
+  VOID
   )
 {
-#if (FixedPcdGet32(PcdIsAlteraSoCFPGADevelopmentBoards) == 1)
-  UINT32  SiliconID1;
-  SiliconID1 = MmioRead32 (ALT_SYSMGR_CORE_OFST + ALT_SYSMGR_CORE_SILICONID1_OFST);
-  InfoPrint ("\r\n"
-             "User's Code: Board Init...\r\n"
-             "\r\n");
-
-#else
   InfoPrint ("User's Code: Board Init...\r\n");
-#endif
+
 }
 

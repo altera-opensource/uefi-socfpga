@@ -39,7 +39,7 @@
 VOID
 EFIAPI
 InitSdMmc(
-  IN  CONST VOID*  Fdt
+  VOID
   );
 
 VOID

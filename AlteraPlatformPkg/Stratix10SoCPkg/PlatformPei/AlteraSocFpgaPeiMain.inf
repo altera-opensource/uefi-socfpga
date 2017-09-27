@@ -47,18 +47,15 @@
   AlteraSdMmcPei/MmcIdentification.c
   AlteraSdMmcPei/SdMmcHostProtocol.c
   Assert.c
-  Banner.c
   Board.c
   Boot.c
-  DeviceTree.c
-  MemoryTest.c
   MkimageHeader.c
+  Mmu.c
   NandLib.c
   PitStopUtility.c
   PlatformInit.c
   SdMmc.c
-  MemoryController.c
-  Mmu.c
+
 
 [Packages]
   AlteraPlatformPkg/AlteraPlatformPkg.dec
@@ -93,6 +90,7 @@
   SerialPortLib
   SerialPortPrintLib
   TimerLib
+  ArmGenericTimerCounterLib
 
 [Ppis]
   gEfiPeiMasterBootModePpiGuid                  # PPI ALWAYS_PRODUCED
@@ -158,6 +156,7 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_BOOTIMAGE_CPU_JUMP_ADDR
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_ZIMAGE_AT_PEI_PHASE
   gAlteraSocFpgaTokenSpaceGuid.PcdBoot_LOAD_UEFI_DXE_PHASE
+  gAlteraSocFpgaTokenSpaceGuid.PcdNandStopIfMoreThanThisNumberBadBlocks
   gArmPlatformTokenSpaceGuid.PcdClusterCount
   gArmPlatformTokenSpaceGuid.PcdCoreCount
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
@@ -197,3 +196,8 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
+  gAlteraSocFpgaTokenSpaceGuid.PcdMaxFAT32ClusterSize
+  gAlteraSocFpgaTokenSpaceGuid.PcdQspiMode
+  gAlteraSocFpgaTokenSpaceGuid.PcdQspiClkFreq
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcBlockUseInternalDMA
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSweepAllDrvselAndSmplselValues

@@ -50,16 +50,13 @@
 
 #include "AlteraSdMmcPei/AlteraSdMmcPei.h"
 #include "Assert.h"
-#include "DeviceTree.h"
 #include "SdMmc.h"
 #include "Boot.h"
-#include "MemoryController.h"
 #include "MkimageHeader.h"
 #include "NandLib.h"
 
 #if (FixedPcdGet32(PcdDebugMsg_Boot) == 0)
-  //#define ProgressPrint(FormatString, ...)    /* do nothing */
-  #define ProgressPrint                       SerialPortPrint
+  #define ProgressPrint(FormatString, ...)    /* do nothing */
   #define InfoPrint(FormatString, ...)        /* do nothing */
   #define MmioHexDump(BaseAddr, Data32Size)   /* do nothing */
 #else
@@ -72,6 +69,32 @@ typedef VOID (*LINUX_KERNEL64)(UINTN ParametersBase, UINTN Reserved0,
 //
 // Functions
 //
+
+UINT64
+EFIAPI
+GetMpuWindowDramSize (
+  VOID
+)
+{
+  UINT64 RamSize;
+  // Considered the case where MPU DRAM windows does not start at 0
+  RamSize = 0x40000000;
+  return RamSize;
+}
+
+
+UINTN
+EFIAPI
+GetMpuWindowDramBaseAddr (
+  VOID
+)
+{
+ // Assuming DRAM always start at 0x00000000
+  return 0x00000000;
+}
+
+
+
 BOOT_SOURCE_TYPE
 EFIAPI
 GetBootSourceType (
@@ -185,12 +208,10 @@ LoadDxeImageToRam (
   {
     case BOOT_SOURCE_SDMMC:
       // Read DXE.ROM file from root folder of FAT32 partition on SD/MMC card
-      //LoadFileToMemory (
-      //  (CHAR8*) PcdGetPtr (PcdFileName_DXE_ROM),
-      //  DestinationMemoryBase,
-      //  pFileSize);
-		//temp add in
-		*pFileSize = PcdGet32 (PcdDxeFvSize);
+      LoadFileToMemory (
+        (CHAR8*) PcdGetPtr (PcdFileName_DXE_ROM),
+        DestinationMemoryBase,
+        pFileSize);
       break;
     case BOOT_SOURCE_NAND:
    // case BOOT_SOURCE_QSPI:
@@ -372,7 +393,7 @@ LoadBootImageAndTransferControl (
           LinuxDtbFilename,
           OriginalFdtOffset,
           &OriginalFdtSize);
-        break;
+       break;
 
       case BOOT_SOURCE_NAND:
      // case BOOT_SOURCE_QSPI:
@@ -402,30 +423,34 @@ LoadBootImageAndTransferControl (
       EFI_DEADLOOP();
     }
 
+    InfoPrint("Reolocate the Linux FDT\n");
     // Relocate the Linux FDT blob and allocate more space for additional entries
     RelocatedFdtOffset = LINUX_DTB_RELOCATED_OFFSET;
     Status = RelocateFdt (OriginalFdtOffset, OriginalFdtSize, RelocatedFdtOffset, (UINTN*)&RelocatedFdtSize);
     ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
 
+    InfoPrint("Update DTB\n");
     // and then patch the "memory" node and "chosen" node with runtime detected info
     Status = UpdateBootImageDtbWithMemoryInfoAndBootArgs (BootSourceType, RelocatedFdtOffset);
     ASSERT_PLATFORM_INIT(!EFI_ERROR(Status));
 
+    InfoPrint("Check if Linux image is uImage\n");
     LinuxImage                    = LINUX_IMAGE_LOAD_ADDR;
     LINUX_KERNEL64  LinuxKernel   = (LINUX_KERNEL64)LinuxImage;
     // Check if the Linux Image is a uImage
     if (*(UINTN*)LinuxKernel == LINUX_UIMAGE_SIGNATURE) {
-	  // Assume the Image Entry Point is just after the uImage header (64-byte size)
+      InfoPrint("Is uImage\n");
+      // Assume the Image Entry Point is just after the uImage header (64-byte size)
       LinuxKernel = (LINUX_KERNEL64)((UINTN)LinuxKernel + 64);
       LinuxImageSize -= 64;
-	}
+    }
     // Transfer control
     ProgressPrint ("Booting Linux...\r\n");
     // Prepare hardware
     PreparePlatformHardwareToBoot ();
     // ARM32 and AArch64 kernel handover differ.
     // x0 is set to FDT base.
-    // x1-x3 are reserved for future use and should be set to zero.
+    // x1-   x3 are reserved for future use and should be set to zero.
 
     ProgressPrint ("Control transfered to 0x%08x with "
                  "X0 = 0x%08x "
@@ -457,7 +482,7 @@ BootLinuxFromRam (
   EFI_STATUS              Status;
 
   OriginalFdtOffset = LINUX_DTB_ORIGINAL_OFFSET;
-  OriginalFdtSize = 0x34ce;
+  OriginalFdtSize = 0x3820;   // todo: change to PCD parameter
   // Relocate the Linux FDT blob and allocate more space for additional entries
   RelocatedFdtOffset = LINUX_DTB_RELOCATED_OFFSET;
   Status = RelocateFdt (OriginalFdtOffset, OriginalFdtSize, RelocatedFdtOffset, (UINTN*)&RelocatedFdtSize);
@@ -470,7 +495,7 @@ BootLinuxFromRam (
   LinuxImage                        = LINUX_IMAGE_LOAD_ADDR;
   LINUX_KERNEL64        LinuxKernel = (LINUX_KERNEL64)LinuxImage;
   // If the Linux Image is an uImage
-  if (*(UINTN*)LinuxKernel == LINUX_UIMAGE_SIGNATURE) {
+  if (*(UINT32*)LinuxKernel == LINUX_UIMAGE_SIGNATURE) {
     // Assume the Image Entry Point is just after the uImage header (64-byte size)
     LinuxKernel = (LINUX_KERNEL64)((UINTN)LinuxKernel + 64);
     LinuxImageSize -= 64;

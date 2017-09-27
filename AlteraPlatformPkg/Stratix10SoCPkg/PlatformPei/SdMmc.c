@@ -45,13 +45,11 @@
 #include <Library/TimerLib.h>
 #include "AlteraSdMmcPei/AlteraSdMmcPei.h"
 #include "Assert.h"
-#include "DeviceTree.h"
 #include "MkimageHeader.h"
 #include "SdMmc.h"
 
 #if (FixedPcdGet32(PcdDebugMsg_SdMmc) == 0)
-  //#define ProgressPrint(FormatString, ...)    /* do nothing */
-  #define ProgressPrint                       SerialPortPrint
+  #define ProgressPrint(FormatString, ...)    /* do nothing */
   #define InfoPrint(FormatString, ...)        /* do nothing */
   #define MmioHexDump(BaseAddr, Data32Size)   /* do nothing */
 #else
@@ -67,7 +65,7 @@
 VOID
 EFIAPI
 InitSdMmc (
-  IN  CONST VOID*  Fdt
+  VOID
   )
 {
   EFI_STATUS          Status;

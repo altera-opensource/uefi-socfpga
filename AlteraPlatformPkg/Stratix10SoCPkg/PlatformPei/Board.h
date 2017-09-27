@@ -39,7 +39,7 @@
 VOID
 EFIAPI
 BoardSpecificInitialization (
-  IN  CONST VOID*  Fdt
+  VOID
   );
 
 #endif

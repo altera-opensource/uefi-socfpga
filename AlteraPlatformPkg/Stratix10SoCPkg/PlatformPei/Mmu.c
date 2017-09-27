@@ -39,7 +39,6 @@
 #include <Library/SerialPortPrintLib.h>
 #include <Library/TimerLib.h>
 #include "Assert.h"
-#include "MemoryController.h"
 #include "Mmu.h"
 
 #if (FixedPcdGet32(PcdDebugMsg_MemoryController) == 0)
@@ -59,7 +58,7 @@ ARM_MEMORY_REGION_DESCRIPTOR  gVirtualMemoryTable[MAX_VIRTUAL_MEMORY_MAP_DESCRIP
 #define DDR_ATTRIBUTES_UNCACHED         ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED
 
 #define DRAM_BASE                0x0
-#define DRAM_SIZE                0x80000000
+#define DRAM_SIZE                0x40000000
 
 #define FPGA_SLAVES_BASE         0x80000000
 #define FPGA_SLAVES_SIZE         0x60000000
@@ -157,7 +156,7 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[Index].Length       = 0;
   VirtualMemoryTable[Index++].Attributes   = (ARM_MEMORY_REGION_ATTRIBUTES)0;
 
-  ASSERT_PLATFORM_INIT((Index) <= MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS);
+  //ASSERT_PLATFORM_INIT((Index) <= MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS);
 
   *VirtualMemoryMap = VirtualMemoryTable;
 
@@ -187,7 +186,7 @@ InitMmu (
   VOID                          *TranslationTableBase;
   UINTN                         TranslationTableSize;
   RETURN_STATUS                 Status;
-
+ InfoPrint ("Init MMU\r\n");
   // Construct a Virtual Memory Map for this platform
   ArmPlatformGetVirtualMemoryMap (&MemoryTable);
 
@@ -195,7 +194,7 @@ InitMmu (
   Status = ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
   if (EFI_ERROR (Status)) {
     InfoPrint ("Error: Failed to enable MMU with Status = 0x%x\n", Status);
-    ASSERT_PLATFORM_INIT(0);
+    //ASSERT_PLATFORM_INIT(0);
   }
 
   InfoPrint (

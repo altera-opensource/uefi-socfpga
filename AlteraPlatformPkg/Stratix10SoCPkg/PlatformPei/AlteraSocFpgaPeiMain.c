@@ -53,19 +53,24 @@
 #include <Library/SerialPortLib.h>
 #include <Library/SerialPortPrintLib.h>
 #include <Library/TimerLib.h>
+#include <Library/ArmGenericTimerCounterLib.h>
+
+
+#include <libfdt.h>
+#include <Library/ArmGicLib.h>
+#include <Library/ArmCpuLib.h>
+#include <Chipset/ArmArchTimer.h>
+#include <Chipset/ArmCortexA5x.h>
+#include <Chipset/AArch64.h>
 
 #include "AlteraSocFpgaPeiMain.h"
 #include "Assert.h"
-#include "Banner.h"
 #include "Boot.h"
 #include "LzmaDecompress.h"
-#include "MemoryController.h"
 #include "Mmu.h"
+#include "PitStopUtility.h"
 #include "PlatformInit.h"
-//#include "ResetManager.h"
 #include "SdMmc.h"
-//#include "SecurityManager.h"
-//#include "SystemManager.h"
 
 #define EFI_DXE_CORE_GUID \
 { \
@@ -78,6 +83,7 @@ VOID
   IN  VOID *HobStart
   );
 
+
 VOID
 EFIAPI
 AlteraSocFpgaPeiMainEntry (
@@ -86,54 +92,21 @@ AlteraSocFpgaPeiMainEntry (
   IN VOID                              *Data
   )
 {
-  // Initialize the Timer Library
-  TimerConstructor ();
+  SerialPortPrint ("UEFI firmware version 1 built at %a on %a\r\n", __TIME__, __DATE__);
 
   // Init Hob and also record time of PEI start
   InitializeHOBs (SecCoreData, PpiList, GetPerformanceCounter());
 
-  // Initialize Memory Serial Log
-  MemorySerialLogInit ();
+  // External Memory should be up, build the System Memory Hobs
+  BuildSystemMemoryHOBs (0, 0x40000000);
 
-  // Print some useful information to semihosting console if enabled
-  PrintModuleEntryPointAndMemoryMapInfoToMemorySerialLogOrSemihostingConsoleIfEnabled (SecCoreData);
-
-  // Initialize Platform
   PeiStagePlatformInit();
 
-  // External Memory should be up, build the System Memory Hobs
-  BuildSystemMemoryHOBs (
-    GetMpuWindowDramBaseAddr(),
-    GetMpuWindowDramSize()
-    );
-
-  // Boot UEFI DXE phase
+  SerialPortPrint ("BootCompressedDxeFv\r\n");
   BootCompressedDxeFv (SecCoreData);    // Try LZMA compressed DXE FV
+
+  SerialPortPrint ("Boot Uncompressed Dxe\r\n");
   BootUnCompressedDxeFv (SecCoreData);  // If it fail try RAW DXE FV
-
-  // Should not reach here
-  ASSERT_PLATFORM_INIT(0);
-}
-
-
-VOID
-EFIAPI
-MemorySerialLogInit (
-  VOID
-  )
-{
-  // At this point, UART is not up yet, so the primary purpose of calling
-  // this DisplayFirmwareVersion function is to give a header to MemorySerialLogWrite
-  //DisplayFirmwareVersion ();
-  //
-  //// Display System Manager Info
-  //DisplaySystemManagerInfo ();
-  //
-  //// Display Reset Manager Info
-  //DisplayResetManagerInfo ();
-  //
-  //// Display Security Manager Info
-  //DisplaySecurityManagerInfo ();
 }
 
 
@@ -309,6 +282,7 @@ InitializeHOBs (
 
   // Build HOBs to pass up our version of stuff the DXE Core needs to save space
   BuildPeCoffLoaderHob ();
+
   BuildExtractSectionHob (
     &gLzmaCustomDecompressGuid,
     LzmaGuidedSectionGetInfo,
@@ -427,7 +401,7 @@ BuildSystemMemoryHOBs (
 
   return EFI_SUCCESS;
 }
-  
+
 VOID
 EFIAPI
 BootUnCompressedDxeFv (
@@ -440,9 +414,9 @@ BootUnCompressedDxeFv (
 
   // Load DXE FV to DRAM
   DxeFvBase = (UINTN)PcdGet64(PcdFdBaseAddress); // Defined in .FDF file
-  
+
   LoadDxeImageToRam (DxeFvBase, &DxeFileSize);
-  
+
   // Assert if this is not a DXE FV file matching this PEI
   ASSERT_PLATFORM_INIT(DxeFileSize == PcdGet32(PcdDxeFvSize));
 
@@ -494,7 +468,7 @@ BootCompressedDxeFv (
   // Load Compress DXE FV to DRAM
   // PcdFdBaseAddress is defined in .FDF file
   DxeDecompressedFvBase = (UINTN)PcdGet64(PcdFdBaseAddress);
-  
+
   // Compressed FV is load 16 MB after decompression destination offset
   DxeCompressedFvBase = DxeDecompressedFvBase + 0x1000000;
   // LZMA Scratch Buffer
@@ -507,12 +481,14 @@ BootCompressedDxeFv (
   ASSERT_PLATFORM_INIT(DxeFileSize == PcdGet32(PcdDxeFvSize));
   // Verify is a compressed DXE FV
   Section = (EFI_COMMON_SECTION_HEADER*)(DxeCompressedFvBase + 0x60); // FVH header size (0x48) + FFS header size (0x18)
+
   Status = LzmaGuidedSectionGetInfo (Section, &OutputBufferSize, &ScratchBufferSize, &SectionAttribute);
   if (EFI_ERROR(Status)) {
     // Not a LZMA compressed DXE FV
 	SerialPortPrint ("Not a LZMA compressed DXE FV\r\n");
     return;
   }
+
   // Decompress the FV
   LzmaGuidedSectionExtraction (Section, &OutputBuffer, ScratchBuffer, &AuthenticationStatus);
 
@@ -530,6 +506,7 @@ BootCompressedDxeFv (
       EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE |
       EFI_RESOURCE_ATTRIBUTE_TESTED
   );
+
   BuildResourceDescriptorHob (
     EFI_RESOURCE_SYSTEM_MEMORY,
     ResourceAttributes & ~EFI_RESOURCE_ATTRIBUTE_PRESENT,
@@ -622,7 +599,6 @@ EnterDxeCoreEntryPoint (
   SerialPortPrint ("Section         : %08x\r\n", Section);
   SerialPortPrint ("PECoffBase      : %08x\r\n", PECoffBase);
   SerialPortPrint ("DxeCore GUID    : %g\r\n", &DxeCoreFileInfo.FileName);
-  
   SerialPortPrint ("0x00005A4D      : %08x\r\n", *((UINT32*)(UINTN)(PECoffBase)));
   SerialPortPrint ("0x00004550      : %08x\r\n", *((UINT32*)(UINTN)(PECoffBase + 0x80)));
 
@@ -632,7 +608,7 @@ EnterDxeCoreEntryPoint (
     // Found "MZ" and "PE" signature, prepare to boot DXE phase
     //DxeCoreEntryPoint = (*((UINT32*)(UINTN)(PECoffBase + 0x80 + 0x34)) + *((UINT32*)(UINTN)(PECoffBase + 0x80 + 0x28)));
     DxeCoreEntryPoint = 0x00010002d4;
-	
+
     // Add HOB for the DXE Core
     BuildModuleHob (
       &DxeCoreFileInfo.FileName,
@@ -664,8 +640,8 @@ EnterDxeCoreEntryPoint (
 
     // Update PHIT HOB to reflect the DRAM memory range instead of OCRAM
     Hob = GetHobList ();
-    Hob->EfiMemoryTop        = (UINTN)GetMpuWindowDramBaseAddr() + GetMpuWindowDramSize();
-    Hob->EfiMemoryBottom     = (UINTN)GetMpuWindowDramBaseAddr();
+    Hob->EfiMemoryTop        = 0x40000000;
+    Hob->EfiMemoryBottom     = 0x0;
     Hob->EfiFreeMemoryTop    = Hob->EfiMemoryTop;
 
     // Make a copy of PEI Hob to DRAM memory range for DXE Core HOB relocation code to work correctly
@@ -706,9 +682,6 @@ EnterDxeCoreEntryPoint (
   } else {
     SerialPortPrint ("ERROR INVALID DXE.ROM\r\n");
   }
-
-  // Should not reach here
-  ASSERT_PLATFORM_INIT(0);
   // Dead loop
   EFI_DEADLOOP();
 }
