@@ -1,32 +1,34 @@
-/*******************************************************************************
-*                                                                              *
-* Copyright 2014 Altera Corporation. All Rights Reserved.                      *
-*                                                                              *
-* Redistribution and use in source and binary forms, with or without           *
-* modification, are permitted provided that the following conditions are met:  *
-*                                                                              *
-* 1. Redistributions of source code must retain the above copyright notice,    *
-*    this list of conditions and the following disclaimer.                     *
-*                                                                              *
-* 2. Redistributions in binary form must reproduce the above copyright notice, *
-*    this list of conditions and the following disclaimer in the documentation *
-*    and/or other materials provided with the distribution.                    *
-*                                                                              *
-* 3. The name of the author may not be used to endorse or promote products     *
-*    derived from this software without specific prior written permission.     *
-*                                                                              *
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR *
-* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF *
-* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO  *
-* EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,       *
-* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, *
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;  *
-* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,     *
-* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR      *
-* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF       *
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                   *
-*                                                                              *
-*******************************************************************************/
+/***********************************************************************************
+*                                                                                  *
+* Copyright 2013-2015 Altera Corporation. All Rights Reserved.                     *
+*                                                                                  *
+* Redistribution and use in source and binary forms, with or without               *
+* modification, are permitted provided that the following conditions are met:      *
+*                                                                                  *
+* 1. Redistributions of source code must retain the above copyright notice,        *
+*    this list of conditions and the following disclaimer.                         *
+*                                                                                  *
+* 2. Redistributions in binary form must reproduce the above copyright notice,     *
+*    this list of conditions and the following disclaimer in the documentation     *
+*    and/or other materials provided with the distribution.                        *
+*                                                                                  *
+* 3. Neither the name of the copyright holder nor the names of its contributors    *
+*    may be used to endorse or promote products derived from this software without *
+*    specific prior written permission.                                            *
+*                                                                                  *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"      *
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE        *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE       *
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE        *
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR              *
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF             *
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS         *
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN          *
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)          *
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
+* POSSIBILITY OF SUCH DAMAGE.                                                      *
+*                                                                                  *
+***********************************************************************************/
 
 /* Altera - hps */
 
@@ -39,7 +41,7 @@
 extern "C"
 {
 #else   /* __cplusplus */
-////#include <stdint.h>
+//#include <stdint.h>
 #endif  /* __cplusplus */
 #endif  /* __ASSEMBLY__ */
 
@@ -2406,6 +2408,8 @@ extern "C"
 #define ALT_MPFE_HMC_ADP_MPR_8BEAT2_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_MPR_8BEAT2_OFST))
 /* The address of the ALT_MPFE_HMC_ADP_AUTO_PRECHARGE register for the ALT_MPFE_HMC_ADP instance. */
 #define ALT_MPFE_HMC_ADP_AUTO_PRECHARGE_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_AUTO_PRECHARGE_OFST))
+/* The address of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH register for the ALT_MPFE_HMC_ADP instance. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_OFST))
 /* The address of the ALT_MPFE_HMC_ADP_ECCCTRL1 register for the ALT_MPFE_HMC_ADP instance. */
 #define ALT_MPFE_HMC_ADP_ECCCTRL1_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_ECCCTRL1_OFST))
 /* The address of the ALT_MPFE_HMC_ADP_ECCCTRL2 register for the ALT_MPFE_HMC_ADP instance. */
@@ -2468,14 +2472,6 @@ extern "C"
 #define ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_2_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_2_OFST))
 /* The address of the ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3 register for the ALT_MPFE_HMC_ADP instance. */
 #define ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3_OFST))
-/* The address of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0 register for the ALT_MPFE_HMC_ADP instance. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_OFST))
-/* The address of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1 register for the ALT_MPFE_HMC_ADP instance. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_OFST))
-/* The address of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2 register for the ALT_MPFE_HMC_ADP instance. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_OFST))
-/* The address of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3 register for the ALT_MPFE_HMC_ADP instance. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_OFST))
 /* The address of the ALT_MPFE_HMC_ADP_DERRHADDR register for the ALT_MPFE_HMC_ADP instance. */
 #define ALT_MPFE_HMC_ADP_DERRHADDR_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_DERRHADDR_OFST))
 /* The address of the ALT_MPFE_HMC_ADP_SERRHADDR register for the ALT_MPFE_HMC_ADP instance. */
@@ -2488,10 +2484,6 @@ extern "C"
 #define ALT_MPFE_HMC_ADP_RSTHANDSHAKECTRL_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_RSTHANDSHAKECTRL_OFST))
 /* The address of the ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT register for the ALT_MPFE_HMC_ADP instance. */
 #define ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT_OFST))
-/* The address of the ALT_MPFE_HMC_ADP_MEMCTRLCFG register for the ALT_MPFE_HMC_ADP instance. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_MEMCTRLCFG_OFST))
-/* The address of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH register for the ALT_MPFE_HMC_ADP instance. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_MPFE_HMC_ADP_ADDR) + ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_OFST))
 /* The base address byte offset for the start of the ALT_MPFE_HMC_ADP component. */
 #define ALT_MPFE_HMC_ADP_OFST        0xf8011000
 /* The start address of the ALT_MPFE_HMC_ADP component. */
@@ -14846,13 +14838,13 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_MBOX_STREAM component. */
-#define ALT_MBOX_STREAM_OFST        0xffa30500
+#define ALT_MBOX_STREAM_OFST        0xffa31000
 /* The start address of the ALT_MBOX_STREAM component. */
 #define ALT_MBOX_STREAM_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_MBOX_STREAM_OFST))
 /* The lower bound address range of the ALT_MBOX_STREAM component. */
 #define ALT_MBOX_STREAM_LB_ADDR     ALT_MBOX_STREAM_ADDR
 /* The upper bound address range of the ALT_MBOX_STREAM component. */
-#define ALT_MBOX_STREAM_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_MBOX_STREAM_ADDR) + 0x20) - 1))
+#define ALT_MBOX_STREAM_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_MBOX_STREAM_ADDR) + 0xf000) - 1))
 
 
 /*
@@ -15570,7 +15562,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_0 component. */
-#define ALT_USB0_DFIFO_0_OFST        0xffb04000
+#define ALT_USB0_DFIFO_0_OFST        0xffb01000
 /* The start address of the ALT_USB0_DFIFO_0 component. */
 #define ALT_USB0_DFIFO_0_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_0_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_0 component. */
@@ -15587,7 +15579,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_1 component. */
-#define ALT_USB0_DFIFO_1_OFST        0xffb08000
+#define ALT_USB0_DFIFO_1_OFST        0xffb02000
 /* The start address of the ALT_USB0_DFIFO_1 component. */
 #define ALT_USB0_DFIFO_1_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_1_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_1 component. */
@@ -15604,7 +15596,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_2 component. */
-#define ALT_USB0_DFIFO_2_OFST        0xffb0c000
+#define ALT_USB0_DFIFO_2_OFST        0xffb03000
 /* The start address of the ALT_USB0_DFIFO_2 component. */
 #define ALT_USB0_DFIFO_2_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_2_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_2 component. */
@@ -15621,7 +15613,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_3 component. */
-#define ALT_USB0_DFIFO_3_OFST        0xffb10000
+#define ALT_USB0_DFIFO_3_OFST        0xffb04000
 /* The start address of the ALT_USB0_DFIFO_3 component. */
 #define ALT_USB0_DFIFO_3_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_3_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_3 component. */
@@ -15638,7 +15630,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_4 component. */
-#define ALT_USB0_DFIFO_4_OFST        0xffb14000
+#define ALT_USB0_DFIFO_4_OFST        0xffb05000
 /* The start address of the ALT_USB0_DFIFO_4 component. */
 #define ALT_USB0_DFIFO_4_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_4_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_4 component. */
@@ -15655,7 +15647,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_5 component. */
-#define ALT_USB0_DFIFO_5_OFST        0xffb18000
+#define ALT_USB0_DFIFO_5_OFST        0xffb06000
 /* The start address of the ALT_USB0_DFIFO_5 component. */
 #define ALT_USB0_DFIFO_5_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_5_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_5 component. */
@@ -15672,7 +15664,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_6 component. */
-#define ALT_USB0_DFIFO_6_OFST        0xffb1c000
+#define ALT_USB0_DFIFO_6_OFST        0xffb07000
 /* The start address of the ALT_USB0_DFIFO_6 component. */
 #define ALT_USB0_DFIFO_6_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_6_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_6 component. */
@@ -15689,7 +15681,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_7 component. */
-#define ALT_USB0_DFIFO_7_OFST        0xffb20000
+#define ALT_USB0_DFIFO_7_OFST        0xffb08000
 /* The start address of the ALT_USB0_DFIFO_7 component. */
 #define ALT_USB0_DFIFO_7_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_7_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_7 component. */
@@ -15706,7 +15698,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_8 component. */
-#define ALT_USB0_DFIFO_8_OFST        0xffb24000
+#define ALT_USB0_DFIFO_8_OFST        0xffb09000
 /* The start address of the ALT_USB0_DFIFO_8 component. */
 #define ALT_USB0_DFIFO_8_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_8_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_8 component. */
@@ -15723,7 +15715,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_9 component. */
-#define ALT_USB0_DFIFO_9_OFST        0xffb28000
+#define ALT_USB0_DFIFO_9_OFST        0xffb0a000
 /* The start address of the ALT_USB0_DFIFO_9 component. */
 #define ALT_USB0_DFIFO_9_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_9_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_9 component. */
@@ -15740,7 +15732,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_10 component. */
-#define ALT_USB0_DFIFO_10_OFST        0xffb2c000
+#define ALT_USB0_DFIFO_10_OFST        0xffb0b000
 /* The start address of the ALT_USB0_DFIFO_10 component. */
 #define ALT_USB0_DFIFO_10_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_10_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_10 component. */
@@ -15757,7 +15749,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_11 component. */
-#define ALT_USB0_DFIFO_11_OFST        0xffb30000
+#define ALT_USB0_DFIFO_11_OFST        0xffb0c000
 /* The start address of the ALT_USB0_DFIFO_11 component. */
 #define ALT_USB0_DFIFO_11_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_11_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_11 component. */
@@ -15774,7 +15766,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_12 component. */
-#define ALT_USB0_DFIFO_12_OFST        0xffb34000
+#define ALT_USB0_DFIFO_12_OFST        0xffb0d000
 /* The start address of the ALT_USB0_DFIFO_12 component. */
 #define ALT_USB0_DFIFO_12_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_12_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_12 component. */
@@ -15791,7 +15783,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_13 component. */
-#define ALT_USB0_DFIFO_13_OFST        0xffb38000
+#define ALT_USB0_DFIFO_13_OFST        0xffb0e000
 /* The start address of the ALT_USB0_DFIFO_13 component. */
 #define ALT_USB0_DFIFO_13_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_13_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_13 component. */
@@ -15808,13 +15800,47 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB0_DFIFO_14 component. */
-#define ALT_USB0_DFIFO_14_OFST        0xffb3c000
+#define ALT_USB0_DFIFO_14_OFST        0xffb0f000
 /* The start address of the ALT_USB0_DFIFO_14 component. */
 #define ALT_USB0_DFIFO_14_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_14_OFST))
 /* The lower bound address range of the ALT_USB0_DFIFO_14 component. */
 #define ALT_USB0_DFIFO_14_LB_ADDR     ALT_USB0_DFIFO_14_ADDR
 /* The upper bound address range of the ALT_USB0_DFIFO_14 component. */
 #define ALT_USB0_DFIFO_14_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_USB0_DFIFO_14_ADDR) + 0x1000) - 1))
+
+
+/*
+ * Component Instance : usb0_DFIFO_15
+ * 
+ * Instance usb0_DFIFO_15 of component ALT_USB_DFIFO.
+ * 
+ * 
+ */
+/* The base address byte offset for the start of the ALT_USB0_DFIFO_15 component. */
+#define ALT_USB0_DFIFO_15_OFST        0xffb10000
+/* The start address of the ALT_USB0_DFIFO_15 component. */
+#define ALT_USB0_DFIFO_15_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_15_OFST))
+/* The lower bound address range of the ALT_USB0_DFIFO_15 component. */
+#define ALT_USB0_DFIFO_15_LB_ADDR     ALT_USB0_DFIFO_15_ADDR
+/* The upper bound address range of the ALT_USB0_DFIFO_15 component. */
+#define ALT_USB0_DFIFO_15_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_USB0_DFIFO_15_ADDR) + 0x1000) - 1))
+
+
+/*
+ * Component Instance : usb0_DFIFO_DA
+ * 
+ * Instance usb0_DFIFO_DA of component ALT_USB0_DFIFO_DA.
+ * 
+ * 
+ */
+/* The base address byte offset for the start of the ALT_USB0_DFIFO_DA component. */
+#define ALT_USB0_DFIFO_DA_OFST        0xffb20000
+/* The start address of the ALT_USB0_DFIFO_DA component. */
+#define ALT_USB0_DFIFO_DA_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB0_DFIFO_DA_OFST))
+/* The lower bound address range of the ALT_USB0_DFIFO_DA component. */
+#define ALT_USB0_DFIFO_DA_LB_ADDR     ALT_USB0_DFIFO_DA_ADDR
+/* The upper bound address range of the ALT_USB0_DFIFO_DA component. */
+#define ALT_USB0_DFIFO_DA_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_USB0_DFIFO_DA_ADDR) + 0x8000) - 1))
 
 
 /*
@@ -16532,7 +16558,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_0 component. */
-#define ALT_USB1_DFIFO_0_OFST        0xffb44000
+#define ALT_USB1_DFIFO_0_OFST        0xffb41000
 /* The start address of the ALT_USB1_DFIFO_0 component. */
 #define ALT_USB1_DFIFO_0_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_0_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_0 component. */
@@ -16549,7 +16575,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_1 component. */
-#define ALT_USB1_DFIFO_1_OFST        0xffb48000
+#define ALT_USB1_DFIFO_1_OFST        0xffb42000
 /* The start address of the ALT_USB1_DFIFO_1 component. */
 #define ALT_USB1_DFIFO_1_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_1_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_1 component. */
@@ -16566,7 +16592,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_2 component. */
-#define ALT_USB1_DFIFO_2_OFST        0xffb4c000
+#define ALT_USB1_DFIFO_2_OFST        0xffb43000
 /* The start address of the ALT_USB1_DFIFO_2 component. */
 #define ALT_USB1_DFIFO_2_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_2_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_2 component. */
@@ -16583,7 +16609,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_3 component. */
-#define ALT_USB1_DFIFO_3_OFST        0xffb50000
+#define ALT_USB1_DFIFO_3_OFST        0xffb44000
 /* The start address of the ALT_USB1_DFIFO_3 component. */
 #define ALT_USB1_DFIFO_3_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_3_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_3 component. */
@@ -16600,7 +16626,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_4 component. */
-#define ALT_USB1_DFIFO_4_OFST        0xffb54000
+#define ALT_USB1_DFIFO_4_OFST        0xffb45000
 /* The start address of the ALT_USB1_DFIFO_4 component. */
 #define ALT_USB1_DFIFO_4_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_4_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_4 component. */
@@ -16617,7 +16643,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_5 component. */
-#define ALT_USB1_DFIFO_5_OFST        0xffb58000
+#define ALT_USB1_DFIFO_5_OFST        0xffb46000
 /* The start address of the ALT_USB1_DFIFO_5 component. */
 #define ALT_USB1_DFIFO_5_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_5_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_5 component. */
@@ -16634,7 +16660,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_6 component. */
-#define ALT_USB1_DFIFO_6_OFST        0xffb5c000
+#define ALT_USB1_DFIFO_6_OFST        0xffb47000
 /* The start address of the ALT_USB1_DFIFO_6 component. */
 #define ALT_USB1_DFIFO_6_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_6_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_6 component. */
@@ -16651,7 +16677,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_7 component. */
-#define ALT_USB1_DFIFO_7_OFST        0xffb60000
+#define ALT_USB1_DFIFO_7_OFST        0xffb48000
 /* The start address of the ALT_USB1_DFIFO_7 component. */
 #define ALT_USB1_DFIFO_7_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_7_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_7 component. */
@@ -16668,7 +16694,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_8 component. */
-#define ALT_USB1_DFIFO_8_OFST        0xffb64000
+#define ALT_USB1_DFIFO_8_OFST        0xffb49000
 /* The start address of the ALT_USB1_DFIFO_8 component. */
 #define ALT_USB1_DFIFO_8_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_8_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_8 component. */
@@ -16685,7 +16711,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_9 component. */
-#define ALT_USB1_DFIFO_9_OFST        0xffb68000
+#define ALT_USB1_DFIFO_9_OFST        0xffb4a000
 /* The start address of the ALT_USB1_DFIFO_9 component. */
 #define ALT_USB1_DFIFO_9_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_9_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_9 component. */
@@ -16702,7 +16728,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_10 component. */
-#define ALT_USB1_DFIFO_10_OFST        0xffb6c000
+#define ALT_USB1_DFIFO_10_OFST        0xffb4b000
 /* The start address of the ALT_USB1_DFIFO_10 component. */
 #define ALT_USB1_DFIFO_10_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_10_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_10 component. */
@@ -16719,7 +16745,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_11 component. */
-#define ALT_USB1_DFIFO_11_OFST        0xffb70000
+#define ALT_USB1_DFIFO_11_OFST        0xffb4c000
 /* The start address of the ALT_USB1_DFIFO_11 component. */
 #define ALT_USB1_DFIFO_11_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_11_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_11 component. */
@@ -16736,7 +16762,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_12 component. */
-#define ALT_USB1_DFIFO_12_OFST        0xffb74000
+#define ALT_USB1_DFIFO_12_OFST        0xffb4d000
 /* The start address of the ALT_USB1_DFIFO_12 component. */
 #define ALT_USB1_DFIFO_12_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_12_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_12 component. */
@@ -16753,7 +16779,7 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_13 component. */
-#define ALT_USB1_DFIFO_13_OFST        0xffb78000
+#define ALT_USB1_DFIFO_13_OFST        0xffb4e000
 /* The start address of the ALT_USB1_DFIFO_13 component. */
 #define ALT_USB1_DFIFO_13_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_13_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_13 component. */
@@ -16770,13 +16796,47 @@ extern "C"
  * 
  */
 /* The base address byte offset for the start of the ALT_USB1_DFIFO_14 component. */
-#define ALT_USB1_DFIFO_14_OFST        0xffb7c000
+#define ALT_USB1_DFIFO_14_OFST        0xffb4f000
 /* The start address of the ALT_USB1_DFIFO_14 component. */
 #define ALT_USB1_DFIFO_14_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_14_OFST))
 /* The lower bound address range of the ALT_USB1_DFIFO_14 component. */
 #define ALT_USB1_DFIFO_14_LB_ADDR     ALT_USB1_DFIFO_14_ADDR
 /* The upper bound address range of the ALT_USB1_DFIFO_14 component. */
 #define ALT_USB1_DFIFO_14_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_USB1_DFIFO_14_ADDR) + 0x1000) - 1))
+
+
+/*
+ * Component Instance : usb1_DFIFO_15
+ * 
+ * Instance usb1_DFIFO_15 of component ALT_USB_DFIFO.
+ * 
+ * 
+ */
+/* The base address byte offset for the start of the ALT_USB1_DFIFO_15 component. */
+#define ALT_USB1_DFIFO_15_OFST        0xffb50000
+/* The start address of the ALT_USB1_DFIFO_15 component. */
+#define ALT_USB1_DFIFO_15_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_15_OFST))
+/* The lower bound address range of the ALT_USB1_DFIFO_15 component. */
+#define ALT_USB1_DFIFO_15_LB_ADDR     ALT_USB1_DFIFO_15_ADDR
+/* The upper bound address range of the ALT_USB1_DFIFO_15 component. */
+#define ALT_USB1_DFIFO_15_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_USB1_DFIFO_15_ADDR) + 0x1000) - 1))
+
+
+/*
+ * Component Instance : usb1_DFIFO_DA
+ * 
+ * Instance usb1_DFIFO_DA of component ALT_USB0_DFIFO_DA.
+ * 
+ * 
+ */
+/* The base address byte offset for the start of the ALT_USB1_DFIFO_DA component. */
+#define ALT_USB1_DFIFO_DA_OFST        0xffb60000
+/* The start address of the ALT_USB1_DFIFO_DA component. */
+#define ALT_USB1_DFIFO_DA_ADDR        ALT_CAST(void *, (ALT_CAST(char *, ALT_HPS_ADDR) + ALT_USB1_DFIFO_DA_OFST))
+/* The lower bound address range of the ALT_USB1_DFIFO_DA component. */
+#define ALT_USB1_DFIFO_DA_LB_ADDR     ALT_USB1_DFIFO_DA_ADDR
+/* The upper bound address range of the ALT_USB1_DFIFO_DA component. */
+#define ALT_USB1_DFIFO_DA_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_USB1_DFIFO_DA_ADDR) + 0x8000) - 1))
 
 
 /*
@@ -18058,7 +18118,7 @@ extern "C"
 /* The lower bound address range of the ALT_WDT0 component. */
 #define ALT_WDT0_LB_ADDR     ALT_WDT0_ADDR
 /* The upper bound address range of the ALT_WDT0 component. */
-#define ALT_WDT0_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_WDT0_ADDR) + 0x1000) - 1))
+#define ALT_WDT0_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_WDT0_ADDR) + 0x100) - 1))
 
 
 /*
@@ -18101,7 +18161,7 @@ extern "C"
 /* The lower bound address range of the ALT_WDT1 component. */
 #define ALT_WDT1_LB_ADDR     ALT_WDT1_ADDR
 /* The upper bound address range of the ALT_WDT1 component. */
-#define ALT_WDT1_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_WDT1_ADDR) + 0x1000) - 1))
+#define ALT_WDT1_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_WDT1_ADDR) + 0x100) - 1))
 
 
 /*
@@ -18144,7 +18204,7 @@ extern "C"
 /* The lower bound address range of the ALT_WDT2 component. */
 #define ALT_WDT2_LB_ADDR     ALT_WDT2_ADDR
 /* The upper bound address range of the ALT_WDT2 component. */
-#define ALT_WDT2_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_WDT2_ADDR) + 0x1000) - 1))
+#define ALT_WDT2_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_WDT2_ADDR) + 0x100) - 1))
 
 
 /*
@@ -18187,7 +18247,7 @@ extern "C"
 /* The lower bound address range of the ALT_WDT3 component. */
 #define ALT_WDT3_LB_ADDR     ALT_WDT3_ADDR
 /* The upper bound address range of the ALT_WDT3 component. */
-#define ALT_WDT3_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_WDT3_ADDR) + 0x1000) - 1))
+#define ALT_WDT3_UB_ADDR     ALT_CAST(void *, ((ALT_CAST(char *, ALT_WDT3_ADDR) + 0x100) - 1))
 
 
 /*
@@ -18540,6 +18600,8 @@ extern "C"
 #define ALT_SYSMGR_CORE_NOC_ADDR_REMAP_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_SYSMGR_CORE_ADDR) + ALT_SYSMGR_CORE_NOC_ADDR_REMAP_OFST))
 /* The address of the ALT_SYSMGR_CORE_HMC_CLK register for the ALT_SYSMGR_CORE instance. */
 #define ALT_SYSMGR_CORE_HMC_CLK_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_SYSMGR_CORE_ADDR) + ALT_SYSMGR_CORE_HMC_CLK_OFST))
+/* The address of the ALT_SYSMGR_CORE_IO_PA_CTRL register for the ALT_SYSMGR_CORE instance. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_SYSMGR_CORE_ADDR) + ALT_SYSMGR_CORE_IO_PA_CTRL_OFST))
 /* The address of the ALT_SYSMGR_CORE_NOC_TIMEOUT register for the ALT_SYSMGR_CORE instance. */
 #define ALT_SYSMGR_CORE_NOC_TIMEOUT_ADDR  ALT_CAST(void *, (ALT_CAST(char *, ALT_SYSMGR_CORE_ADDR) + ALT_SYSMGR_CORE_NOC_TIMEOUT_OFST))
 /* The address of the ALT_SYSMGR_CORE_NOC_IDLEREQ_SET register for the ALT_SYSMGR_CORE instance. */
@@ -22049,73 +22111,51 @@ extern "C"
  *  0xffa30400 - 0xffa3040b     | ALT_DOORBELL_IN                        
  *  0xffa3040c - 0xffa3047f     | Undefined                              
  *  0xffa30480 - 0xffa3048b     | ALT_DOORBELL_OUT                       
- *  0xffa3048c - 0xffa304ff     | Undefined                              
- *  0xffa30500 - 0xffa3051f     | ALT_MBOX_STREAM                        
- *  0xffa30520 - 0xffafffff     | Undefined                              
+ *  0xffa3048c - 0xffa30fff     | Undefined                              
+ *  0xffa31000 - 0xffa3ffff     | ALT_MBOX_STREAM                        
+ *  0xffa40000 - 0xffafffff     | Undefined                              
  *  0xffb00000 - 0xffb00eff     | ALT_USB0_INTREG                        
- *  0xffb00f00 - 0xffb03fff     | Undefined                              
- *  0xffb04000 - 0xffb04fff     | ALT_USB0_DFIFO_0                       
- *  0xffb05000 - 0xffb07fff     | Undefined                              
- *  0xffb08000 - 0xffb08fff     | ALT_USB0_DFIFO_1                       
- *  0xffb09000 - 0xffb0bfff     | Undefined                              
- *  0xffb0c000 - 0xffb0cfff     | ALT_USB0_DFIFO_2                       
- *  0xffb0d000 - 0xffb0ffff     | Undefined                              
- *  0xffb10000 - 0xffb10fff     | ALT_USB0_DFIFO_3                       
- *  0xffb11000 - 0xffb13fff     | Undefined                              
- *  0xffb14000 - 0xffb14fff     | ALT_USB0_DFIFO_4                       
- *  0xffb15000 - 0xffb17fff     | Undefined                              
- *  0xffb18000 - 0xffb18fff     | ALT_USB0_DFIFO_5                       
- *  0xffb19000 - 0xffb1bfff     | Undefined                              
- *  0xffb1c000 - 0xffb1cfff     | ALT_USB0_DFIFO_6                       
- *  0xffb1d000 - 0xffb1ffff     | Undefined                              
- *  0xffb20000 - 0xffb20fff     | ALT_USB0_DFIFO_7                       
- *  0xffb21000 - 0xffb23fff     | Undefined                              
- *  0xffb24000 - 0xffb24fff     | ALT_USB0_DFIFO_8                       
- *  0xffb25000 - 0xffb27fff     | Undefined                              
- *  0xffb28000 - 0xffb28fff     | ALT_USB0_DFIFO_9                       
- *  0xffb29000 - 0xffb2bfff     | Undefined                              
- *  0xffb2c000 - 0xffb2cfff     | ALT_USB0_DFIFO_10                      
- *  0xffb2d000 - 0xffb2ffff     | Undefined                              
- *  0xffb30000 - 0xffb30fff     | ALT_USB0_DFIFO_11                      
- *  0xffb31000 - 0xffb33fff     | Undefined                              
- *  0xffb34000 - 0xffb34fff     | ALT_USB0_DFIFO_12                      
- *  0xffb35000 - 0xffb37fff     | Undefined                              
- *  0xffb38000 - 0xffb38fff     | ALT_USB0_DFIFO_13                      
- *  0xffb39000 - 0xffb3bfff     | Undefined                              
- *  0xffb3c000 - 0xffb3cfff     | ALT_USB0_DFIFO_14                      
- *  0xffb3d000 - 0xffb3ffff     | Undefined                              
+ *  0xffb00f00 - 0xffb00fff     | Undefined                              
+ *  0xffb01000 - 0xffb01fff     | ALT_USB0_DFIFO_0                       
+ *  0xffb02000 - 0xffb02fff     | ALT_USB0_DFIFO_1                       
+ *  0xffb03000 - 0xffb03fff     | ALT_USB0_DFIFO_2                       
+ *  0xffb04000 - 0xffb04fff     | ALT_USB0_DFIFO_3                       
+ *  0xffb05000 - 0xffb05fff     | ALT_USB0_DFIFO_4                       
+ *  0xffb06000 - 0xffb06fff     | ALT_USB0_DFIFO_5                       
+ *  0xffb07000 - 0xffb07fff     | ALT_USB0_DFIFO_6                       
+ *  0xffb08000 - 0xffb08fff     | ALT_USB0_DFIFO_7                       
+ *  0xffb09000 - 0xffb09fff     | ALT_USB0_DFIFO_8                       
+ *  0xffb0a000 - 0xffb0afff     | ALT_USB0_DFIFO_9                       
+ *  0xffb0b000 - 0xffb0bfff     | ALT_USB0_DFIFO_10                      
+ *  0xffb0c000 - 0xffb0cfff     | ALT_USB0_DFIFO_11                      
+ *  0xffb0d000 - 0xffb0dfff     | ALT_USB0_DFIFO_12                      
+ *  0xffb0e000 - 0xffb0efff     | ALT_USB0_DFIFO_13                      
+ *  0xffb0f000 - 0xffb0ffff     | ALT_USB0_DFIFO_14                      
+ *  0xffb10000 - 0xffb10fff     | ALT_USB0_DFIFO_15                      
+ *  0xffb11000 - 0xffb1ffff     | Undefined                              
+ *  0xffb20000 - 0xffb27fff     | ALT_USB0_DFIFO_DA                      
+ *  0xffb28000 - 0xffb3ffff     | Undefined                              
  *  0xffb40000 - 0xffb40eff     | ALT_USB1_INTREG                        
- *  0xffb40f00 - 0xffb43fff     | Undefined                              
- *  0xffb44000 - 0xffb44fff     | ALT_USB1_DFIFO_0                       
- *  0xffb45000 - 0xffb47fff     | Undefined                              
- *  0xffb48000 - 0xffb48fff     | ALT_USB1_DFIFO_1                       
- *  0xffb49000 - 0xffb4bfff     | Undefined                              
- *  0xffb4c000 - 0xffb4cfff     | ALT_USB1_DFIFO_2                       
- *  0xffb4d000 - 0xffb4ffff     | Undefined                              
- *  0xffb50000 - 0xffb50fff     | ALT_USB1_DFIFO_3                       
- *  0xffb51000 - 0xffb53fff     | Undefined                              
- *  0xffb54000 - 0xffb54fff     | ALT_USB1_DFIFO_4                       
- *  0xffb55000 - 0xffb57fff     | Undefined                              
- *  0xffb58000 - 0xffb58fff     | ALT_USB1_DFIFO_5                       
- *  0xffb59000 - 0xffb5bfff     | Undefined                              
- *  0xffb5c000 - 0xffb5cfff     | ALT_USB1_DFIFO_6                       
- *  0xffb5d000 - 0xffb5ffff     | Undefined                              
- *  0xffb60000 - 0xffb60fff     | ALT_USB1_DFIFO_7                       
- *  0xffb61000 - 0xffb63fff     | Undefined                              
- *  0xffb64000 - 0xffb64fff     | ALT_USB1_DFIFO_8                       
- *  0xffb65000 - 0xffb67fff     | Undefined                              
- *  0xffb68000 - 0xffb68fff     | ALT_USB1_DFIFO_9                       
- *  0xffb69000 - 0xffb6bfff     | Undefined                              
- *  0xffb6c000 - 0xffb6cfff     | ALT_USB1_DFIFO_10                      
- *  0xffb6d000 - 0xffb6ffff     | Undefined                              
- *  0xffb70000 - 0xffb70fff     | ALT_USB1_DFIFO_11                      
- *  0xffb71000 - 0xffb73fff     | Undefined                              
- *  0xffb74000 - 0xffb74fff     | ALT_USB1_DFIFO_12                      
- *  0xffb75000 - 0xffb77fff     | Undefined                              
- *  0xffb78000 - 0xffb78fff     | ALT_USB1_DFIFO_13                      
- *  0xffb79000 - 0xffb7bfff     | Undefined                              
- *  0xffb7c000 - 0xffb7cfff     | ALT_USB1_DFIFO_14                      
- *  0xffb7d000 - 0xffb7ffff     | Undefined                              
+ *  0xffb40f00 - 0xffb40fff     | Undefined                              
+ *  0xffb41000 - 0xffb41fff     | ALT_USB1_DFIFO_0                       
+ *  0xffb42000 - 0xffb42fff     | ALT_USB1_DFIFO_1                       
+ *  0xffb43000 - 0xffb43fff     | ALT_USB1_DFIFO_2                       
+ *  0xffb44000 - 0xffb44fff     | ALT_USB1_DFIFO_3                       
+ *  0xffb45000 - 0xffb45fff     | ALT_USB1_DFIFO_4                       
+ *  0xffb46000 - 0xffb46fff     | ALT_USB1_DFIFO_5                       
+ *  0xffb47000 - 0xffb47fff     | ALT_USB1_DFIFO_6                       
+ *  0xffb48000 - 0xffb48fff     | ALT_USB1_DFIFO_7                       
+ *  0xffb49000 - 0xffb49fff     | ALT_USB1_DFIFO_8                       
+ *  0xffb4a000 - 0xffb4afff     | ALT_USB1_DFIFO_9                       
+ *  0xffb4b000 - 0xffb4bfff     | ALT_USB1_DFIFO_10                      
+ *  0xffb4c000 - 0xffb4cfff     | ALT_USB1_DFIFO_11                      
+ *  0xffb4d000 - 0xffb4dfff     | ALT_USB1_DFIFO_12                      
+ *  0xffb4e000 - 0xffb4efff     | ALT_USB1_DFIFO_13                      
+ *  0xffb4f000 - 0xffb4ffff     | ALT_USB1_DFIFO_14                      
+ *  0xffb50000 - 0xffb50fff     | ALT_USB1_DFIFO_15                      
+ *  0xffb51000 - 0xffb5ffff     | Undefined                              
+ *  0xffb60000 - 0xffb67fff     | ALT_USB1_DFIFO_DA                      
+ *  0xffb68000 - 0xffb7ffff     | Undefined                              
  *  0xffb80000 - 0xffb802b3     | ALT_HPS_NAND_CFG                       
  *  0xffb802b4 - 0xffb802ff     | Undefined                              
  *  0xffb80300 - 0xffb803f3     | ALT_HPS_NAND_PARAM                     
@@ -22145,10 +22185,11 @@ extern "C"
  *  0xffc03380 - 0xffcfffff     | Undefined                              
  *  0xffd00000 - 0xffd000ff     | ALT_TMR_SYS0                           
  *  0xffd00100 - 0xffd001ff     | ALT_TMR_SYS1                           
- *  0xffd00200 - 0xffd011ff     | ALT_WDT0                               
- *  0xffd00300 - 0xffd012ff     | ALT_WDT1                               
- *  0xffd00400 - 0xffd013ff     | ALT_WDT2                               
- *  0xffd00500 - 0xffd014ff     | ALT_WDT3                               
+ *  0xffd00200 - 0xffd002ff     | ALT_WDT0                               
+ *  0xffd00300 - 0xffd003ff     | ALT_WDT1                               
+ *  0xffd00400 - 0xffd004ff     | ALT_WDT2                               
+ *  0xffd00500 - 0xffd005ff     | ALT_WDT3                               
+ *  0xffd00600 - 0xffd00fff     | Undefined                              
  *  0xffd01000 - 0xffd01fff     | ALT_CS_GTIMER_RW_SEC                   
  *  0xffd02000 - 0xffd02fff     | ALT_CS_GTIMER_RO_NSEC                  
  *  0xffd03000 - 0xffd0ffff     | Undefined                              

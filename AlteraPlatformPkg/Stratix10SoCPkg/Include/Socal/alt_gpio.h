@@ -1,32 +1,34 @@
-/*******************************************************************************
-*                                                                              *
-* Copyright 2014 Altera Corporation. All Rights Reserved.                      *
-*                                                                              *
-* Redistribution and use in source and binary forms, with or without           *
-* modification, are permitted provided that the following conditions are met:  *
-*                                                                              *
-* 1. Redistributions of source code must retain the above copyright notice,    *
-*    this list of conditions and the following disclaimer.                     *
-*                                                                              *
-* 2. Redistributions in binary form must reproduce the above copyright notice, *
-*    this list of conditions and the following disclaimer in the documentation *
-*    and/or other materials provided with the distribution.                    *
-*                                                                              *
-* 3. The name of the author may not be used to endorse or promote products     *
-*    derived from this software without specific prior written permission.     *
-*                                                                              *
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR *
-* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF *
-* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO  *
-* EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,       *
-* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, *
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;  *
-* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,     *
-* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR      *
-* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF       *
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                   *
-*                                                                              *
-*******************************************************************************/
+/***********************************************************************************
+*                                                                                  *
+* Copyright 2013-2015 Altera Corporation. All Rights Reserved.                     *
+*                                                                                  *
+* Redistribution and use in source and binary forms, with or without               *
+* modification, are permitted provided that the following conditions are met:      *
+*                                                                                  *
+* 1. Redistributions of source code must retain the above copyright notice,        *
+*    this list of conditions and the following disclaimer.                         *
+*                                                                                  *
+* 2. Redistributions in binary form must reproduce the above copyright notice,     *
+*    this list of conditions and the following disclaimer in the documentation     *
+*    and/or other materials provided with the distribution.                        *
+*                                                                                  *
+* 3. Neither the name of the copyright holder nor the names of its contributors    *
+*    may be used to endorse or promote products derived from this software without *
+*    specific prior written permission.                                            *
+*                                                                                  *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"      *
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE        *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE       *
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE        *
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR              *
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF             *
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS         *
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN          *
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)          *
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
+* POSSIBILITY OF SUCH DAMAGE.                                                      *
+*                                                                                  *
+***********************************************************************************/
 
 /* Altera - ALT_GPIO */
 
@@ -39,7 +41,7 @@
 extern "C"
 {
 #else   /* __cplusplus */
-////#include <stdint.h>
+//#include <stdint.h>
 #endif  /* __cplusplus */
 #endif  /* __ASSEMBLY__ */
 
@@ -79,6 +81,10 @@ extern "C"
  * Port A is set to Software mode. The value read back is equal
  * 
  * to the last value written to this register.
+ * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
  * 
  * Field Access Macros:
  * 
@@ -162,6 +168,10 @@ typedef struct ALT_GPIO_GPIO_SWPORTA_DR_s  ALT_GPIO_GPIO_SWPORTA_DR_t;
  * 0  Input (default)
  * 
  * 1  Output
+ * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
  * 
  * Field Enumeration Values:
  * 
@@ -274,6 +284,10 @@ typedef struct ALT_GPIO_GPIO_SWPORTA_DDR_s  ALT_GPIO_GPIO_SWPORTA_DDR_t;
  * 
  * 1  Configure Port A bit as interrupt
  * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
+ * 
  * Field Enumeration Values:
  * 
  *  Enum                                      | Value | Description          
@@ -383,6 +397,10 @@ typedef struct ALT_GPIO_GPIO_INTEN_s  ALT_GPIO_GPIO_INTEN_t;
  * 
  * 1  Mask interrupt
  * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
+ * 
  * Field Enumeration Values:
  * 
  *  Enum                                          | Value | Description                
@@ -485,6 +503,10 @@ typedef struct ALT_GPIO_GPIO_INTMASK_s  ALT_GPIO_GPIO_INTMASK_t;
  * 0  Level-sensitive (default)
  * 
  * 1  Edge-sensitive
+ * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
  * 
  * Field Enumeration Values:
  * 
@@ -591,6 +613,10 @@ typedef struct ALT_GPIO_GPIO_INTTYPE_LEVEL_s  ALT_GPIO_GPIO_INTTYPE_LEVEL_t;
  * 
  * 1  Active-high
  * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
+ * 
  * Field Enumeration Values:
  * 
  *  Enum                                                       | Value | Description         
@@ -684,6 +710,10 @@ typedef struct ALT_GPIO_GPIO_INT_POLARITY_s  ALT_GPIO_GPIO_INT_POLARITY_t;
  * 
  * Interrupt status of Port A.
  * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
+ * 
  * Field Enumeration Values:
  * 
  *  Enum                                              | Value | Description
@@ -776,6 +806,10 @@ typedef struct ALT_GPIO_GPIO_INTSTATUS_s  ALT_GPIO_GPIO_INTSTATUS_t;
  * Field : GPIO_RAW_INTSTATUS
  * 
  * Raw interrupt of status of Port A (premasking bits)
+ * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
  * 
  * Field Enumeration Values:
  * 
@@ -884,6 +918,10 @@ typedef struct ALT_GPIO_GPIO_RAW_INTSTATUS_s  ALT_GPIO_GPIO_RAW_INTSTATUS_t;
  * 
  * 1  Enable debounce
  * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
+ * 
  * Field Enumeration Values:
  * 
  *  Enum                                            | Value | Description    
@@ -987,6 +1025,10 @@ typedef struct ALT_GPIO_GPIO_DEBOUNCE_s  ALT_GPIO_GPIO_DEBOUNCE_t;
  * 
  * 1  Clear interrupt
  * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
+ * 
  * Field Enumeration Values:
  * 
  *  Enum                                              | Value | Description       
@@ -1079,6 +1121,10 @@ typedef struct ALT_GPIO_GPIO_PORTA_EOI_s  ALT_GPIO_GPIO_PORTA_EOI_t;
  * Field : GPIO_EXT_PORTA
  * 
  * This register always reflects the signals value on the External Port A.
+ * 
+ * DO NOT PUBLISH BELOW THIS LINE
+ * 
+ * For internal usage only, [0:18] for SDM, [0:23] for HPS
  * 
  * Field Access Macros:
  * 

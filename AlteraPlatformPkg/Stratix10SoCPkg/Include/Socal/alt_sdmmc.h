@@ -1,32 +1,34 @@
-/*******************************************************************************
-*                                                                              *
-* Copyright 2014 Altera Corporation. All Rights Reserved.                      *
-*                                                                              *
-* Redistribution and use in source and binary forms, with or without           *
-* modification, are permitted provided that the following conditions are met:  *
-*                                                                              *
-* 1. Redistributions of source code must retain the above copyright notice,    *
-*    this list of conditions and the following disclaimer.                     *
-*                                                                              *
-* 2. Redistributions in binary form must reproduce the above copyright notice, *
-*    this list of conditions and the following disclaimer in the documentation *
-*    and/or other materials provided with the distribution.                    *
-*                                                                              *
-* 3. The name of the author may not be used to endorse or promote products     *
-*    derived from this software without specific prior written permission.     *
-*                                                                              *
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR *
-* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF *
-* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO  *
-* EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,       *
-* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, *
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;  *
-* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,     *
-* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR      *
-* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF       *
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                   *
-*                                                                              *
-*******************************************************************************/
+/***********************************************************************************
+*                                                                                  *
+* Copyright 2013-2015 Altera Corporation. All Rights Reserved.                     *
+*                                                                                  *
+* Redistribution and use in source and binary forms, with or without               *
+* modification, are permitted provided that the following conditions are met:      *
+*                                                                                  *
+* 1. Redistributions of source code must retain the above copyright notice,        *
+*    this list of conditions and the following disclaimer.                         *
+*                                                                                  *
+* 2. Redistributions in binary form must reproduce the above copyright notice,     *
+*    this list of conditions and the following disclaimer in the documentation     *
+*    and/or other materials provided with the distribution.                        *
+*                                                                                  *
+* 3. Neither the name of the copyright holder nor the names of its contributors    *
+*    may be used to endorse or promote products derived from this software without *
+*    specific prior written permission.                                            *
+*                                                                                  *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"      *
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE        *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE       *
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE        *
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR              *
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF             *
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS         *
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN          *
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)          *
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
+* POSSIBILITY OF SUCH DAMAGE.                                                      *
+*                                                                                  *
+***********************************************************************************/
 
 /* Altera - ALT_SDMMC */
 
@@ -39,7 +41,7 @@
 extern "C"
 {
 #else   /* __cplusplus */
-////#include <stdint.h>
+//#include <stdint.h>
 #endif  /* __cplusplus */
 #endif  /* __ASSEMBLY__ */
 
@@ -973,7 +975,7 @@ typedef struct ALT_SDMMC_PWREN_s  ALT_SDMMC_PWREN_t;
  * 
  * Clock divider-0 value. Clock division is 2*n. For example, value of 0 means
  * divide by 2*0 = 0 (no division, bypass), value of 1 means divide by 2*1 = 2,
- * value of “ff” means divide by 2*255 = 510, and so on.
+ * value of "ff" means divide by 2*255 = 510, and so on.
  * 
  * Field Access Macros:
  * 
@@ -1000,7 +1002,7 @@ typedef struct ALT_SDMMC_PWREN_s  ALT_SDMMC_PWREN_t;
  * 
  * Clock divider-1 value. Clock division is 2*n. For example, value of 0 means
  * divide by 2*0 = 0 (no division, bypass), value of 1 means divide by 2*1 = 2,
- * value of “ff” means divide by 2*255 = 510, and so on. In MMC-Ver3.3-only
+ * value of "ff" means divide by 2*255 = 510, and so on. In MMC-Ver3.3-only
  * mode, bits not implemented because only one clock divider is supported
  * 
  * Field Access Macros:
@@ -1028,7 +1030,7 @@ typedef struct ALT_SDMMC_PWREN_s  ALT_SDMMC_PWREN_t;
  * 
  * Clock divider-2 value. Clock division is 2*n. For example, value of 0 means
  * divide by 2*0 = 0 (no division, bypass), value of 1 means divide by 2*1 = 2,
- * value of “ff” means divide by 2*255 = 510, and so on. In MMC-Ver3.3-only
+ * value of "ff" means divide by 2*255 = 510, and so on. In MMC-Ver3.3-only
  * mode, bits not implemented because only one clock divider is supported.
  * 
  * Field Access Macros:
@@ -1056,7 +1058,7 @@ typedef struct ALT_SDMMC_PWREN_s  ALT_SDMMC_PWREN_t;
  * 
  * Clock divider-3 value. Clock division is 2*n. For example, value of 0 means
  * divide by 2*0 = 0 (no division, bypass), a value of 1 means divide by 2*1 = 2, a
- * value of “ff” means divide by 2*255 = 510, and so on. In MMC-Ver3.3-only
+ * value of "ff" means divide by 2*255 = 510, and so on. In MMC-Ver3.3-only
  * mode, bits not implemented because only one clock divider is supported.
  * 
  * Field Access Macros:
@@ -4882,7 +4884,7 @@ typedef struct ALT_SDMMC_CMDARG_s  ALT_SDMMC_CMDARG_t;
  * 
  * 1-Write to card
  * 
- * Don’t care if no data expected from card.
+ * Don't care if no data expected from card.
  * 
  * Field Enumeration Values:
  * 
@@ -4931,7 +4933,7 @@ typedef struct ALT_SDMMC_CMDARG_s  ALT_SDMMC_CMDARG_t;
  * 
  * 1-Stream data transfer command
  * 
- * Don’t care if no data expected.
+ * Don't care if no data expected.
  * 
  * Field Enumeration Values:
  * 
@@ -4991,7 +4993,7 @@ typedef struct ALT_SDMMC_CMDARG_s  ALT_SDMMC_CMDARG_t;
  * 
  * stop command
  * 
- * Additionally, when “resume” is sent to resume  suspended memory access of
+ * Additionally, when "resume" is sent to resume  suspended memory access of
  * SD-Combo card  bit should be set correctly if suspended data transfer needs
  * send_auto_stop.Don't care if no data expected from card.
  * 
@@ -5896,7 +5898,7 @@ typedef struct ALT_SDMMC_RESP0_s  ALT_SDMMC_RESP0_t;
  * When CIU sends auto-stop command, then response is saved in register. Response
  * for previous command sent by host is still preserved in Response 0 register.
  * Additional auto-stop issued only for data transfer commands, and response type
- * is always “short” for them.
+ * is always "short" for them.
  * 
  * Field Access Macros:
  * 
@@ -9887,8 +9889,8 @@ typedef struct ALT_SDMMC_RINTSTS_s  ALT_SDMMC_RINTSTS_t;
  * 
  * * Bit 18  Boot Mode
  * 
- * Due to this, while command FSM is in “Wait for CCS state” or “Send CCSD”
- * or “Boot Mode”, the Status register indicates status as 0 for the bit field
+ * Due to this, while command FSM is in "Wait for CCS state" or "Send CCSD"
+ * or "Boot Mode", the Status register indicates status as 0 for the bit field
  * 7:4.
  * 
  * Field Access Macros:
@@ -9933,7 +9935,7 @@ typedef struct ALT_SDMMC_RINTSTS_s  ALT_SDMMC_RINTSTS_t;
 /*
  * Enumerated value for register field ALT_SDMMC_STATUS_DATA_3_STATUS
  * 
- * Card  not present
+ * Card not present
  */
 #define ALT_SDMMC_STATUS_DATA_3_STATUS_E_LOW    0x0
 /*
@@ -11152,7 +11154,7 @@ typedef struct ALT_SDMMC_USRID_s  ALT_SDMMC_USRID_t;
  * 
  *  Bits   | Access | Reset      | Description           
  * :-------|:-------|:-----------|:-----------------------
- *  [31:0] | R      | 0x5342270a | ALT_SDMMC_VERID_VER_ID
+ *  [31:0] | R      | 0x5342280a | ALT_SDMMC_VERID_VER_ID
  * 
  */
 /*
@@ -11175,7 +11177,7 @@ typedef struct ALT_SDMMC_USRID_s  ALT_SDMMC_USRID_t;
 /* The mask used to clear the ALT_SDMMC_VERID_VER_ID register field value. */
 #define ALT_SDMMC_VERID_VER_ID_CLR_MSK    0x00000000
 /* The reset value of the ALT_SDMMC_VERID_VER_ID register field. */
-#define ALT_SDMMC_VERID_VER_ID_RESET      0x5342270a
+#define ALT_SDMMC_VERID_VER_ID_RESET      0x5342280a
 /* Extracts the ALT_SDMMC_VERID_VER_ID field value from a register. */
 #define ALT_SDMMC_VERID_VER_ID_GET(value) (((value) & 0xffffffff) >> 0)
 /* Produces a ALT_SDMMC_VERID_VER_ID register field value suitable for setting the register. */
@@ -11203,7 +11205,7 @@ typedef struct ALT_SDMMC_VERID_s  ALT_SDMMC_VERID_t;
 #endif  /* __ASSEMBLY__ */
 
 /* The reset value of the ALT_SDMMC_VERID register. */
-#define ALT_SDMMC_VERID_RESET       0x5342270a
+#define ALT_SDMMC_VERID_RESET       0x5342280a
 /* The byte offset of the ALT_SDMMC_VERID register from the beginning of the component. */
 #define ALT_SDMMC_VERID_OFST        0x6c
 /* The address of the ALT_SDMMC_VERID register. */
@@ -11399,7 +11401,7 @@ typedef struct ALT_SDMMC_VERID_s  ALT_SDMMC_VERID_t;
  * 
  * 9  10 bits
  * 
- * …
+ * ...
  * 
  * 31  32 bits
  * 
@@ -11874,7 +11876,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -11935,7 +11937,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -11996,7 +11998,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12057,7 +12059,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12118,7 +12120,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12179,7 +12181,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12240,7 +12242,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12301,7 +12303,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12362,7 +12364,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12423,7 +12425,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12484,7 +12486,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12545,7 +12547,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12606,7 +12608,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12667,7 +12669,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12728,7 +12730,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -12789,7 +12791,7 @@ typedef struct ALT_SDMMC_HCON_s  ALT_SDMMC_HCON_t;
  * 
  * value programmed in the register.
  * 
- * VOLT_REG[0] should be set to 1’b1 for card number 0 in order to make it
+ * VOLT_REG[0] should be set to 1'b1 for card number 0 in order to make it
  * 
  * operate for 1.8V.
  * 
@@ -13771,9 +13773,9 @@ typedef struct ALT_SDMMC_UHS_REG_s  ALT_SDMMC_UHS_REG_t;
  * These bits cause the cards to enter pre-idle state, which requires them to be
  * re-initialized.
  * 
- * ■ CARD_RESET[0] should be set to 1’b0 to reset card number 0
+ * CARD_RESET[0] should be set to 1'b0 to reset card number 0
  * 
- * ■ CARD_RESET[15] should be set to 1'b0 to reset card number 15.
+ * CARD_RESET[15] should be set to 1'b0 to reset card number 15.
  * 
  * The number of bits implemented is restricted to NUM_CARDS.
  * 
@@ -14375,7 +14377,7 @@ typedef struct ALT_SDMMC_DBADDR_s  ALT_SDMMC_DBADDR_t;
  * Field : TI
  * 
  * Transmit Interrupt. Indicates that data transmission is finished for a
- * descriptor. Writing a ‘1’ clears this bit.
+ * descriptor. Writing a '1' clears this bit.
  * 
  * Field Enumeration Values:
  * 
@@ -14562,26 +14564,26 @@ typedef struct ALT_SDMMC_DBADDR_s  ALT_SDMMC_DBADDR_t;
  * Card Error Summary. Indicates the status of the transaction to/from the card;
  * also present in RINTSTS. Indicates the logical OR of the following bits:
  * 
- * ■ EBE  End Bit Error
+ * EBE  End Bit Error
  * 
- * ■ RTO  Response Timeout/Boot Ack Timeout
+ * RTO  Response Timeout/Boot Ack Timeout
  * 
- * ■ RCRC  Response CRC
+ * RCRC  Response CRC
  * 
- * ■ SBE  Start Bit Error
+ * SBE  Start Bit Error
  * 
- * ■ DRTO  Data Read Timeout/BDS timeout
+ * DRTO  Data Read Timeout/BDS timeout
  * 
- * ■ DCRC  Data CRC for Receive
+ * DCRC  Data CRC for Receive
  * 
- * ■ RE  Response Error
+ * RE  Response Error
  * 
  * Writing a 1 clears this bit.
  * 
  * The abort condition of the IDMAC depends on the setting of this CES bit. If the
  * CES bit
  * 
- * is enabled, then the IDMAC aborts on a “response error”; however, it will
+ * is enabled, then the IDMAC aborts on a "response error"; however, it will
  * not abort if the
  * 
  * CES bit is cleared.
@@ -14631,9 +14633,9 @@ typedef struct ALT_SDMMC_DBADDR_s  ALT_SDMMC_DBADDR_t;
  * 
  * Normal Interrupt Summary. Logical OR of the following:
  * 
- * ■ IDSTS[0]-Transmit Interrupt
+ * IDSTS[0]-Transmit Interrupt
  * 
- * ■ IDSTS[1]-Receive Interrupt
+ * IDSTS[1]-Receive Interrupt
  * 
  * Only unmasked bits affect this bit.
  * 
@@ -14687,9 +14689,9 @@ typedef struct ALT_SDMMC_DBADDR_s  ALT_SDMMC_DBADDR_t;
  * 
  * Abnormal Interrupt Summary. Logical OR of the following:
  * 
- * ■ IDSTS[2]-Fatal Bus Interrupt
+ * IDSTS[2]-Fatal Bus Interrupt
  * 
- * ■ IDSTS[4]-DU bit Interrupt
+ * IDSTS[4]-DU bit Interrupt
  * 
  * Only unmasked bits affect this bit.
  * 
@@ -14747,9 +14749,9 @@ typedef struct ALT_SDMMC_DBADDR_s  ALT_SDMMC_DBADDR_t;
  * 
  * Error bitIDSTS[2] set. This field does not generate an interrupt.
  * 
- * 3’b001  Host Abort received during transmission
+ * 3'b001  Host Abort received during transmission
  * 
- * 3’b010  Host Abort received during reception
+ * 3'b010  Host Abort received during reception
  * 
  * Others: Reserved
  * 
@@ -15130,9 +15132,9 @@ typedef struct ALT_SDMMC_IDSTS_s  ALT_SDMMC_IDSTS_t;
  * Normal Interrupt Summary Enable. When set, a normal interrupt is enabled. When
  * reset, a normal interrupt is disabled. This bit enables the following bits:
  * 
- * ■ IDINTEN[0] - Transmit Interrupt
+ * IDINTEN[0] - Transmit Interrupt
  * 
- * ■ IDINTEN[1] - Receive Interrupt
+ * IDINTEN[1] - Receive Interrupt
  * 
  * Field Enumeration Values:
  * 
@@ -15180,9 +15182,9 @@ typedef struct ALT_SDMMC_IDSTS_s  ALT_SDMMC_IDSTS_t;
  * Abnormal Interrupt Summary Enable. When set, an abnormal interrupt is enabled.
  * This bit enables the following bits:
  * 
- * ■ IDINTEN[2] - Fatal Bus Error Interrupt
+ * IDINTEN[2] - Fatal Bus Error Interrupt
  * 
- * ■ IDINTEN[4] -  DU Interrupt
+ * IDINTEN[4] -  DU Interrupt
  * 
  * Field Enumeration Values:
  * 
@@ -15435,9 +15437,9 @@ typedef struct ALT_SDMMC_BUFADDR_s  ALT_SDMMC_BUFADDR_t;
  * 
  * Card Read Threshold Enable
  * 
- * ■ 1'b0 - Card Read Threshold disabled
+ * 1'b0 - Card Read Threshold disabled
  * 
- * ■ 1'b1 - Card Read Threshold enabled. Host Controller initiates
+ * 1'b1 - Card Read Threshold enabled. Host Controller initiates
  * 
  * Read Transfer only if CardRdThreshold amount of space is
  * 
@@ -15488,9 +15490,9 @@ typedef struct ALT_SDMMC_BUFADDR_s  ALT_SDMMC_BUFADDR_t;
  * 
  * Busy Clear Interrupt generation:
  * 
- * ■ 1'b0 - Busy Clear Interrupt disabled
+ * 1'b0 - Busy Clear Interrupt disabled
  * 
- * ■ 1'b1 - Busy Clear Interrupt enabled
+ * 1'b1 - Busy Clear Interrupt enabled
  * 
  * Note: The application can disable this feature if it does not want to wait for a
  * Busy Clear Interrupt. For example, in a multi-card scenario, the application can
@@ -15544,9 +15546,9 @@ typedef struct ALT_SDMMC_BUFADDR_s  ALT_SDMMC_BUFADDR_t;
  * 
  * Card Write Threshold Enable
  * 
- * ■ 1'b0 - Card Write Threshold disabled
+ * 1'b0 - Card Write Threshold disabled
  * 
- * ■ 1'b1 - Card Write Threshold enabled. Host Controller initiates
+ * 1'b1 - Card Write Threshold enabled. Host Controller initiates
  * 
  * Write Transfer only if CardThreshold amount of data is
  * 
@@ -15597,15 +15599,15 @@ typedef struct ALT_SDMMC_BUFADDR_s  ALT_SDMMC_BUFADDR_t;
  * 
  * Card Read Threshold size; N depends on the FIFO size:
  * 
- * ■ N = 27  FIFO_DEPTH is 128
+ * N = 27  FIFO_DEPTH is 128
  * 
- * ■ N = 26  FIFO_DEPTH is 64
+ * N = 26  FIFO_DEPTH is 64
  * 
- * ■ N = 25  FIFO_DEPTH is 32
+ * N = 25  FIFO_DEPTH is 32
  * 
- * ■ N = 24  FIFO_DEPTH is 16
+ * N = 24  FIFO_DEPTH is 16
  * 
- * ■ N = 23  FIFO_DEPTH is 8
+ * N = 23  FIFO_DEPTH is 8
  * 
  * Note: The maximum programmable value of Card Read Threshold size is 512.
  * 
@@ -15701,9 +15703,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -15752,9 +15754,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -15803,9 +15805,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -15854,9 +15856,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -15905,9 +15907,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -15956,9 +15958,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16007,9 +16009,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16058,9 +16060,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16109,9 +16111,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16160,9 +16162,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16211,9 +16213,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16262,9 +16264,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16313,9 +16315,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16364,9 +16366,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16415,9 +16417,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -16466,9 +16468,9 @@ typedef struct ALT_SDMMC_CARDTHRCTL_s  ALT_SDMMC_CARDTHRCTL_t;
  * 
  * Back end power
  * 
- * ■ 1'b0  Off; Reset
+ * 1'b0  Off; Reset
  * 
- * ■ 1'b1  Back-end Power supplied to card application; one pin per
+ * 1'b1  Back-end Power supplied to card application; one pin per
  * 
  * card
  * 
@@ -17644,9 +17646,9 @@ typedef struct ALT_SDMMC_UHS_REG_EXT_s  ALT_SDMMC_UHS_REG_EXT_t;
  * 
  * be:
  * 
- * ■ Full cycle (HALF_START_BIT = 0)
+ * Full cycle (HALF_START_BIT = 0)
  * 
- * ■ Less than one full cycle (HALF_START_BIT = 1)
+ * Less than one full cycle (HALF_START_BIT = 1)
  * 
  * Set HALF_START_BIT=1 for eMMC 4.5 and above; set to 0 for SD applications.
  * 
@@ -17697,9 +17699,9 @@ typedef struct ALT_SDMMC_UHS_REG_EXT_s  ALT_SDMMC_UHS_REG_EXT_t;
  * 
  * HS400 Mode Enable
  * 
- * ■ 1'b0 - Disable
+ * 1'b0 - Disable
  * 
- * ■ 1'b1 - Enable
+ * 1'b1 - Enable
  * 
  * Note: The application is required to set this bit to '1' before initiating any
  * data
@@ -17804,13 +17806,13 @@ typedef struct ALT_SDMMC_EMMC_DDR_REG_s  ALT_SDMMC_EMMC_DDR_REG_t;
  * enables in the design. Two bits are assigned for each card/slot. For example,
  * bits[1:0] control slot0 and indicate the following.
  * 
- * ■ 00  Default phase shift
- * 
- * ■ 01  Enables shifted to next immediate positive edge
- * 
- * ■ 10  Enables shifted to next immediate negative edge
- * 
- * ■ 11  Reserved
+ * 00  Default phase shift
+ *
+ * 01  Enables shifted to next immediate positive edge
+ *
+ * 10  Enables shifted to next immediate negative edge
+ *
+ * 11  Reserved
  * 
  * Field Enumeration Values:
  * 

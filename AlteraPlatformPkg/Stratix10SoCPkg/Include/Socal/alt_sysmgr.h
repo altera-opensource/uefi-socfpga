@@ -1,32 +1,34 @@
-/*******************************************************************************
-*                                                                              *
-* Copyright 2014 Altera Corporation. All Rights Reserved.                      *
-*                                                                              *
-* Redistribution and use in source and binary forms, with or without           *
-* modification, are permitted provided that the following conditions are met:  *
-*                                                                              *
-* 1. Redistributions of source code must retain the above copyright notice,    *
-*    this list of conditions and the following disclaimer.                     *
-*                                                                              *
-* 2. Redistributions in binary form must reproduce the above copyright notice, *
-*    this list of conditions and the following disclaimer in the documentation *
-*    and/or other materials provided with the distribution.                    *
-*                                                                              *
-* 3. The name of the author may not be used to endorse or promote products     *
-*    derived from this software without specific prior written permission.     *
-*                                                                              *
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR *
-* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF *
-* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO  *
-* EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,       *
-* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, *
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;  *
-* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,     *
-* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR      *
-* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF       *
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                   *
-*                                                                              *
-*******************************************************************************/
+/***********************************************************************************
+*                                                                                  *
+* Copyright 2013-2015 Altera Corporation. All Rights Reserved.                     *
+*                                                                                  *
+* Redistribution and use in source and binary forms, with or without               *
+* modification, are permitted provided that the following conditions are met:      *
+*                                                                                  *
+* 1. Redistributions of source code must retain the above copyright notice,        *
+*    this list of conditions and the following disclaimer.                         *
+*                                                                                  *
+* 2. Redistributions in binary form must reproduce the above copyright notice,     *
+*    this list of conditions and the following disclaimer in the documentation     *
+*    and/or other materials provided with the distribution.                        *
+*                                                                                  *
+* 3. Neither the name of the copyright holder nor the names of its contributors    *
+*    may be used to endorse or promote products derived from this software without *
+*    specific prior written permission.                                            *
+*                                                                                  *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"      *
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE        *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE       *
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE        *
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR              *
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF             *
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS         *
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN          *
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)          *
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
+* POSSIBILITY OF SUCH DAMAGE.                                                      *
+*                                                                                  *
+***********************************************************************************/
 
 /* Altera - ALT_SYSMGR_CORE */
 
@@ -39,7 +41,7 @@
 extern "C"
 {
 #else   /* __cplusplus */
-////#include <stdint.h>
+//#include <stdint.h>
 #endif  /* __cplusplus */
 #endif  /* __ASSEMBLY__ */
 
@@ -286,16 +288,18 @@ typedef struct ALT_SYSMGR_CORE_SILICONID2_s  ALT_SYSMGR_CORE_SILICONID2_t;
  * Field : Debug Mode - mode_0
  * 
  * Controls behavior of L4 watchdog when CPUs in debug mode. Field array index
- * matches L4 watchdog index.G616
+ * matches L4 watchdog index.
  * 
  * Field Enumeration Values:
  * 
- *  Enum                                       | Value | Description
- * :-------------------------------------------|:------|:------------
- *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_CONTINUE    | 0x0   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_PAUSECPU0   | 0x1   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_PAUSECPU1   | 0x2   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_PAUSEEITHER | 0x3   |            
+ *  Enum                                                    | Value | Description
+ * :--------------------------------------------------------|:------|:------------
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_DONT_PAUSE        | 0x0   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_CPU0    | 0x1   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_CPU1    | 0x2   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_CPU2    | 0x4   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_CPU3    | 0x8   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_ANY_CPU | 0xf   |            
  * 
  * Field Access Macros:
  * 
@@ -304,22 +308,32 @@ typedef struct ALT_SYSMGR_CORE_SILICONID2_s  ALT_SYSMGR_CORE_SILICONID2_t;
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_0
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_CONTINUE     0x0
+#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_DONT_PAUSE        0x0
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_0
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_PAUSECPU0    0x1
+#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_CPU0    0x1
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_0
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_PAUSECPU1    0x2
+#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_CPU1    0x2
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_0
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_PAUSEEITHER  0x3
+#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_CPU2    0x4
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_0
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_CPU3    0x8
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_0
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_0_E_MODE_0_PAUSE_FOR_ANY_CPU 0xf
 
 /* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_WDDBG_MODE_0 register field. */
 #define ALT_SYSMGR_CORE_WDDBG_MODE_0_LSB        0
@@ -346,12 +360,14 @@ typedef struct ALT_SYSMGR_CORE_SILICONID2_s  ALT_SYSMGR_CORE_SILICONID2_t;
  * 
  * Field Enumeration Values:
  * 
- *  Enum                                       | Value | Description
- * :-------------------------------------------|:------|:------------
- *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_CONTINUE    | 0x0   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_PAUSECPU0   | 0x1   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_PAUSECPU1   | 0x2   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_PAUSEEITHER | 0x3   |            
+ *  Enum                                                    | Value | Description
+ * :--------------------------------------------------------|:------|:------------
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_DONT_PAUSE        | 0x0   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_CPU0    | 0x1   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_CPU1    | 0x2   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_CPU2    | 0x4   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_CPU3    | 0x8   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_ANY_CPU | 0xf   |            
  * 
  * Field Access Macros:
  * 
@@ -360,22 +376,32 @@ typedef struct ALT_SYSMGR_CORE_SILICONID2_s  ALT_SYSMGR_CORE_SILICONID2_t;
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_1
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_CONTINUE     0x0
+#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_DONT_PAUSE        0x0
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_1
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_PAUSECPU0    0x1
+#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_CPU0    0x1
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_1
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_PAUSECPU1    0x2
+#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_CPU1    0x2
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_1
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_PAUSEEITHER  0x3
+#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_CPU2    0x4
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_1
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_CPU3    0x8
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_1
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_1_E_MODE_1_PAUSE_FOR_ANY_CPU 0xf
 
 /* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_WDDBG_MODE_1 register field. */
 #define ALT_SYSMGR_CORE_WDDBG_MODE_1_LSB        8
@@ -402,12 +428,14 @@ typedef struct ALT_SYSMGR_CORE_SILICONID2_s  ALT_SYSMGR_CORE_SILICONID2_t;
  * 
  * Field Enumeration Values:
  * 
- *  Enum                                       | Value | Description
- * :-------------------------------------------|:------|:------------
- *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_CONTINUE    | 0x0   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_PAUSECPU0   | 0x1   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_PAUSECPU1   | 0x2   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_PAUSEEITHER | 0x3   |            
+ *  Enum                                                    | Value | Description
+ * :--------------------------------------------------------|:------|:------------
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_DONT_PAUSE        | 0x0   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_CPU0    | 0x1   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_CPU1    | 0x2   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_CPU2    | 0x4   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_CPU3    | 0x8   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_ANY_CPU | 0xf   |            
  * 
  * Field Access Macros:
  * 
@@ -416,22 +444,32 @@ typedef struct ALT_SYSMGR_CORE_SILICONID2_s  ALT_SYSMGR_CORE_SILICONID2_t;
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_2
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_CONTINUE     0x0
+#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_DONT_PAUSE        0x0
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_2
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_PAUSECPU0    0x1
+#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_CPU0    0x1
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_2
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_PAUSECPU1    0x2
+#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_CPU1    0x2
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_2
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_PAUSEEITHER  0x3
+#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_CPU2    0x4
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_2
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_CPU3    0x8
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_2
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_2_E_MODE_2_PAUSE_FOR_ANY_CPU 0xf
 
 /* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_WDDBG_MODE_2 register field. */
 #define ALT_SYSMGR_CORE_WDDBG_MODE_2_LSB        16
@@ -458,10 +496,14 @@ typedef struct ALT_SYSMGR_CORE_SILICONID2_s  ALT_SYSMGR_CORE_SILICONID2_t;
  * 
  * Field Enumeration Values:
  * 
- *  Enum                                      | Value | Description
- * :------------------------------------------|:------|:------------
- *  ALT_SYSMGR_CORE_WDDBG_MODE_3_E_SINGLE_BIT | 0x0   |            
- *  ALT_SYSMGR_CORE_WDDBG_MODE_3_E_DOUBLE_BIT | 0x1   |            
+ *  Enum                                                    | Value | Description
+ * :--------------------------------------------------------|:------|:------------
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_DONT_PAUSE        | 0x0   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_CPU0    | 0x1   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_CPU1    | 0x2   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_CPU2    | 0x4   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_CPU3    | 0x8   |            
+ *  ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_ANY_CPU | 0xf   |            
  * 
  * Field Access Macros:
  * 
@@ -470,12 +512,32 @@ typedef struct ALT_SYSMGR_CORE_SILICONID2_s  ALT_SYSMGR_CORE_SILICONID2_t;
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_3
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_3_E_SINGLE_BIT   0x0
+#define ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_DONT_PAUSE        0x0
 /*
  * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_3
  * 
  */
-#define ALT_SYSMGR_CORE_WDDBG_MODE_3_E_DOUBLE_BIT   0x1
+#define ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_CPU0    0x1
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_3
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_CPU1    0x2
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_3
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_CPU2    0x4
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_3
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_CPU3    0x8
+/*
+ * Enumerated value for register field ALT_SYSMGR_CORE_WDDBG_MODE_3
+ * 
+ */
+#define ALT_SYSMGR_CORE_WDDBG_MODE_3_E_MODE_3_PAUSE_FOR_ANY_CPU 0xf
 
 /* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_WDDBG_MODE_3 register field. */
 #define ALT_SYSMGR_CORE_WDDBG_MODE_3_LSB        24
@@ -1247,16 +1309,6 @@ typedef struct ALT_SYSMGR_CORE_SDMMC_s  ALT_SYSMGR_CORE_SDMMC_t;
 /*
  * Field : hprot
  * 
- * ==========================
- * 
- * HPROT[4] Allocate
- * 
- * 0: L3 master accesses for the module are non-allocatable
- * 
- * 1: L3 master accesses for the module are allocatable
- * 
- * ==========================
- * 
  * HPROT[3] Cachable
  * 
  * 0: L3 master accesses for the module are non-cacheable.
@@ -1286,43 +1338,6 @@ typedef struct ALT_SYSMGR_CORE_SDMMC_s  ALT_SYSMGR_CORE_SDMMC_t;
  * 0: Specifies if the L3 master access is for opcode
  * 
  * 1: Specifies if the L3 master access is for data
- * 
- * ==========================
- * 
- * HPROT[4:2] Example Encodings
- * 
- * ==========================
- * 
- * 0       0       0       Strongly Ordered, cannot be buffered
- * 
- * 0       0       1       Device, can be buffered
- * 
- * 0       1       0       Cachable (Outer Noncachable, do not allocate on reads or
- * writes)
- * 
- * 1       1       0       Cachable Write-Through (allocate on reads only, no
- * allocate on write)
- * 
- * 0       1       1       Cachable Write-Back (allocate on reads and writes)
- * 
- * 1       1       1       Cachable Write-Back (allocate on reads only, no allocate
- * on write)
- * 
- * ==========================
- * 
- * HPROT[1:0] Example Encodings
- * 
- * ==========================
- * 
- * * 0       Opcode Fetch
- * 
- * * 1       Data Access
- * 
- * 0       -       User Access
- * 
- * 1       -       Privileged Access
- * 
- * ==========================
  * 
  * Field Access Macros:
  * 
@@ -8844,20 +8859,28 @@ typedef struct ALT_SYSMGR_CORE_NOC_ADDR_REMAP_s  ALT_SYSMGR_CORE_NOC_ADDR_REMAP_
 /*
  * Register : hmc_clk
  * 
- * HMC clock status indicator
+ * HMC Clock and IO Lock status indicator
  * 
  * Register Layout
  * 
- *  Bits   | Access | Reset   | Description                   
- * :-------|:-------|:--------|:-------------------------------
- *  [0]    | R      | Unknown | ALT_SYSMGR_CORE_HMC_CLK_STATUS
- *  [31:1] | ???    | Unknown | *UNDEFINED*                   
+ *  Bits    | Access | Reset   | Description                          
+ * :--------|:-------|:--------|:--------------------------------------
+ *  [0]     | R      | Unknown | ALT_SYSMGR_CORE_HMC_CLK_STATUS       
+ *  [7:1]   | ???    | Unknown | *UNDEFINED*                          
+ *  [8]     | R      | Unknown | ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A
+ *  [9]     | R      | Unknown | ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B
+ *  [10]    | R      | Unknown | ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C
+ *  [15:11] | ???    | Unknown | *UNDEFINED*                          
+ *  [16]    | R      | Unknown | ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A
+ *  [17]    | R      | Unknown | ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B
+ *  [18]    | R      | Unknown | ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C
+ *  [31:19] | ???    | Unknown | *UNDEFINED*                          
  * 
  */
 /*
  * Field : status
  * 
- * hmc clock status: hmc clock not running = 0; hmc clock runnin = 1.
+ * HMC clock status: HMC clock not running = 0; HMC clock running = 1.
  * 
  * Field Access Macros:
  * 
@@ -8879,6 +8902,156 @@ typedef struct ALT_SYSMGR_CORE_NOC_ADDR_REMAP_s  ALT_SYSMGR_CORE_NOC_ADDR_REMAP_
 /* Produces a ALT_SYSMGR_CORE_HMC_CLK_STATUS register field value suitable for setting the register. */
 #define ALT_SYSMGR_CORE_HMC_CLK_STATUS_SET(value) (((value) << 0) & 0x00000001)
 
+/*
+ * Field : io_pll_lock_a
+ * 
+ * PLL Lock A status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A_MSB        8
+/* The width in bits of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A_WIDTH      1
+/* The mask used to set the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A_SET_MSK    0x00000100
+/* The mask used to clear the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A register field is UNKNOWN. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A_RESET      0x0
+/* Extracts the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A field value from a register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A register field value suitable for setting the register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A_SET(value) (((value) << 8) & 0x00000100)
+
+/*
+ * Field : io_pll_lock_b
+ * 
+ * PLL Lock B status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B_LSB        9
+/* The Most Significant Bit (MSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B_MSB        9
+/* The width in bits of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B_WIDTH      1
+/* The mask used to set the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B_SET_MSK    0x00000200
+/* The mask used to clear the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B_CLR_MSK    0xfffffdff
+/* The reset value of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B register field is UNKNOWN. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B_RESET      0x0
+/* Extracts the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B field value from a register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B_GET(value) (((value) & 0x00000200) >> 9)
+/* Produces a ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B register field value suitable for setting the register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B_SET(value) (((value) << 9) & 0x00000200)
+
+/*
+ * Field : io_pll_lock_c
+ * 
+ * PLL Lock C status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C_LSB        10
+/* The Most Significant Bit (MSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C_MSB        10
+/* The width in bits of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C_WIDTH      1
+/* The mask used to set the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C_SET_MSK    0x00000400
+/* The mask used to clear the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C_CLR_MSK    0xfffffbff
+/* The reset value of the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C register field is UNKNOWN. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C_RESET      0x0
+/* Extracts the ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C field value from a register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C_GET(value) (((value) & 0x00000400) >> 10)
+/* Produces a ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C register field value suitable for setting the register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C_SET(value) (((value) << 10) & 0x00000400)
+
+/*
+ * Field : io_cpa_lock_a
+ * 
+ * CPA Lock A status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A_MSB        16
+/* The width in bits of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A_WIDTH      1
+/* The mask used to set the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A_SET_MSK    0x00010000
+/* The mask used to clear the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A_CLR_MSK    0xfffeffff
+/* The reset value of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A register field is UNKNOWN. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A_RESET      0x0
+/* Extracts the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A field value from a register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A_GET(value) (((value) & 0x00010000) >> 16)
+/* Produces a ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A register field value suitable for setting the register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A_SET(value) (((value) << 16) & 0x00010000)
+
+/*
+ * Field : io_cpa_lock_b
+ * 
+ * CPA Lock B status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B_LSB        17
+/* The Most Significant Bit (MSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B_MSB        17
+/* The width in bits of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B_WIDTH      1
+/* The mask used to set the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B_SET_MSK    0x00020000
+/* The mask used to clear the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B_CLR_MSK    0xfffdffff
+/* The reset value of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B register field is UNKNOWN. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B_RESET      0x0
+/* Extracts the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B field value from a register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B_GET(value) (((value) & 0x00020000) >> 17)
+/* Produces a ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B register field value suitable for setting the register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B_SET(value) (((value) << 17) & 0x00020000)
+
+/*
+ * Field : io_cpa_lock_c
+ * 
+ * CPA Lock C status
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C_LSB        18
+/* The Most Significant Bit (MSB) position of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C_MSB        18
+/* The width in bits of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C register field. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C_WIDTH      1
+/* The mask used to set the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C_SET_MSK    0x00040000
+/* The mask used to clear the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C register field value. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C_CLR_MSK    0xfffbffff
+/* The reset value of the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C register field is UNKNOWN. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C_RESET      0x0
+/* Extracts the ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C field value from a register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C_GET(value) (((value) & 0x00040000) >> 18)
+/* Produces a ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C register field value suitable for setting the register. */
+#define ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C_SET(value) (((value) << 18) & 0x00040000)
+
 #ifndef __ASSEMBLY__
 /*
  * WARNING: The C register and register group struct declarations are provided for
@@ -8893,8 +9066,16 @@ typedef struct ALT_SYSMGR_CORE_NOC_ADDR_REMAP_s  ALT_SYSMGR_CORE_NOC_ADDR_REMAP_
  */
 struct ALT_SYSMGR_CORE_HMC_CLK_s
 {
-    const volatile uint32_t  status :  1;  /* ALT_SYSMGR_CORE_HMC_CLK_STATUS */
-    uint32_t                        : 31;  /* *UNDEFINED* */
+    const volatile uint32_t  status        :  1;  /* ALT_SYSMGR_CORE_HMC_CLK_STATUS */
+    uint32_t                               :  7;  /* *UNDEFINED* */
+    const volatile uint32_t  io_pll_lock_a :  1;  /* ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_A */
+    const volatile uint32_t  io_pll_lock_b :  1;  /* ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_B */
+    const volatile uint32_t  io_pll_lock_c :  1;  /* ALT_SYSMGR_CORE_HMC_CLK_IO_PLL_LOCK_C */
+    uint32_t                               :  5;  /* *UNDEFINED* */
+    const volatile uint32_t  io_cpa_lock_a :  1;  /* ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_A */
+    const volatile uint32_t  io_cpa_lock_b :  1;  /* ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_B */
+    const volatile uint32_t  io_cpa_lock_c :  1;  /* ALT_SYSMGR_CORE_HMC_CLK_IO_CPA_LOCK_C */
+    uint32_t                               : 13;  /* *UNDEFINED* */
 };
 
 /* The typedef declaration for register ALT_SYSMGR_CORE_HMC_CLK. */
@@ -8905,6 +9086,128 @@ typedef struct ALT_SYSMGR_CORE_HMC_CLK_s  ALT_SYSMGR_CORE_HMC_CLK_t;
 #define ALT_SYSMGR_CORE_HMC_CLK_RESET       0x00000000
 /* The byte offset of the ALT_SYSMGR_CORE_HMC_CLK register from the beginning of the component. */
 #define ALT_SYSMGR_CORE_HMC_CLK_OFST        0xb4
+
+/*
+ * Register : io_pa_ctrl
+ * 
+ * HMC clock status indicator
+ * 
+ * Register Layout
+ * 
+ *  Bits   | Access | Reset | Description                               
+ * :-------|:-------|:------|:-------------------------------------------
+ *  [0]    | RW     | 0x1   | ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A
+ *  [1]    | RW     | 0x1   | ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B
+ *  [2]    | RW     | 0x1   | ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C
+ *  [31:3] | ???    | 0x0   | *UNDEFINED*                               
+ * 
+ */
+/*
+ * Field : io_pa_reset_n_a
+ * 
+ * This will allow HPS software to control when it wants to start receiving the
+ * IO48 clock.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A_MSB        0
+/* The width in bits of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A_WIDTH      1
+/* The mask used to set the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A register field value. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A_SET_MSK    0x00000001
+/* The mask used to clear the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A register field value. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A_RESET      0x1
+/* Extracts the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A field value from a register. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A register field value suitable for setting the register. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : io_pa_reset_n_b
+ * 
+ * This will allow HPS software to control when it wants to start receiving the
+ * IO48 clock.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B_MSB        1
+/* The width in bits of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B_WIDTH      1
+/* The mask used to set the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B register field value. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B_SET_MSK    0x00000002
+/* The mask used to clear the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B register field value. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B_RESET      0x1
+/* Extracts the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B field value from a register. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B register field value suitable for setting the register. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : io_pa_reset_n_c
+ * 
+ * This will allow HPS software to control when it wants to start receiving the
+ * IO48 clock.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C_MSB        2
+/* The width in bits of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C_WIDTH      1
+/* The mask used to set the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C register field value. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C_SET_MSK    0x00000004
+/* The mask used to clear the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C register field value. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C register field. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C_RESET      0x1
+/* Extracts the ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C field value from a register. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C register field value suitable for setting the register. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C_SET(value) (((value) << 2) & 0x00000004)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for coding device
+ * drivers is to use the SoCAL access macros in conjunction with alt_read_word()
+ * and alt_write_word() functions for 32 bit registers and alt_read_dword() and
+ * alt_write_dword() functions for 64 bit registers.
+ * 
+ * The struct declaration for register ALT_SYSMGR_CORE_IO_PA_CTRL.
+ */
+struct ALT_SYSMGR_CORE_IO_PA_CTRL_s
+{
+    volatile uint32_t  io_pa_reset_n_a :  1;  /* ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_A */
+    volatile uint32_t  io_pa_reset_n_b :  1;  /* ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_B */
+    volatile uint32_t  io_pa_reset_n_c :  1;  /* ALT_SYSMGR_CORE_IO_PA_CTRL_IO_PA_RESET_N_C */
+    uint32_t                           : 29;  /* *UNDEFINED* */
+};
+
+/* The typedef declaration for register ALT_SYSMGR_CORE_IO_PA_CTRL. */
+typedef struct ALT_SYSMGR_CORE_IO_PA_CTRL_s  ALT_SYSMGR_CORE_IO_PA_CTRL_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_SYSMGR_CORE_IO_PA_CTRL register. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_RESET       0x00000007
+/* The byte offset of the ALT_SYSMGR_CORE_IO_PA_CTRL register from the beginning of the component. */
+#define ALT_SYSMGR_CORE_IO_PA_CTRL_OFST        0xb8
 
 /*
  * Register : noc_timeout
@@ -10994,7 +11297,8 @@ struct ALT_SYSMGR_CORE_s
     volatile uint32_t                              _pad_0xa4_0xaf[3];      /* *UNDEFINED* */
     volatile ALT_SYSMGR_CORE_NOC_ADDR_REMAP_t      noc_addr_remap;         /* ALT_SYSMGR_CORE_NOC_ADDR_REMAP */
     volatile ALT_SYSMGR_CORE_HMC_CLK_t             hmc_clk;                /* ALT_SYSMGR_CORE_HMC_CLK */
-    volatile uint32_t                              _pad_0xb8_0xbf[2];      /* *UNDEFINED* */
+    volatile ALT_SYSMGR_CORE_IO_PA_CTRL_t          io_pa_ctrl;             /* ALT_SYSMGR_CORE_IO_PA_CTRL */
+    volatile uint32_t                              _pad_0xbc_0xbf;         /* *UNDEFINED* */
     volatile ALT_SYSMGR_CORE_NOC_TIMEOUT_t         noc_timeout;            /* ALT_SYSMGR_CORE_NOC_TIMEOUT */
     volatile ALT_SYSMGR_CORE_NOC_IDLEREQ_SET_t     noc_idlereq_set;        /* ALT_SYSMGR_CORE_NOC_IDLEREQ_SET */
     volatile ALT_SYSMGR_CORE_NOC_IDLEREQ_CLR_t     noc_idlereq_clr;        /* ALT_SYSMGR_CORE_NOC_IDLEREQ_CLR */
@@ -11070,7 +11374,8 @@ struct ALT_SYSMGR_CORE_raw_s
     volatile uint32_t  _pad_0xa4_0xaf[3];      /* *UNDEFINED* */
     volatile uint32_t  noc_addr_remap;         /* ALT_SYSMGR_CORE_NOC_ADDR_REMAP */
     volatile uint32_t  hmc_clk;                /* ALT_SYSMGR_CORE_HMC_CLK */
-    volatile uint32_t  _pad_0xb8_0xbf[2];      /* *UNDEFINED* */
+    volatile uint32_t  io_pa_ctrl;             /* ALT_SYSMGR_CORE_IO_PA_CTRL */
+    volatile uint32_t  _pad_0xbc_0xbf;         /* *UNDEFINED* */
     volatile uint32_t  noc_timeout;            /* ALT_SYSMGR_CORE_NOC_TIMEOUT */
     volatile uint32_t  noc_idlereq_set;        /* ALT_SYSMGR_CORE_NOC_IDLEREQ_SET */
     volatile uint32_t  noc_idlereq_clr;        /* ALT_SYSMGR_CORE_NOC_IDLEREQ_CLR */

@@ -1,32 +1,34 @@
-/*******************************************************************************
-*                                                                              *
-* Copyright 2014 Altera Corporation. All Rights Reserved.                      *
-*                                                                              *
-* Redistribution and use in source and binary forms, with or without           *
-* modification, are permitted provided that the following conditions are met:  *
-*                                                                              *
-* 1. Redistributions of source code must retain the above copyright notice,    *
-*    this list of conditions and the following disclaimer.                     *
-*                                                                              *
-* 2. Redistributions in binary form must reproduce the above copyright notice, *
-*    this list of conditions and the following disclaimer in the documentation *
-*    and/or other materials provided with the distribution.                    *
-*                                                                              *
-* 3. The name of the author may not be used to endorse or promote products     *
-*    derived from this software without specific prior written permission.     *
-*                                                                              *
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR *
-* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF *
-* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO  *
-* EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,       *
-* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, *
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;  *
-* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,     *
-* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR      *
-* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF       *
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                   *
-*                                                                              *
-*******************************************************************************/
+/***********************************************************************************
+*                                                                                  *
+* Copyright 2013-2015 Altera Corporation. All Rights Reserved.                     *
+*                                                                                  *
+* Redistribution and use in source and binary forms, with or without               *
+* modification, are permitted provided that the following conditions are met:      *
+*                                                                                  *
+* 1. Redistributions of source code must retain the above copyright notice,        *
+*    this list of conditions and the following disclaimer.                         *
+*                                                                                  *
+* 2. Redistributions in binary form must reproduce the above copyright notice,     *
+*    this list of conditions and the following disclaimer in the documentation     *
+*    and/or other materials provided with the distribution.                        *
+*                                                                                  *
+* 3. Neither the name of the copyright holder nor the names of its contributors    *
+*    may be used to endorse or promote products derived from this software without *
+*    specific prior written permission.                                            *
+*                                                                                  *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"      *
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE        *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE       *
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE        *
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR              *
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF             *
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS         *
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN          *
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)          *
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
+* POSSIBILITY OF SUCH DAMAGE.                                                      *
+*                                                                                  *
+***********************************************************************************/
 
 /* Altera - ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS */
 
@@ -39,7 +41,7 @@
 extern "C"
 {
 #else   /* __cplusplus */
-////#include <stdint.h>
+//#include <stdint.h>
 #endif  /* __cplusplus */
 #endif  /* __ASSEMBLY__ */
 
@@ -52,10 +54,10 @@ extern "C"
  * 
  * Register Layout
  * 
- *  Bits   | Access | Reset    | Description                                                                          
- * :-------|:-------|:---------|:--------------------------------------------------------------------------------------
- *  [7:0]  | R      | 0x4      | ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORETYPEID  
- *  [31:8] | R      | 0xb2ac6a | ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM
+ *  Bits   | Access | Reset  | Description                                                                          
+ * :-------|:-------|:-------|:--------------------------------------------------------------------------------------
+ *  [7:0]  | R      | 0x4    | ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORETYPEID  
+ *  [31:8] | R      | 0x5bde | ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM
  * 
  */
 /*
@@ -102,7 +104,7 @@ extern "C"
 /* The mask used to clear the ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM register field value. */
 #define ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM_CLR_MSK    0x000000ff
 /* The reset value of the ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM register field. */
-#define ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM_RESET      0xb2ac6a
+#define ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM_RESET      0x5bde
 /* Extracts the ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM field value from a register. */
 #define ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM_GET(value) (((value) & 0xffffff00) >> 8)
 /* Produces a ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_CORECHECKSUM register field value suitable for setting the register. */
@@ -131,7 +133,7 @@ typedef struct ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID
 #endif  /* __ASSEMBLY__ */
 
 /* The reset value of the ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID register. */
-#define ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_RESET       0xb2ac6a04
+#define ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_RESET       0x005bde04
 /* The byte offset of the ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID register from the beginning of the component. */
 #define ALT_NOC_CCU_IOS_IO_TBU_M_MAIN_QOS_IO_TBU_M_I_MAIN_QOSGENERATOR_ID_COREID_OFST        0x0
 

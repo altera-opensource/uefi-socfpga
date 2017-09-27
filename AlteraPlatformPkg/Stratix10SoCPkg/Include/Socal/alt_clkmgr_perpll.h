@@ -1,32 +1,34 @@
-/*******************************************************************************
-*                                                                              *
-* Copyright 2014 Altera Corporation. All Rights Reserved.                      *
-*                                                                              *
-* Redistribution and use in source and binary forms, with or without           *
-* modification, are permitted provided that the following conditions are met:  *
-*                                                                              *
-* 1. Redistributions of source code must retain the above copyright notice,    *
-*    this list of conditions and the following disclaimer.                     *
-*                                                                              *
-* 2. Redistributions in binary form must reproduce the above copyright notice, *
-*    this list of conditions and the following disclaimer in the documentation *
-*    and/or other materials provided with the distribution.                    *
-*                                                                              *
-* 3. The name of the author may not be used to endorse or promote products     *
-*    derived from this software without specific prior written permission.     *
-*                                                                              *
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR *
-* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF *
-* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO  *
-* EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,       *
-* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, *
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;  *
-* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,     *
-* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR      *
-* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF       *
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                   *
-*                                                                              *
-*******************************************************************************/
+/***********************************************************************************
+*                                                                                  *
+* Copyright 2013-2015 Altera Corporation. All Rights Reserved.                     *
+*                                                                                  *
+* Redistribution and use in source and binary forms, with or without               *
+* modification, are permitted provided that the following conditions are met:      *
+*                                                                                  *
+* 1. Redistributions of source code must retain the above copyright notice,        *
+*    this list of conditions and the following disclaimer.                         *
+*                                                                                  *
+* 2. Redistributions in binary form must reproduce the above copyright notice,     *
+*    this list of conditions and the following disclaimer in the documentation     *
+*    and/or other materials provided with the distribution.                        *
+*                                                                                  *
+* 3. Neither the name of the copyright holder nor the names of its contributors    *
+*    may be used to endorse or promote products derived from this software without *
+*    specific prior written permission.                                            *
+*                                                                                  *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"      *
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE        *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE       *
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE        *
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR              *
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF             *
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS         *
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN          *
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)          *
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
+* POSSIBILITY OF SUCH DAMAGE.                                                      *
+*                                                                                  *
+***********************************************************************************/
 
 /* Altera - ALT_CLKMGR_PERPLL */
 
@@ -39,7 +41,7 @@
 extern "C"
 {
 #else   /* __cplusplus */
-////#include <stdint.h>
+//#include <stdint.h>
 #endif  /* __cplusplus */
 #endif  /* __ASSEMBLY__ */
 
@@ -3126,9 +3128,9 @@ typedef struct ALT_CLKMGR_PERPLL_GPIODIV_s  ALT_CLKMGR_PERPLL_GPIODIV_t;
  * 
  * Mutes All PLL Outputs Glitch-Free:
  * 
- * 1 – Output Clocks Are Muted To 1’B0;
+ * 1 - Output Clocks Are Muted To 1'B0;
  * 
- * 0 – Output Clocks Are Active
+ * 0 - Output Clocks Are Active
  * 
  * Field Enumeration Values:
  * 
@@ -3175,9 +3177,9 @@ typedef struct ALT_CLKMGR_PERPLL_GPIODIV_s  ALT_CLKMGR_PERPLL_GPIODIV_t;
  * while the PLL is at reset or power down state. It cannot be switched
  * dynamically.
  * 
- * Select: 1’B1 - Fractional Mode
+ * Select: 1'B1 - Fractional Mode
  * 
- * 1’B0 - Integer Mode;
+ * 1'B0 - Integer Mode;
  * 
  * Field Enumeration Values:
  * 
@@ -3425,17 +3427,17 @@ typedef struct ALT_CLKMGR_PERPLL_PLLGLOB_s  ALT_CLKMGR_PERPLL_PLLGLOB_t;
  * Feedback Clock Divider. The Pll Initially Operates At The Frequency Based On The
  * Mdiv And Fdiv Values Set At Reset. After Pll Exits Reset, Any Change In Mdiv Or
  * Fdiv Values At The Interface Are Stored Internally. ictl_vpll_mdiv_a_[7:0] =
- * (Fvco /( Fref / ictl_vpll_refdiv_nt_[5:0])) – 6.
+ * (Fvco /( Fref / ictl_vpll_refdiv_nt_[5:0])) - 6.
  * 
- * Fref_eff    = (Fref)/(refdiv[5:0])
+ * Fref_eff = (Fref)/(refdiv[5:0])
  * 
- * Frq_mul = {(6+ mdiv[7:0]* (fdiv[23:0]/ (2^24)))}
+ * Frq_mul = {(6+ mdiv[7:0]* (fdiv[23:0] / (2^24)))}
  * 
  * Fsyn = Frq_mul * Fref_eff
  * 
  * (Fsyn /6) >= 3* Fref_eff
  * 
- * Fock_vpll_pr1   =    Fsyn /(pr1[7:0])
+ * Fock_vpll_pr1 = Fsyn /(pr1[7:0])
  * 
  * Field Access Macros:
  * 
@@ -3579,7 +3581,7 @@ typedef struct ALT_CLKMGR_PERPLL_FDBCK_s  ALT_CLKMGR_PERPLL_FDBCK_t;
 /*
  * Field : wr
  * 
- * Memory Read/Write Signal. 0 – Indicates A Read Transaction. 1 – Indicates A
+ * Memory Read/Write Signal. 0 - Indicates A Read Transaction. 1 - Indicates A
  * Write Transaction
  * 
  * Field Enumeration Values:

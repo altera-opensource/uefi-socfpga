@@ -1,32 +1,34 @@
-/*******************************************************************************
-*                                                                              *
-* Copyright 2014 Altera Corporation. All Rights Reserved.                      *
-*                                                                              *
-* Redistribution and use in source and binary forms, with or without           *
-* modification, are permitted provided that the following conditions are met:  *
-*                                                                              *
-* 1. Redistributions of source code must retain the above copyright notice,    *
-*    this list of conditions and the following disclaimer.                     *
-*                                                                              *
-* 2. Redistributions in binary form must reproduce the above copyright notice, *
-*    this list of conditions and the following disclaimer in the documentation *
-*    and/or other materials provided with the distribution.                    *
-*                                                                              *
-* 3. The name of the author may not be used to endorse or promote products     *
-*    derived from this software without specific prior written permission.     *
-*                                                                              *
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR *
-* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF *
-* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO  *
-* EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,       *
-* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, *
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;  *
-* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,     *
-* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR      *
-* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF       *
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                   *
-*                                                                              *
-*******************************************************************************/
+/***********************************************************************************
+*                                                                                  *
+* Copyright 2013-2015 Altera Corporation. All Rights Reserved.                     *
+*                                                                                  *
+* Redistribution and use in source and binary forms, with or without               *
+* modification, are permitted provided that the following conditions are met:      *
+*                                                                                  *
+* 1. Redistributions of source code must retain the above copyright notice,        *
+*    this list of conditions and the following disclaimer.                         *
+*                                                                                  *
+* 2. Redistributions in binary form must reproduce the above copyright notice,     *
+*    this list of conditions and the following disclaimer in the documentation     *
+*    and/or other materials provided with the distribution.                        *
+*                                                                                  *
+* 3. Neither the name of the copyright holder nor the names of its contributors    *
+*    may be used to endorse or promote products derived from this software without *
+*    specific prior written permission.                                            *
+*                                                                                  *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"      *
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE        *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE       *
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE        *
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR              *
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF             *
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS         *
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN          *
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)          *
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
+* POSSIBILITY OF SUCH DAMAGE.                                                      *
+*                                                                                  *
+***********************************************************************************/
 
 /* Altera - ALT_QSPI */
 
@@ -39,7 +41,7 @@
 extern "C"
 {
 #else   /* __cplusplus */
-////#include <stdint.h>
+//#include <stdint.h>
 #endif  /* __cplusplus */
 #endif  /* __ASSEMBLY__ */
 
@@ -2165,10 +2167,10 @@ typedef struct ALT_QSPI_DEVSZ_s  ALT_QSPI_DEVSZ_t;
  * 
  * Register Layout
  * 
- *  Bits   | Access | Reset | Description                 
- * :-------|:-------|:------|:-----------------------------
- *  [7:0]  | RW     | 0x80  | Indirect Read Partition Size
- *  [31:8] | R      | 0x0   | Reserved                    
+ *  Bits    | Access | Reset | Description                 
+ * :--------|:-------|:------|:-----------------------------
+ *  [9:0]   | RW     | 0x80  | Indirect Read Partition Size
+ *  [31:10] | R      | 0x0   | Reserved                    
  * 
  */
 /*
@@ -2185,19 +2187,19 @@ typedef struct ALT_QSPI_DEVSZ_s  ALT_QSPI_DEVSZ_t;
 /* The Least Significant Bit (LSB) position of the ALT_QSPI_SRAMPART_ADDR register field. */
 #define ALT_QSPI_SRAMPART_ADDR_LSB        0
 /* The Most Significant Bit (MSB) position of the ALT_QSPI_SRAMPART_ADDR register field. */
-#define ALT_QSPI_SRAMPART_ADDR_MSB        7
+#define ALT_QSPI_SRAMPART_ADDR_MSB        9
 /* The width in bits of the ALT_QSPI_SRAMPART_ADDR register field. */
-#define ALT_QSPI_SRAMPART_ADDR_WIDTH      8
+#define ALT_QSPI_SRAMPART_ADDR_WIDTH      10
 /* The mask used to set the ALT_QSPI_SRAMPART_ADDR register field value. */
-#define ALT_QSPI_SRAMPART_ADDR_SET_MSK    0x000000ff
+#define ALT_QSPI_SRAMPART_ADDR_SET_MSK    0x000003ff
 /* The mask used to clear the ALT_QSPI_SRAMPART_ADDR register field value. */
-#define ALT_QSPI_SRAMPART_ADDR_CLR_MSK    0xffffff00
+#define ALT_QSPI_SRAMPART_ADDR_CLR_MSK    0xfffffc00
 /* The reset value of the ALT_QSPI_SRAMPART_ADDR register field. */
 #define ALT_QSPI_SRAMPART_ADDR_RESET      0x80
 /* Extracts the ALT_QSPI_SRAMPART_ADDR field value from a register. */
-#define ALT_QSPI_SRAMPART_ADDR_GET(value) (((value) & 0x000000ff) >> 0)
+#define ALT_QSPI_SRAMPART_ADDR_GET(value) (((value) & 0x000003ff) >> 0)
 /* Produces a ALT_QSPI_SRAMPART_ADDR register field value suitable for setting the register. */
-#define ALT_QSPI_SRAMPART_ADDR_SET(value) (((value) << 0) & 0x000000ff)
+#define ALT_QSPI_SRAMPART_ADDR_SET(value) (((value) << 0) & 0x000003ff)
 
 /*
  * Field : Reserved - resv_fld
@@ -2206,21 +2208,21 @@ typedef struct ALT_QSPI_DEVSZ_s  ALT_QSPI_DEVSZ_t;
  * 
  */
 /* The Least Significant Bit (LSB) position of the ALT_QSPI_SRAMPART_RESV_FLD register field. */
-#define ALT_QSPI_SRAMPART_RESV_FLD_LSB        8
+#define ALT_QSPI_SRAMPART_RESV_FLD_LSB        10
 /* The Most Significant Bit (MSB) position of the ALT_QSPI_SRAMPART_RESV_FLD register field. */
 #define ALT_QSPI_SRAMPART_RESV_FLD_MSB        31
 /* The width in bits of the ALT_QSPI_SRAMPART_RESV_FLD register field. */
-#define ALT_QSPI_SRAMPART_RESV_FLD_WIDTH      24
+#define ALT_QSPI_SRAMPART_RESV_FLD_WIDTH      22
 /* The mask used to set the ALT_QSPI_SRAMPART_RESV_FLD register field value. */
-#define ALT_QSPI_SRAMPART_RESV_FLD_SET_MSK    0xffffff00
+#define ALT_QSPI_SRAMPART_RESV_FLD_SET_MSK    0xfffffc00
 /* The mask used to clear the ALT_QSPI_SRAMPART_RESV_FLD register field value. */
-#define ALT_QSPI_SRAMPART_RESV_FLD_CLR_MSK    0x000000ff
+#define ALT_QSPI_SRAMPART_RESV_FLD_CLR_MSK    0x000003ff
 /* The reset value of the ALT_QSPI_SRAMPART_RESV_FLD register field. */
 #define ALT_QSPI_SRAMPART_RESV_FLD_RESET      0x0
 /* Extracts the ALT_QSPI_SRAMPART_RESV_FLD field value from a register. */
-#define ALT_QSPI_SRAMPART_RESV_FLD_GET(value) (((value) & 0xffffff00) >> 8)
+#define ALT_QSPI_SRAMPART_RESV_FLD_GET(value) (((value) & 0xfffffc00) >> 10)
 /* Produces a ALT_QSPI_SRAMPART_RESV_FLD register field value suitable for setting the register. */
-#define ALT_QSPI_SRAMPART_RESV_FLD_SET(value) (((value) << 8) & 0xffffff00)
+#define ALT_QSPI_SRAMPART_RESV_FLD_SET(value) (((value) << 10) & 0xfffffc00)
 
 #ifndef __ASSEMBLY__
 /*
@@ -2236,8 +2238,8 @@ typedef struct ALT_QSPI_DEVSZ_s  ALT_QSPI_DEVSZ_t;
  */
 struct ALT_QSPI_SRAMPART_s
 {
-    volatile uint32_t        addr     :  8;  /* Indirect Read Partition Size */
-    const volatile uint32_t  resv_fld : 24;  /* Reserved */
+    volatile uint32_t        addr     : 10;  /* Indirect Read Partition Size */
+    const volatile uint32_t  resv_fld : 22;  /* Reserved */
 };
 
 /* The typedef declaration for register ALT_QSPI_SRAMPART. */

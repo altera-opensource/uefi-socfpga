@@ -1,32 +1,34 @@
-/*******************************************************************************
-*                                                                              *
-* Copyright 2014 Altera Corporation. All Rights Reserved.                      *
-*                                                                              *
-* Redistribution and use in source and binary forms, with or without           *
-* modification, are permitted provided that the following conditions are met:  *
-*                                                                              *
-* 1. Redistributions of source code must retain the above copyright notice,    *
-*    this list of conditions and the following disclaimer.                     *
-*                                                                              *
-* 2. Redistributions in binary form must reproduce the above copyright notice, *
-*    this list of conditions and the following disclaimer in the documentation *
-*    and/or other materials provided with the distribution.                    *
-*                                                                              *
-* 3. The name of the author may not be used to endorse or promote products     *
-*    derived from this software without specific prior written permission.     *
-*                                                                              *
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR *
-* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF *
-* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO  *
-* EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,       *
-* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, *
-* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;  *
-* OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,     *
-* WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR      *
-* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF       *
-* ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                                   *
-*                                                                              *
-*******************************************************************************/
+/***********************************************************************************
+*                                                                                  *
+* Copyright 2013-2015 Altera Corporation. All Rights Reserved.                     *
+*                                                                                  *
+* Redistribution and use in source and binary forms, with or without               *
+* modification, are permitted provided that the following conditions are met:      *
+*                                                                                  *
+* 1. Redistributions of source code must retain the above copyright notice,        *
+*    this list of conditions and the following disclaimer.                         *
+*                                                                                  *
+* 2. Redistributions in binary form must reproduce the above copyright notice,     *
+*    this list of conditions and the following disclaimer in the documentation     *
+*    and/or other materials provided with the distribution.                        *
+*                                                                                  *
+* 3. Neither the name of the copyright holder nor the names of its contributors    *
+*    may be used to endorse or promote products derived from this software without *
+*    specific prior written permission.                                            *
+*                                                                                  *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"      *
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE        *
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE       *
+* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE        *
+* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR              *
+* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF             *
+* SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS         *
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN          *
+* CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)          *
+* ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE       *
+* POSSIBILITY OF SUCH DAMAGE.                                                      *
+*                                                                                  *
+***********************************************************************************/
 
 /* Altera - ALT_MPFE_DDR_MAIN_PRB */
 
@@ -39,7 +41,7 @@
 extern "C"
 {
 #else   /* __cplusplus */
-////#include <stdint.h>
+//#include <stdint.h>
 #endif  /* __cplusplus */
 #endif  /* __ASSEMBLY__ */
 
@@ -5349,9 +5351,148 @@ typedef struct ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_ID_REVISIONID_s  ALT
  * Selection of a configuration of mappings of address bits to memory device, bank,
  * row, and column. <See SoC-specific DDR Conf documentation>
  * 
+ * Field Enumeration Values:
+ * 
+ *  Enum                                                                      | Value | Description
+ * :--------------------------------------------------------------------------|:------|:------------
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R12_B3_C10 | 0x00  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R13_B3_C9  | 0x01  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R13_B3_C10 | 0x02  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R14_B3_C9  | 0x03  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R14_B3_C10 | 0x04  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R15_B3_C10 | 0x05  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R14_B3_C11 | 0x06  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R15_B3_C11 | 0x07  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R16_B3_C10 | 0x08  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R16_B3_C11 | 0x09  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R15_B3_C12 | 0x0A  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B3_R14_C10 | 0x0B  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B4_R14_C10 | 0x0C  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B3_R15_C10 | 0x0D  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B4_R15_C10 | 0x0E  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B3_R16_C10 | 0x0F  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B4_R16_C10 | 0x10  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B3_R17_C10 | 0x11  |            
+ *  ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B4_R17_C10 | 0x12  |            
+ * 
  * Field Access Macros:
  * 
  */
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R12_B3_C10   0x00
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R13_B3_C9    0x01
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R13_B3_C10   0x02
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R14_B3_C9    0x03
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R14_B3_C10   0x04
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R15_B3_C10   0x05
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R14_B3_C11   0x06
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R15_B3_C11   0x07
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R16_B3_C10   0x08
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R16_B3_C11   0x09
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR3 or LPDDR3
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_R15_B3_C12   0x0A
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR4 only
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B3_R14_C10   0x0B
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR4 only
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B4_R14_C10   0x0C
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR4 only
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B3_R15_C10   0x0D
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR4 only
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B4_R15_C10   0x0E
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR4 only
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B3_R16_C10   0x0F
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR4 only
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B4_R16_C10   0x10
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR4 only
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B3_R17_C10   0x11
+/*
+ * Enumerated value for register field ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF
+ * 
+ * DDR4 only
+ */
+#define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_E_B4_R17_C10   0x12
+
 /* The Least Significant Bit (LSB) position of the ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF register field. */
 #define ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF_LSB        0
 /* The Most Significant Bit (MSB) position of the ALT_MPFE_DDR_MAIN_SCHED_DDR_T_MAIN_SCHEDULER_DDRCONF_DDRCONF register field. */
@@ -18594,6 +18735,192 @@ typedef struct ALT_MPFE_HMC_ADP_AUTO_PRECHARGE_s  ALT_MPFE_HMC_ADP_AUTO_PRECHARG
 #define ALT_MPFE_HMC_ADP_AUTO_PRECHARGE_OFST        0x60
 
 /*
+ * Register : DRAMADDRWIDTH
+ * 
+ * DRAM address bit width
+ * 
+ * Register Layout
+ * 
+ *  Bits    | Access | Reset | Description                                             
+ * :--------|:-------|:------|:---------------------------------------------------------
+ *  [4:0]   | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH       
+ *  [9:5]   | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH       
+ *  [13:10] | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH      
+ *  [15:14] | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH
+ *  [18:16] | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH        
+ *  [31:19] | ???    | 0x0   | *UNDEFINED*                                             
+ * 
+ */
+/*
+ * Field : CFG_COL_ADDR_WIDTH
+ * 
+ * DRAM Column Address Bits
+ * 
+ * The number of column address bits for the memory devices in your memory
+ * interface.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_MSB        4
+/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_WIDTH      5
+/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_SET_MSK    0x0000001f
+/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_CLR_MSK    0xffffffe0
+/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_RESET      0x0
+/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH field value from a register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_GET(value) (((value) & 0x0000001f) >> 0)
+/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field value suitable for setting the register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_SET(value) (((value) << 0) & 0x0000001f)
+
+/*
+ * Field : CFG_ROW_ADDR_WIDTH
+ * 
+ * DRAM Row Address Bits
+ * 
+ * The number of row address bits for the memory devices in your memory interface.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_MSB        9
+/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_WIDTH      5
+/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_SET_MSK    0x000003e0
+/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_CLR_MSK    0xfffffc1f
+/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_RESET      0x0
+/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH field value from a register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_GET(value) (((value) & 0x000003e0) >> 5)
+/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field value suitable for setting the register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_SET(value) (((value) << 5) & 0x000003e0)
+
+/*
+ * Field : CFG_BANK_ADDR_WIDTH
+ * 
+ * DRAM Bank Address Bits
+ * 
+ * The number of bank address bits for the memory devices in your memory interface.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_LSB        10
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_MSB        13
+/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_WIDTH      4
+/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_SET_MSK    0x00003c00
+/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_CLR_MSK    0xffffc3ff
+/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_RESET      0x0
+/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH field value from a register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_GET(value) (((value) & 0x00003c00) >> 10)
+/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field value suitable for setting the register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_SET(value) (((value) << 10) & 0x00003c00)
+
+/*
+ * Field : CFG_BANK_GROUP_ADDR_WIDTH
+ * 
+ * DRAM Bank Group Address Bits
+ * 
+ * The number of bank group address bits for t     he memory devices in your memory
+ * interface.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_LSB        14
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_MSB        15
+/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_WIDTH      2
+/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_SET_MSK    0x0000c000
+/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_CLR_MSK    0xffff3fff
+/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_RESET      0x0
+/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH field value from a register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_GET(value) (((value) & 0x0000c000) >> 14)
+/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field value suitable for setting the register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_SET(value) (((value) << 14) & 0x0000c000)
+
+/*
+ * Field : CFG_CS_ADDR_WIDTH
+ * 
+ * Chip Address Bits
+ * 
+ * The number of chip select address bits for the memory devices in your memory
+ * interface.
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_LSB        16
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_MSB        18
+/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_WIDTH      3
+/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_SET_MSK    0x00070000
+/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field value. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_CLR_MSK    0xfff8ffff
+/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_RESET      0x0
+/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH field value from a register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_GET(value) (((value) & 0x00070000) >> 16)
+/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field value suitable for setting the register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_SET(value) (((value) << 16) & 0x00070000)
+
+#ifndef __ASSEMBLY__
+/*
+ * WARNING: The C register and register group struct declarations are provided for
+ * convenience and illustrative purposes. They should, however, be used with
+ * caution as the C language standard provides no guarantees about the alignment or
+ * atomicity of device memory accesses. The recommended practice for coding device
+ * drivers is to use the SoCAL access macros in conjunction with alt_read_word()
+ * and alt_write_word() functions for 32 bit registers and alt_read_dword() and
+ * alt_write_dword() functions for 64 bit registers.
+ * 
+ * The struct declaration for register ALT_MPFE_HMC_ADP_DRAMADDRWIDTH.
+ */
+struct ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_s
+{
+    volatile uint32_t  CFG_COL_ADDR_WIDTH        :  5;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH */
+    volatile uint32_t  CFG_ROW_ADDR_WIDTH        :  5;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH */
+    volatile uint32_t  CFG_BANK_ADDR_WIDTH       :  4;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH */
+    volatile uint32_t  CFG_BANK_GROUP_ADDR_WIDTH :  2;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH */
+    volatile uint32_t  CFG_CS_ADDR_WIDTH         :  3;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH */
+    uint32_t                                     : 13;  /* *UNDEFINED* */
+};
+
+/* The typedef declaration for register ALT_MPFE_HMC_ADP_DRAMADDRWIDTH. */
+typedef struct ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_s  ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_t;
+#endif  /* __ASSEMBLY__ */
+
+/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH register. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_RESET       0x00000000
+/* The byte offset of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH register from the beginning of the component. */
+#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_OFST        0xe0
+
+/*
  * Register : ECCCTRL1
  * 
  * ECC control 1.
@@ -23235,630 +23562,6 @@ typedef struct ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3_s  ALT_MPFE_HMC_ADP_ECC_ERRGEN
 #define ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3_OFST        0x18c
 
 /*
- * Register : ECC_RDECCDATA2REGBUS_BEAT0
- * 
- * ECC of data from RAM will be written to register. Beat0
- * 
- * Register Layout
- * 
- *  Bits    | Access | Reset | Description                                        
- * :--------|:-------|:------|:----------------------------------------------------
- *  [7:0]   | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS
- *  [15:8]  | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS
- *  [23:16] | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS
- *  [31:24] | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS
- * 
- */
-/*
- * Field : ECC0BUS
- * 
- * ECC of data [63:0] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS_MSB        7
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS_SET_MSK    0x000000ff
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS_CLR_MSK    0xffffff00
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS_GET(value) (((value) & 0x000000ff) >> 0)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS_SET(value) (((value) << 0) & 0x000000ff)
-
-/*
- * Field : ECC1BUS
- * 
- * ECC of data [127:64] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS_MSB        15
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS_SET_MSK    0x0000ff00
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS_CLR_MSK    0xffff00ff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS_GET(value) (((value) & 0x0000ff00) >> 8)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS_SET(value) (((value) << 8) & 0x0000ff00)
-
-/*
- * Field : ECC2BUS
- * 
- * ECC of data [191:128] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS_LSB        16
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS_MSB        23
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS_SET_MSK    0x00ff0000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS_CLR_MSK    0xff00ffff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS_GET(value) (((value) & 0x00ff0000) >> 16)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS_SET(value) (((value) << 16) & 0x00ff0000)
-
-/*
- * Field : ECC3BUS
- * 
- * ECC of data [255:192] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS_LSB        24
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS_MSB        31
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS_SET_MSK    0xff000000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS_CLR_MSK    0x00ffffff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS_GET(value) (((value) & 0xff000000) >> 24)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS_SET(value) (((value) << 24) & 0xff000000)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for coding device
- * drivers is to use the SoCAL access macros in conjunction with alt_read_word()
- * and alt_write_word() functions for 32 bit registers and alt_read_dword() and
- * alt_write_dword() functions for 64 bit registers.
- * 
- * The struct declaration for register ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0.
- */
-struct ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_s
-{
-    volatile uint32_t  ECC0BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC0BUS */
-    volatile uint32_t  ECC1BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC1BUS */
-    volatile uint32_t  ECC2BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC2BUS */
-    volatile uint32_t  ECC3BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_ECC3BUS */
-};
-
-/* The typedef declaration for register ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0. */
-typedef struct ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_s  ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0 register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_RESET       0x00000000
-/* The byte offset of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0 register from the beginning of the component. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_OFST        0x190
-
-/*
- * Register : ECC_RDECCDATA2REGBUS_BEAT1
- * 
- * ECC of data from RAM will be written to register. Beat1
- * 
- * Register Layout
- * 
- *  Bits    | Access | Reset | Description                                        
- * :--------|:-------|:------|:----------------------------------------------------
- *  [7:0]   | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS
- *  [15:8]  | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS
- *  [23:16] | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS
- *  [31:24] | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS
- * 
- */
-/*
- * Field : ECC0BUS
- * 
- * ECC of data [63:0] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS_MSB        7
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS_SET_MSK    0x000000ff
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS_CLR_MSK    0xffffff00
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS_GET(value) (((value) & 0x000000ff) >> 0)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS_SET(value) (((value) << 0) & 0x000000ff)
-
-/*
- * Field : ECC1BUS
- * 
- * ECC of data [127:64] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS_MSB        15
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS_SET_MSK    0x0000ff00
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS_CLR_MSK    0xffff00ff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS_GET(value) (((value) & 0x0000ff00) >> 8)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS_SET(value) (((value) << 8) & 0x0000ff00)
-
-/*
- * Field : ECC2BUS
- * 
- * ECC of data [191:128] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS_LSB        16
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS_MSB        23
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS_SET_MSK    0x00ff0000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS_CLR_MSK    0xff00ffff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS_GET(value) (((value) & 0x00ff0000) >> 16)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS_SET(value) (((value) << 16) & 0x00ff0000)
-
-/*
- * Field : ECC3BUS
- * 
- * ECC of data [255:192] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS_LSB        24
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS_MSB        31
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS_SET_MSK    0xff000000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS_CLR_MSK    0x00ffffff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS_GET(value) (((value) & 0xff000000) >> 24)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS_SET(value) (((value) << 24) & 0xff000000)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for coding device
- * drivers is to use the SoCAL access macros in conjunction with alt_read_word()
- * and alt_write_word() functions for 32 bit registers and alt_read_dword() and
- * alt_write_dword() functions for 64 bit registers.
- * 
- * The struct declaration for register ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1.
- */
-struct ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_s
-{
-    volatile uint32_t  ECC0BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC0BUS */
-    volatile uint32_t  ECC1BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC1BUS */
-    volatile uint32_t  ECC2BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC2BUS */
-    volatile uint32_t  ECC3BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_ECC3BUS */
-};
-
-/* The typedef declaration for register ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1. */
-typedef struct ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_s  ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1 register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_RESET       0x00000000
-/* The byte offset of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1 register from the beginning of the component. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_OFST        0x194
-
-/*
- * Register : ECC_RDECCDATA2REGBUS_BEAT2
- * 
- * ECC of data from RAM will be written to register. Beat2
- * 
- * Register Layout
- * 
- *  Bits    | Access | Reset | Description                                        
- * :--------|:-------|:------|:----------------------------------------------------
- *  [7:0]   | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS
- *  [15:8]  | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS
- *  [23:16] | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS
- *  [31:24] | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS
- * 
- */
-/*
- * Field : ECC0BUS
- * 
- * ECC of data [63:0] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS_MSB        7
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS_SET_MSK    0x000000ff
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS_CLR_MSK    0xffffff00
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS_GET(value) (((value) & 0x000000ff) >> 0)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS_SET(value) (((value) << 0) & 0x000000ff)
-
-/*
- * Field : ECC1BUS
- * 
- * ECC of data [127:64] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS_MSB        15
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS_SET_MSK    0x0000ff00
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS_CLR_MSK    0xffff00ff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS_GET(value) (((value) & 0x0000ff00) >> 8)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS_SET(value) (((value) << 8) & 0x0000ff00)
-
-/*
- * Field : ECC2BUS
- * 
- * ECC of data [191:128] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS_LSB        16
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS_MSB        23
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS_SET_MSK    0x00ff0000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS_CLR_MSK    0xff00ffff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS_GET(value) (((value) & 0x00ff0000) >> 16)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS_SET(value) (((value) << 16) & 0x00ff0000)
-
-/*
- * Field : ECC3BUS
- * 
- * ECC of data [255:192] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS_LSB        24
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS_MSB        31
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS_SET_MSK    0xff000000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS_CLR_MSK    0x00ffffff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS_GET(value) (((value) & 0xff000000) >> 24)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS_SET(value) (((value) << 24) & 0xff000000)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for coding device
- * drivers is to use the SoCAL access macros in conjunction with alt_read_word()
- * and alt_write_word() functions for 32 bit registers and alt_read_dword() and
- * alt_write_dword() functions for 64 bit registers.
- * 
- * The struct declaration for register ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2.
- */
-struct ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_s
-{
-    volatile uint32_t  ECC0BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC0BUS */
-    volatile uint32_t  ECC1BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC1BUS */
-    volatile uint32_t  ECC2BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC2BUS */
-    volatile uint32_t  ECC3BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_ECC3BUS */
-};
-
-/* The typedef declaration for register ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2. */
-typedef struct ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_s  ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2 register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_RESET       0x00000000
-/* The byte offset of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2 register from the beginning of the component. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_OFST        0x198
-
-/*
- * Register : ECC_RDECCDATA2REGBUS_BEAT3
- * 
- * ECC of data from RAM will be written to register. Beat3
- * 
- * Register Layout
- * 
- *  Bits    | Access | Reset | Description                                        
- * :--------|:-------|:------|:----------------------------------------------------
- *  [7:0]   | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS
- *  [15:8]  | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS
- *  [23:16] | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS
- *  [31:24] | RW     | 0x0   | ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS
- * 
- */
-/*
- * Field : ECC0BUS
- * 
- * ECC of data [63:0] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS_MSB        7
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS_SET_MSK    0x000000ff
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS_CLR_MSK    0xffffff00
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS_GET(value) (((value) & 0x000000ff) >> 0)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS_SET(value) (((value) << 0) & 0x000000ff)
-
-/*
- * Field : ECC1BUS
- * 
- * ECC of data [127:64] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS_LSB        8
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS_MSB        15
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS_SET_MSK    0x0000ff00
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS_CLR_MSK    0xffff00ff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS_GET(value) (((value) & 0x0000ff00) >> 8)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS_SET(value) (((value) << 8) & 0x0000ff00)
-
-/*
- * Field : ECC2BUS
- * 
- * ECC of data [191:128] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS_LSB        16
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS_MSB        23
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS_SET_MSK    0x00ff0000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS_CLR_MSK    0xff00ffff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS_GET(value) (((value) & 0x00ff0000) >> 16)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS_SET(value) (((value) << 16) & 0x00ff0000)
-
-/*
- * Field : ECC3BUS
- * 
- * ECC of data [255:192] from RAM which will be written to register.
- * 
- * Based on the DDR IO width, unimplemented bytes of this register will read as
- * zero.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS_LSB        24
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS_MSB        31
-/* The width in bits of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS_WIDTH      8
-/* The mask used to set the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS_SET_MSK    0xff000000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS register field value. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS_CLR_MSK    0x00ffffff
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS register field. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS field value from a register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS_GET(value) (((value) & 0xff000000) >> 24)
-/* Produces a ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS_SET(value) (((value) << 24) & 0xff000000)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for coding device
- * drivers is to use the SoCAL access macros in conjunction with alt_read_word()
- * and alt_write_word() functions for 32 bit registers and alt_read_dword() and
- * alt_write_dword() functions for 64 bit registers.
- * 
- * The struct declaration for register ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3.
- */
-struct ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_s
-{
-    volatile uint32_t  ECC0BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC0BUS */
-    volatile uint32_t  ECC1BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC1BUS */
-    volatile uint32_t  ECC2BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC2BUS */
-    volatile uint32_t  ECC3BUS :  8;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_ECC3BUS */
-};
-
-/* The typedef declaration for register ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3. */
-typedef struct ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_s  ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The reset value of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3 register. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_RESET       0x00000000
-/* The byte offset of the ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3 register from the beginning of the component. */
-#define ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_OFST        0x19c
-
-/*
  * Register : DERRHADDR
  * 
  * Double-bit error high address
@@ -24974,298 +24677,6 @@ typedef struct ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT_s  ALT_MPFE_HMC_ADP_RSTHANDSHAK
 /* The byte offset of the ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT register from the beginning of the component. */
 #define ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT_OFST        0x218
 
-/*
- * Register : MEMCTRLCFG
- * 
- * DRAM address configuration
- * 
- * Register Layout
- * 
- *  Bits   | Access | Reset | Description                               
- * :-------|:-------|:------|:-------------------------------------------
- *  [3:0]  | RW     | 0x0   | ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE  
- *  [4]    | ???    | 0x0   | *UNDEFINED*                               
- *  [6:5]  | RW     | 0x0   | ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER
- *  [31:7] | ???    | 0x0   | *UNDEFINED*                               
- * 
- */
-/*
- * Field : CFG_MEM_TYPE
- * 
- * DRAM Memory Type
- * 
- * Selects memory type. Program this field with one of the following binary values,
- * "0000" for DDR3 SDRAM, "0001" for DDR4 SDRAM and "0010" for LPDDR3 SDRAM.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE register field. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE register field. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE_MSB        3
-/* The width in bits of the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE register field. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE_WIDTH      4
-/* The mask used to set the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE register field value. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE_SET_MSK    0x0000000f
-/* The mask used to clear the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE register field value. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE_CLR_MSK    0xfffffff0
-/* The reset value of the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE register field. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE field value from a register. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE_GET(value) (((value) & 0x0000000f) >> 0)
-/* Produces a ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE_SET(value) (((value) << 0) & 0x0000000f)
-
-/*
- * Field : CFG_ADDR_ORDER
- * 
- * Address Interleaving Order
- * 
- * Selects the order for address interleaving. Programming this field with
- * different values gives different mappings between the AXI byte address and the
- * SDRAM address. Program this field with the following binary values to select the
- * ordering. For DDR3 SDRAM and LPDDR3 SDRAM, binary value "00" for “chip, row,
- * bank, column”; "01" for “chip, bank, row, column.  For DDR4 SDRAM, binary
- * value “00" for “chip, row, bank, column (high bits), bank group, column (low
- * bits); "01" for “chip, bank group, bank, row, column. Please see the Technical
- * Reference Manual for more specific details).
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER register field. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER register field. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER_MSB        6
-/* The width in bits of the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER register field. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER_WIDTH      2
-/* The mask used to set the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER register field value. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER_SET_MSK    0x00000060
-/* The mask used to clear the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER register field value. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER_CLR_MSK    0xffffff9f
-/* The reset value of the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER register field. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER field value from a register. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER_GET(value) (((value) & 0x00000060) >> 5)
-/* Produces a ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER_SET(value) (((value) << 5) & 0x00000060)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for coding device
- * drivers is to use the SoCAL access macros in conjunction with alt_read_word()
- * and alt_write_word() functions for 32 bit registers and alt_read_dword() and
- * alt_write_dword() functions for 64 bit registers.
- * 
- * The struct declaration for register ALT_MPFE_HMC_ADP_MEMCTRLCFG.
- */
-struct ALT_MPFE_HMC_ADP_MEMCTRLCFG_s
-{
-    volatile uint32_t  CFG_MEM_TYPE   :  4;  /* ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_MEM_TYPE */
-    uint32_t                          :  1;  /* *UNDEFINED* */
-    volatile uint32_t  CFG_ADDR_ORDER :  2;  /* ALT_MPFE_HMC_ADP_MEMCTRLCFG_CFG_ADDR_ORDER */
-    uint32_t                          : 25;  /* *UNDEFINED* */
-};
-
-/* The typedef declaration for register ALT_MPFE_HMC_ADP_MEMCTRLCFG. */
-typedef struct ALT_MPFE_HMC_ADP_MEMCTRLCFG_s  ALT_MPFE_HMC_ADP_MEMCTRLCFG_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The reset value of the ALT_MPFE_HMC_ADP_MEMCTRLCFG register. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_RESET       0x00000000
-/* The byte offset of the ALT_MPFE_HMC_ADP_MEMCTRLCFG register from the beginning of the component. */
-#define ALT_MPFE_HMC_ADP_MEMCTRLCFG_OFST        0x220
-
-/*
- * Register : DRAMADDRWIDTH
- * 
- * DRAM address bit width
- * 
- * Register Layout
- * 
- *  Bits    | Access | Reset | Description                                             
- * :--------|:-------|:------|:---------------------------------------------------------
- *  [4:0]   | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH       
- *  [9:5]   | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH       
- *  [13:10] | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH      
- *  [15:14] | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH
- *  [18:16] | RW     | 0x0   | ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH        
- *  [31:19] | ???    | 0x0   | *UNDEFINED*                                             
- * 
- */
-/*
- * Field : CFG_COL_ADDR_WIDTH
- * 
- * DRAM Column Address Bits
- * 
- * The number of column address bits for the memory devices in your memory
- * interface.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_MSB        4
-/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_WIDTH      5
-/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_SET_MSK    0x0000001f
-/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_CLR_MSK    0xffffffe0
-/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH field value from a register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_GET(value) (((value) & 0x0000001f) >> 0)
-/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH_SET(value) (((value) << 0) & 0x0000001f)
-
-/*
- * Field : CFG_ROW_ADDR_WIDTH
- * 
- * DRAM Row Address Bits
- * 
- * The number of row address bits for the memory devices in your memory interface.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_LSB        5
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_MSB        9
-/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_WIDTH      5
-/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_SET_MSK    0x000003e0
-/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_CLR_MSK    0xfffffc1f
-/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH field value from a register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_GET(value) (((value) & 0x000003e0) >> 5)
-/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH_SET(value) (((value) << 5) & 0x000003e0)
-
-/*
- * Field : CFG_BANK_ADDR_WIDTH
- * 
- * DRAM Bank Address Bits
- * 
- * The number of bank address bits for the memory devices in your memory interface.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_LSB        10
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_MSB        13
-/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_WIDTH      4
-/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_SET_MSK    0x00003c00
-/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_CLR_MSK    0xffffc3ff
-/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH field value from a register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_GET(value) (((value) & 0x00003c00) >> 10)
-/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH_SET(value) (((value) << 10) & 0x00003c00)
-
-/*
- * Field : CFG_BANK_GROUP_ADDR_WIDTH
- * 
- * DRAM Bank Group Address Bits
- * 
- * The number of bank group address bits for t     he memory devices in your memory
- * interface.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_LSB        14
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_MSB        15
-/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_WIDTH      2
-/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_SET_MSK    0x0000c000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_CLR_MSK    0xffff3fff
-/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH field value from a register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_GET(value) (((value) & 0x0000c000) >> 14)
-/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH_SET(value) (((value) << 14) & 0x0000c000)
-
-/*
- * Field : CFG_CS_ADDR_WIDTH
- * 
- * Chip Address Bits
- * 
- * The number of chip select address bits for the memory devices in your memory
- * interface.
- * 
- * Field Access Macros:
- * 
- */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_LSB        16
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_MSB        18
-/* The width in bits of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_WIDTH      3
-/* The mask used to set the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_SET_MSK    0x00070000
-/* The mask used to clear the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field value. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_CLR_MSK    0xfff8ffff
-/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_RESET      0x0
-/* Extracts the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH field value from a register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_GET(value) (((value) & 0x00070000) >> 16)
-/* Produces a ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH register field value suitable for setting the register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH_SET(value) (((value) << 16) & 0x00070000)
-
-#ifndef __ASSEMBLY__
-/*
- * WARNING: The C register and register group struct declarations are provided for
- * convenience and illustrative purposes. They should, however, be used with
- * caution as the C language standard provides no guarantees about the alignment or
- * atomicity of device memory accesses. The recommended practice for coding device
- * drivers is to use the SoCAL access macros in conjunction with alt_read_word()
- * and alt_write_word() functions for 32 bit registers and alt_read_dword() and
- * alt_write_dword() functions for 64 bit registers.
- * 
- * The struct declaration for register ALT_MPFE_HMC_ADP_DRAMADDRWIDTH.
- */
-struct ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_s
-{
-    volatile uint32_t  CFG_COL_ADDR_WIDTH        :  5;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_COL_ADDR_WIDTH */
-    volatile uint32_t  CFG_ROW_ADDR_WIDTH        :  5;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_ROW_ADDR_WIDTH */
-    volatile uint32_t  CFG_BANK_ADDR_WIDTH       :  4;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_ADDR_WIDTH */
-    volatile uint32_t  CFG_BANK_GROUP_ADDR_WIDTH :  2;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_BANK_GROUP_ADDR_WIDTH */
-    volatile uint32_t  CFG_CS_ADDR_WIDTH         :  3;  /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_CFG_CS_ADDR_WIDTH */
-    uint32_t                                     : 13;  /* *UNDEFINED* */
-};
-
-/* The typedef declaration for register ALT_MPFE_HMC_ADP_DRAMADDRWIDTH. */
-typedef struct ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_s  ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_t;
-#endif  /* __ASSEMBLY__ */
-
-/* The reset value of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH register. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_RESET       0x00000000
-/* The byte offset of the ALT_MPFE_HMC_ADP_DRAMADDRWIDTH register from the beginning of the component. */
-#define ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_OFST        0x224
-
 #ifndef __ASSEMBLY__
 /*
  * WARNING: The C register and register group struct declarations are provided for
@@ -25280,82 +24691,77 @@ typedef struct ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_s  ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_
  */
 struct ALT_MPFE_HMC_ADP_s
 {
-    volatile ALT_MPFE_HMC_ADP_IP_REV_ID_t                   IP_REV_ID;                   /* ALT_MPFE_HMC_ADP_IP_REV_ID */
-    volatile uint32_t                                       _pad_0x4_0x7;                /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_DDRIOCTRL_t                   DDRIOCTRL;                   /* ALT_MPFE_HMC_ADP_DDRIOCTRL */
-    volatile ALT_MPFE_HMC_ADP_DDRCALSTAT_t                  DDRCALSTAT;                  /* ALT_MPFE_HMC_ADP_DDRCALSTAT */
-    volatile ALT_MPFE_HMC_ADP_MPR_0BEAT1_t                  MPR_0BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_0BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_MPR_1BEAT1_t                  MPR_1BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_1BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_MPR_2BEAT1_t                  MPR_2BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_2BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_MPR_3BEAT1_t                  MPR_3BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_3BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_MPR_4BEAT1_t                  MPR_4BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_4BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_MPR_5BEAT1_t                  MPR_5BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_5BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_MPR_6BEAT1_t                  MPR_6BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_6BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_MPR_7BEAT1_t                  MPR_7BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_7BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_MPR_8BEAT1_t                  MPR_8BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_8BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_MPR_0BEAT2_t                  MPR_0BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_0BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_MPR_1BEAT2_t                  MPR_1BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_1BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_MPR_2BEAT2_t                  MPR_2BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_2BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_MPR_3BEAT2_t                  MPR_3BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_3BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_MPR_4BEAT2_t                  MPR_4BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_4BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_MPR_5BEAT2_t                  MPR_5BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_5BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_MPR_6BEAT2_t                  MPR_6BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_6BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_MPR_7BEAT2_t                  MPR_7BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_7BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_MPR_8BEAT2_t                  MPR_8BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_8BEAT2 */
-    volatile uint32_t                                       _pad_0x58_0x5f[2];           /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_AUTO_PRECHARGE_t              AUTO_PRECHARGE;              /* ALT_MPFE_HMC_ADP_AUTO_PRECHARGE */
-    volatile uint32_t                                       _pad_0x64_0xff[39];          /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_ECCCTRL1_t                    ECCCTRL1;                    /* ALT_MPFE_HMC_ADP_ECCCTRL1 */
-    volatile ALT_MPFE_HMC_ADP_ECCCTRL2_t                    ECCCTRL2;                    /* ALT_MPFE_HMC_ADP_ECCCTRL2 */
-    volatile uint32_t                                       _pad_0x108_0x10f[2];         /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_ERRINTEN_t                    ERRINTEN;                    /* ALT_MPFE_HMC_ADP_ERRINTEN */
-    volatile ALT_MPFE_HMC_ADP_ERRINTENS_t                   ERRINTENS;                   /* ALT_MPFE_HMC_ADP_ERRINTENS */
-    volatile ALT_MPFE_HMC_ADP_ERRINTENR_t                   ERRINTENR;                   /* ALT_MPFE_HMC_ADP_ERRINTENR */
-    volatile ALT_MPFE_HMC_ADP_INTMODE_t                     INTMODE;                     /* ALT_MPFE_HMC_ADP_INTMODE */
-    volatile ALT_MPFE_HMC_ADP_INTSTAT_t                     INTSTAT;                     /* ALT_MPFE_HMC_ADP_INTSTAT */
-    volatile ALT_MPFE_HMC_ADP_DIAGINTTEST_t                 DIAGINTTEST;                 /* ALT_MPFE_HMC_ADP_DIAGINTTEST */
-    volatile ALT_MPFE_HMC_ADP_MODSTAT_t                     MODSTAT;                     /* ALT_MPFE_HMC_ADP_MODSTAT */
-    volatile ALT_MPFE_HMC_ADP_DERRADDRA_t                   DERRADDRA;                   /* ALT_MPFE_HMC_ADP_DERRADDRA */
-    volatile ALT_MPFE_HMC_ADP_SERRADDRA_t                   SERRADDRA;                   /* ALT_MPFE_HMC_ADP_SERRADDRA */
-    volatile uint32_t                                       _pad_0x134_0x137;            /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_AUTOWB_CORRADDR_t             AUTOWB_CORRADDR;             /* ALT_MPFE_HMC_ADP_AUTOWB_CORRADDR */
-    volatile ALT_MPFE_HMC_ADP_SERRCNTREG_t                  SERRCNTREG;                  /* ALT_MPFE_HMC_ADP_SERRCNTREG */
-    volatile ALT_MPFE_HMC_ADP_AUTOWB_DROP_CNTREG_t          AUTOWB_DROP_CNTREG;          /* ALT_MPFE_HMC_ADP_AUTOWB_DROP_CNTREG */
-    volatile ALT_MPFE_HMC_ADP_ECC_REG2WRECCDATABUS_t        ECC_REG2WRECCDATABUS;        /* ALT_MPFE_HMC_ADP_ECC_REG2WRECCDATABUS */
-    volatile ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_t        ECC_RDECCDATA2REGBUS;        /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS */
-    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDECCDATABUS_t        ECC_REG2RDECCDATABUS;        /* ALT_MPFE_HMC_ADP_ECC_REG2RDECCDATABUS */
-    volatile ALT_MPFE_HMC_ADP_ECC_DIAGON_t                  ECC_DIAGON;                  /* ALT_MPFE_HMC_ADP_ECC_DIAGON */
-    volatile ALT_MPFE_HMC_ADP_ECC_DECSTAT_t                 ECC_DECSTAT;                 /* ALT_MPFE_HMC_ADP_ECC_DECSTAT */
-    volatile uint32_t                                       _pad_0x158_0x15f[2];         /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_0_t            ECC_ERRGENADDR_0;            /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_0 */
-    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_1_t            ECC_ERRGENADDR_1;            /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_1 */
-    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_2_t            ECC_ERRGENADDR_2;            /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_2 */
-    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_3_t            ECC_ERRGENADDR_3;            /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_3 */
-    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT0_t     ECC_REG2RDDATABUS_BEAT0;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT0 */
-    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT1_t     ECC_REG2RDDATABUS_BEAT1;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT2_t     ECC_REG2RDDATABUS_BEAT2;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT3_t     ECC_REG2RDDATABUS_BEAT3;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT3 */
-    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_0_t           ECC_ERRGENHADDR_0;           /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_0 */
-    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_1_t           ECC_ERRGENHADDR_1;           /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_1 */
-    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_2_t           ECC_ERRGENHADDR_2;           /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_2 */
-    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3_t           ECC_ERRGENHADDR_3;           /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3 */
-    volatile ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0_t  ECC_RDECCDATA2REGBUS_BEAT0;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0 */
-    volatile ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1_t  ECC_RDECCDATA2REGBUS_BEAT1;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1 */
-    volatile ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2_t  ECC_RDECCDATA2REGBUS_BEAT2;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2 */
-    volatile ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3_t  ECC_RDECCDATA2REGBUS_BEAT3;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3 */
-    volatile uint32_t                                       _pad_0x1a0_0x1af[4];         /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_DERRHADDR_t                   DERRHADDR;                   /* ALT_MPFE_HMC_ADP_DERRHADDR */
-    volatile ALT_MPFE_HMC_ADP_SERRHADDR_t                   SERRHADDR;                   /* ALT_MPFE_HMC_ADP_SERRHADDR */
-    volatile uint32_t                                       _pad_0x1b8_0x1bb;            /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_AUTOWB_CORRHADDR_t            AUTOWB_CORRHADDR;            /* ALT_MPFE_HMC_ADP_AUTOWB_CORRHADDR */
-    volatile uint32_t                                       _pad_0x1c0_0x20f[20];        /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_HPSINTFCSEL_t                 HPSINTFCSEL;                 /* ALT_MPFE_HMC_ADP_HPSINTFCSEL */
-    volatile ALT_MPFE_HMC_ADP_RSTHANDSHAKECTRL_t            RSTHANDSHAKECTRL;            /* ALT_MPFE_HMC_ADP_RSTHANDSHAKECTRL */
-    volatile ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT_t            RSTHANDSHAKESTAT;            /* ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT */
-    volatile uint32_t                                       _pad_0x21c_0x21f;            /* *UNDEFINED* */
-    volatile ALT_MPFE_HMC_ADP_MEMCTRLCFG_t                  MEMCTRLCFG;                  /* ALT_MPFE_HMC_ADP_MEMCTRLCFG */
-    volatile ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_t               DRAMADDRWIDTH;               /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH */
-    volatile uint32_t                                       _pad_0x228_0x500[182];       /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_IP_REV_ID_t                IP_REV_ID;                /* ALT_MPFE_HMC_ADP_IP_REV_ID */
+    volatile uint32_t                                    _pad_0x4_0x7;             /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_DDRIOCTRL_t                DDRIOCTRL;                /* ALT_MPFE_HMC_ADP_DDRIOCTRL */
+    volatile ALT_MPFE_HMC_ADP_DDRCALSTAT_t               DDRCALSTAT;               /* ALT_MPFE_HMC_ADP_DDRCALSTAT */
+    volatile ALT_MPFE_HMC_ADP_MPR_0BEAT1_t               MPR_0BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_0BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_MPR_1BEAT1_t               MPR_1BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_1BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_MPR_2BEAT1_t               MPR_2BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_2BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_MPR_3BEAT1_t               MPR_3BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_3BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_MPR_4BEAT1_t               MPR_4BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_4BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_MPR_5BEAT1_t               MPR_5BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_5BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_MPR_6BEAT1_t               MPR_6BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_6BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_MPR_7BEAT1_t               MPR_7BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_7BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_MPR_8BEAT1_t               MPR_8BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_8BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_MPR_0BEAT2_t               MPR_0BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_0BEAT2 */
+    volatile ALT_MPFE_HMC_ADP_MPR_1BEAT2_t               MPR_1BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_1BEAT2 */
+    volatile ALT_MPFE_HMC_ADP_MPR_2BEAT2_t               MPR_2BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_2BEAT2 */
+    volatile ALT_MPFE_HMC_ADP_MPR_3BEAT2_t               MPR_3BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_3BEAT2 */
+    volatile ALT_MPFE_HMC_ADP_MPR_4BEAT2_t               MPR_4BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_4BEAT2 */
+    volatile ALT_MPFE_HMC_ADP_MPR_5BEAT2_t               MPR_5BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_5BEAT2 */
+    volatile ALT_MPFE_HMC_ADP_MPR_6BEAT2_t               MPR_6BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_6BEAT2 */
+    volatile ALT_MPFE_HMC_ADP_MPR_7BEAT2_t               MPR_7BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_7BEAT2 */
+    volatile ALT_MPFE_HMC_ADP_MPR_8BEAT2_t               MPR_8BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_8BEAT2 */
+    volatile uint32_t                                    _pad_0x58_0x5f[2];        /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_AUTO_PRECHARGE_t           AUTO_PRECHARGE;           /* ALT_MPFE_HMC_ADP_AUTO_PRECHARGE */
+    volatile uint32_t                                    _pad_0x64_0xdf[31];       /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_DRAMADDRWIDTH_t            DRAMADDRWIDTH;            /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH */
+    volatile uint32_t                                    _pad_0xe4_0xff[7];        /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_ECCCTRL1_t                 ECCCTRL1;                 /* ALT_MPFE_HMC_ADP_ECCCTRL1 */
+    volatile ALT_MPFE_HMC_ADP_ECCCTRL2_t                 ECCCTRL2;                 /* ALT_MPFE_HMC_ADP_ECCCTRL2 */
+    volatile uint32_t                                    _pad_0x108_0x10f[2];      /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_ERRINTEN_t                 ERRINTEN;                 /* ALT_MPFE_HMC_ADP_ERRINTEN */
+    volatile ALT_MPFE_HMC_ADP_ERRINTENS_t                ERRINTENS;                /* ALT_MPFE_HMC_ADP_ERRINTENS */
+    volatile ALT_MPFE_HMC_ADP_ERRINTENR_t                ERRINTENR;                /* ALT_MPFE_HMC_ADP_ERRINTENR */
+    volatile ALT_MPFE_HMC_ADP_INTMODE_t                  INTMODE;                  /* ALT_MPFE_HMC_ADP_INTMODE */
+    volatile ALT_MPFE_HMC_ADP_INTSTAT_t                  INTSTAT;                  /* ALT_MPFE_HMC_ADP_INTSTAT */
+    volatile ALT_MPFE_HMC_ADP_DIAGINTTEST_t              DIAGINTTEST;              /* ALT_MPFE_HMC_ADP_DIAGINTTEST */
+    volatile ALT_MPFE_HMC_ADP_MODSTAT_t                  MODSTAT;                  /* ALT_MPFE_HMC_ADP_MODSTAT */
+    volatile ALT_MPFE_HMC_ADP_DERRADDRA_t                DERRADDRA;                /* ALT_MPFE_HMC_ADP_DERRADDRA */
+    volatile ALT_MPFE_HMC_ADP_SERRADDRA_t                SERRADDRA;                /* ALT_MPFE_HMC_ADP_SERRADDRA */
+    volatile uint32_t                                    _pad_0x134_0x137;         /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_AUTOWB_CORRADDR_t          AUTOWB_CORRADDR;          /* ALT_MPFE_HMC_ADP_AUTOWB_CORRADDR */
+    volatile ALT_MPFE_HMC_ADP_SERRCNTREG_t               SERRCNTREG;               /* ALT_MPFE_HMC_ADP_SERRCNTREG */
+    volatile ALT_MPFE_HMC_ADP_AUTOWB_DROP_CNTREG_t       AUTOWB_DROP_CNTREG;       /* ALT_MPFE_HMC_ADP_AUTOWB_DROP_CNTREG */
+    volatile ALT_MPFE_HMC_ADP_ECC_REG2WRECCDATABUS_t     ECC_REG2WRECCDATABUS;     /* ALT_MPFE_HMC_ADP_ECC_REG2WRECCDATABUS */
+    volatile ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_t     ECC_RDECCDATA2REGBUS;     /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS */
+    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDECCDATABUS_t     ECC_REG2RDECCDATABUS;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDECCDATABUS */
+    volatile ALT_MPFE_HMC_ADP_ECC_DIAGON_t               ECC_DIAGON;               /* ALT_MPFE_HMC_ADP_ECC_DIAGON */
+    volatile ALT_MPFE_HMC_ADP_ECC_DECSTAT_t              ECC_DECSTAT;              /* ALT_MPFE_HMC_ADP_ECC_DECSTAT */
+    volatile uint32_t                                    _pad_0x158_0x15f[2];      /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_0_t         ECC_ERRGENADDR_0;         /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_0 */
+    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_1_t         ECC_ERRGENADDR_1;         /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_1 */
+    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_2_t         ECC_ERRGENADDR_2;         /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_2 */
+    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_3_t         ECC_ERRGENADDR_3;         /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_3 */
+    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT0_t  ECC_REG2RDDATABUS_BEAT0;  /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT0 */
+    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT1_t  ECC_REG2RDDATABUS_BEAT1;  /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT1 */
+    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT2_t  ECC_REG2RDDATABUS_BEAT2;  /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT2 */
+    volatile ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT3_t  ECC_REG2RDDATABUS_BEAT3;  /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT3 */
+    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_0_t        ECC_ERRGENHADDR_0;        /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_0 */
+    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_1_t        ECC_ERRGENHADDR_1;        /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_1 */
+    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_2_t        ECC_ERRGENHADDR_2;        /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_2 */
+    volatile ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3_t        ECC_ERRGENHADDR_3;        /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3 */
+    volatile uint32_t                                    _pad_0x190_0x1af[8];      /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_DERRHADDR_t                DERRHADDR;                /* ALT_MPFE_HMC_ADP_DERRHADDR */
+    volatile ALT_MPFE_HMC_ADP_SERRHADDR_t                SERRHADDR;                /* ALT_MPFE_HMC_ADP_SERRHADDR */
+    volatile uint32_t                                    _pad_0x1b8_0x1bb;         /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_AUTOWB_CORRHADDR_t         AUTOWB_CORRHADDR;         /* ALT_MPFE_HMC_ADP_AUTOWB_CORRHADDR */
+    volatile uint32_t                                    _pad_0x1c0_0x20f[20];     /* *UNDEFINED* */
+    volatile ALT_MPFE_HMC_ADP_HPSINTFCSEL_t              HPSINTFCSEL;              /* ALT_MPFE_HMC_ADP_HPSINTFCSEL */
+    volatile ALT_MPFE_HMC_ADP_RSTHANDSHAKECTRL_t         RSTHANDSHAKECTRL;         /* ALT_MPFE_HMC_ADP_RSTHANDSHAKECTRL */
+    volatile ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT_t         RSTHANDSHAKESTAT;         /* ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT */
+    volatile uint32_t                                    _pad_0x21c_0x500[185];    /* *UNDEFINED* */
 };
 
 /* The typedef declaration for register group ALT_MPFE_HMC_ADP. */
@@ -25363,82 +24769,77 @@ typedef struct ALT_MPFE_HMC_ADP_s  ALT_MPFE_HMC_ADP_t;
 /* The struct declaration for the raw register contents of register group ALT_MPFE_HMC_ADP. */
 struct ALT_MPFE_HMC_ADP_raw_s
 {
-    volatile uint32_t  IP_REV_ID;                   /* ALT_MPFE_HMC_ADP_IP_REV_ID */
-    volatile uint32_t  _pad_0x4_0x7;                /* *UNDEFINED* */
-    volatile uint32_t  DDRIOCTRL;                   /* ALT_MPFE_HMC_ADP_DDRIOCTRL */
-    volatile uint32_t  DDRCALSTAT;                  /* ALT_MPFE_HMC_ADP_DDRCALSTAT */
-    volatile uint32_t  MPR_0BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_0BEAT1 */
-    volatile uint32_t  MPR_1BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_1BEAT1 */
-    volatile uint32_t  MPR_2BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_2BEAT1 */
-    volatile uint32_t  MPR_3BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_3BEAT1 */
-    volatile uint32_t  MPR_4BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_4BEAT1 */
-    volatile uint32_t  MPR_5BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_5BEAT1 */
-    volatile uint32_t  MPR_6BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_6BEAT1 */
-    volatile uint32_t  MPR_7BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_7BEAT1 */
-    volatile uint32_t  MPR_8BEAT1;                  /* ALT_MPFE_HMC_ADP_MPR_8BEAT1 */
-    volatile uint32_t  MPR_0BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_0BEAT2 */
-    volatile uint32_t  MPR_1BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_1BEAT2 */
-    volatile uint32_t  MPR_2BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_2BEAT2 */
-    volatile uint32_t  MPR_3BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_3BEAT2 */
-    volatile uint32_t  MPR_4BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_4BEAT2 */
-    volatile uint32_t  MPR_5BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_5BEAT2 */
-    volatile uint32_t  MPR_6BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_6BEAT2 */
-    volatile uint32_t  MPR_7BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_7BEAT2 */
-    volatile uint32_t  MPR_8BEAT2;                  /* ALT_MPFE_HMC_ADP_MPR_8BEAT2 */
-    volatile uint32_t  _pad_0x58_0x5f[2];           /* *UNDEFINED* */
-    volatile uint32_t  AUTO_PRECHARGE;              /* ALT_MPFE_HMC_ADP_AUTO_PRECHARGE */
-    volatile uint32_t  _pad_0x64_0xff[39];          /* *UNDEFINED* */
-    volatile uint32_t  ECCCTRL1;                    /* ALT_MPFE_HMC_ADP_ECCCTRL1 */
-    volatile uint32_t  ECCCTRL2;                    /* ALT_MPFE_HMC_ADP_ECCCTRL2 */
-    volatile uint32_t  _pad_0x108_0x10f[2];         /* *UNDEFINED* */
-    volatile uint32_t  ERRINTEN;                    /* ALT_MPFE_HMC_ADP_ERRINTEN */
-    volatile uint32_t  ERRINTENS;                   /* ALT_MPFE_HMC_ADP_ERRINTENS */
-    volatile uint32_t  ERRINTENR;                   /* ALT_MPFE_HMC_ADP_ERRINTENR */
-    volatile uint32_t  INTMODE;                     /* ALT_MPFE_HMC_ADP_INTMODE */
-    volatile uint32_t  INTSTAT;                     /* ALT_MPFE_HMC_ADP_INTSTAT */
-    volatile uint32_t  DIAGINTTEST;                 /* ALT_MPFE_HMC_ADP_DIAGINTTEST */
-    volatile uint32_t  MODSTAT;                     /* ALT_MPFE_HMC_ADP_MODSTAT */
-    volatile uint32_t  DERRADDRA;                   /* ALT_MPFE_HMC_ADP_DERRADDRA */
-    volatile uint32_t  SERRADDRA;                   /* ALT_MPFE_HMC_ADP_SERRADDRA */
-    volatile uint32_t  _pad_0x134_0x137;            /* *UNDEFINED* */
-    volatile uint32_t  AUTOWB_CORRADDR;             /* ALT_MPFE_HMC_ADP_AUTOWB_CORRADDR */
-    volatile uint32_t  SERRCNTREG;                  /* ALT_MPFE_HMC_ADP_SERRCNTREG */
-    volatile uint32_t  AUTOWB_DROP_CNTREG;          /* ALT_MPFE_HMC_ADP_AUTOWB_DROP_CNTREG */
-    volatile uint32_t  ECC_REG2WRECCDATABUS;        /* ALT_MPFE_HMC_ADP_ECC_REG2WRECCDATABUS */
-    volatile uint32_t  ECC_RDECCDATA2REGBUS;        /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS */
-    volatile uint32_t  ECC_REG2RDECCDATABUS;        /* ALT_MPFE_HMC_ADP_ECC_REG2RDECCDATABUS */
-    volatile uint32_t  ECC_DIAGON;                  /* ALT_MPFE_HMC_ADP_ECC_DIAGON */
-    volatile uint32_t  ECC_DECSTAT;                 /* ALT_MPFE_HMC_ADP_ECC_DECSTAT */
-    volatile uint32_t  _pad_0x158_0x15f[2];         /* *UNDEFINED* */
-    volatile uint32_t  ECC_ERRGENADDR_0;            /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_0 */
-    volatile uint32_t  ECC_ERRGENADDR_1;            /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_1 */
-    volatile uint32_t  ECC_ERRGENADDR_2;            /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_2 */
-    volatile uint32_t  ECC_ERRGENADDR_3;            /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_3 */
-    volatile uint32_t  ECC_REG2RDDATABUS_BEAT0;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT0 */
-    volatile uint32_t  ECC_REG2RDDATABUS_BEAT1;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT1 */
-    volatile uint32_t  ECC_REG2RDDATABUS_BEAT2;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT2 */
-    volatile uint32_t  ECC_REG2RDDATABUS_BEAT3;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT3 */
-    volatile uint32_t  ECC_ERRGENHADDR_0;           /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_0 */
-    volatile uint32_t  ECC_ERRGENHADDR_1;           /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_1 */
-    volatile uint32_t  ECC_ERRGENHADDR_2;           /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_2 */
-    volatile uint32_t  ECC_ERRGENHADDR_3;           /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3 */
-    volatile uint32_t  ECC_RDECCDATA2REGBUS_BEAT0;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT0 */
-    volatile uint32_t  ECC_RDECCDATA2REGBUS_BEAT1;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT1 */
-    volatile uint32_t  ECC_RDECCDATA2REGBUS_BEAT2;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT2 */
-    volatile uint32_t  ECC_RDECCDATA2REGBUS_BEAT3;  /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS_BEAT3 */
-    volatile uint32_t  _pad_0x1a0_0x1af[4];         /* *UNDEFINED* */
-    volatile uint32_t  DERRHADDR;                   /* ALT_MPFE_HMC_ADP_DERRHADDR */
-    volatile uint32_t  SERRHADDR;                   /* ALT_MPFE_HMC_ADP_SERRHADDR */
-    volatile uint32_t  _pad_0x1b8_0x1bb;            /* *UNDEFINED* */
-    volatile uint32_t  AUTOWB_CORRHADDR;            /* ALT_MPFE_HMC_ADP_AUTOWB_CORRHADDR */
-    volatile uint32_t  _pad_0x1c0_0x20f[20];        /* *UNDEFINED* */
-    volatile uint32_t  HPSINTFCSEL;                 /* ALT_MPFE_HMC_ADP_HPSINTFCSEL */
-    volatile uint32_t  RSTHANDSHAKECTRL;            /* ALT_MPFE_HMC_ADP_RSTHANDSHAKECTRL */
-    volatile uint32_t  RSTHANDSHAKESTAT;            /* ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT */
-    volatile uint32_t  _pad_0x21c_0x21f;            /* *UNDEFINED* */
-    volatile uint32_t  MEMCTRLCFG;                  /* ALT_MPFE_HMC_ADP_MEMCTRLCFG */
-    volatile uint32_t  DRAMADDRWIDTH;               /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH */
-    volatile uint32_t  _pad_0x228_0x500[182];       /* *UNDEFINED* */
+    volatile uint32_t  IP_REV_ID;                /* ALT_MPFE_HMC_ADP_IP_REV_ID */
+    volatile uint32_t  _pad_0x4_0x7;             /* *UNDEFINED* */
+    volatile uint32_t  DDRIOCTRL;                /* ALT_MPFE_HMC_ADP_DDRIOCTRL */
+    volatile uint32_t  DDRCALSTAT;               /* ALT_MPFE_HMC_ADP_DDRCALSTAT */
+    volatile uint32_t  MPR_0BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_0BEAT1 */
+    volatile uint32_t  MPR_1BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_1BEAT1 */
+    volatile uint32_t  MPR_2BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_2BEAT1 */
+    volatile uint32_t  MPR_3BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_3BEAT1 */
+    volatile uint32_t  MPR_4BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_4BEAT1 */
+    volatile uint32_t  MPR_5BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_5BEAT1 */
+    volatile uint32_t  MPR_6BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_6BEAT1 */
+    volatile uint32_t  MPR_7BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_7BEAT1 */
+    volatile uint32_t  MPR_8BEAT1;               /* ALT_MPFE_HMC_ADP_MPR_8BEAT1 */
+    volatile uint32_t  MPR_0BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_0BEAT2 */
+    volatile uint32_t  MPR_1BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_1BEAT2 */
+    volatile uint32_t  MPR_2BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_2BEAT2 */
+    volatile uint32_t  MPR_3BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_3BEAT2 */
+    volatile uint32_t  MPR_4BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_4BEAT2 */
+    volatile uint32_t  MPR_5BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_5BEAT2 */
+    volatile uint32_t  MPR_6BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_6BEAT2 */
+    volatile uint32_t  MPR_7BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_7BEAT2 */
+    volatile uint32_t  MPR_8BEAT2;               /* ALT_MPFE_HMC_ADP_MPR_8BEAT2 */
+    volatile uint32_t  _pad_0x58_0x5f[2];        /* *UNDEFINED* */
+    volatile uint32_t  AUTO_PRECHARGE;           /* ALT_MPFE_HMC_ADP_AUTO_PRECHARGE */
+    volatile uint32_t  _pad_0x64_0xdf[31];       /* *UNDEFINED* */
+    volatile uint32_t  DRAMADDRWIDTH;            /* ALT_MPFE_HMC_ADP_DRAMADDRWIDTH */
+    volatile uint32_t  _pad_0xe4_0xff[7];        /* *UNDEFINED* */
+    volatile uint32_t  ECCCTRL1;                 /* ALT_MPFE_HMC_ADP_ECCCTRL1 */
+    volatile uint32_t  ECCCTRL2;                 /* ALT_MPFE_HMC_ADP_ECCCTRL2 */
+    volatile uint32_t  _pad_0x108_0x10f[2];      /* *UNDEFINED* */
+    volatile uint32_t  ERRINTEN;                 /* ALT_MPFE_HMC_ADP_ERRINTEN */
+    volatile uint32_t  ERRINTENS;                /* ALT_MPFE_HMC_ADP_ERRINTENS */
+    volatile uint32_t  ERRINTENR;                /* ALT_MPFE_HMC_ADP_ERRINTENR */
+    volatile uint32_t  INTMODE;                  /* ALT_MPFE_HMC_ADP_INTMODE */
+    volatile uint32_t  INTSTAT;                  /* ALT_MPFE_HMC_ADP_INTSTAT */
+    volatile uint32_t  DIAGINTTEST;              /* ALT_MPFE_HMC_ADP_DIAGINTTEST */
+    volatile uint32_t  MODSTAT;                  /* ALT_MPFE_HMC_ADP_MODSTAT */
+    volatile uint32_t  DERRADDRA;                /* ALT_MPFE_HMC_ADP_DERRADDRA */
+    volatile uint32_t  SERRADDRA;                /* ALT_MPFE_HMC_ADP_SERRADDRA */
+    volatile uint32_t  _pad_0x134_0x137;         /* *UNDEFINED* */
+    volatile uint32_t  AUTOWB_CORRADDR;          /* ALT_MPFE_HMC_ADP_AUTOWB_CORRADDR */
+    volatile uint32_t  SERRCNTREG;               /* ALT_MPFE_HMC_ADP_SERRCNTREG */
+    volatile uint32_t  AUTOWB_DROP_CNTREG;       /* ALT_MPFE_HMC_ADP_AUTOWB_DROP_CNTREG */
+    volatile uint32_t  ECC_REG2WRECCDATABUS;     /* ALT_MPFE_HMC_ADP_ECC_REG2WRECCDATABUS */
+    volatile uint32_t  ECC_RDECCDATA2REGBUS;     /* ALT_MPFE_HMC_ADP_ECC_RDECCDATA2REGBUS */
+    volatile uint32_t  ECC_REG2RDECCDATABUS;     /* ALT_MPFE_HMC_ADP_ECC_REG2RDECCDATABUS */
+    volatile uint32_t  ECC_DIAGON;               /* ALT_MPFE_HMC_ADP_ECC_DIAGON */
+    volatile uint32_t  ECC_DECSTAT;              /* ALT_MPFE_HMC_ADP_ECC_DECSTAT */
+    volatile uint32_t  _pad_0x158_0x15f[2];      /* *UNDEFINED* */
+    volatile uint32_t  ECC_ERRGENADDR_0;         /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_0 */
+    volatile uint32_t  ECC_ERRGENADDR_1;         /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_1 */
+    volatile uint32_t  ECC_ERRGENADDR_2;         /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_2 */
+    volatile uint32_t  ECC_ERRGENADDR_3;         /* ALT_MPFE_HMC_ADP_ECC_ERRGENADDR_3 */
+    volatile uint32_t  ECC_REG2RDDATABUS_BEAT0;  /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT0 */
+    volatile uint32_t  ECC_REG2RDDATABUS_BEAT1;  /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT1 */
+    volatile uint32_t  ECC_REG2RDDATABUS_BEAT2;  /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT2 */
+    volatile uint32_t  ECC_REG2RDDATABUS_BEAT3;  /* ALT_MPFE_HMC_ADP_ECC_REG2RDDATABUS_BEAT3 */
+    volatile uint32_t  ECC_ERRGENHADDR_0;        /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_0 */
+    volatile uint32_t  ECC_ERRGENHADDR_1;        /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_1 */
+    volatile uint32_t  ECC_ERRGENHADDR_2;        /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_2 */
+    volatile uint32_t  ECC_ERRGENHADDR_3;        /* ALT_MPFE_HMC_ADP_ECC_ERRGENHADDR_3 */
+    volatile uint32_t  _pad_0x190_0x1af[8];      /* *UNDEFINED* */
+    volatile uint32_t  DERRHADDR;                /* ALT_MPFE_HMC_ADP_DERRHADDR */
+    volatile uint32_t  SERRHADDR;                /* ALT_MPFE_HMC_ADP_SERRHADDR */
+    volatile uint32_t  _pad_0x1b8_0x1bb;         /* *UNDEFINED* */
+    volatile uint32_t  AUTOWB_CORRHADDR;         /* ALT_MPFE_HMC_ADP_AUTOWB_CORRHADDR */
+    volatile uint32_t  _pad_0x1c0_0x20f[20];     /* *UNDEFINED* */
+    volatile uint32_t  HPSINTFCSEL;              /* ALT_MPFE_HMC_ADP_HPSINTFCSEL */
+    volatile uint32_t  RSTHANDSHAKECTRL;         /* ALT_MPFE_HMC_ADP_RSTHANDSHAKECTRL */
+    volatile uint32_t  RSTHANDSHAKESTAT;         /* ALT_MPFE_HMC_ADP_RSTHANDSHAKESTAT */
+    volatile uint32_t  _pad_0x21c_0x500[185];    /* *UNDEFINED* */
 };
 
 /* The typedef declaration for the raw register contents of register group ALT_MPFE_HMC_ADP. */
@@ -32848,36 +32249,322 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  * 
  * Register Layout
  * 
- *  Bits    | Access | Reset   | Description                                                                              
- * :--------|:-------|:--------|:------------------------------------------------------------------------------------------
- *  [11:0]  | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0
- *  [31:12] | ???    | Unknown | *UNDEFINED*                                                                              
+ *  Bits    | Access | Reset   | Description                                                                                             
+ * :--------|:-------|:--------|:---------------------------------------------------------------------------------------------------------
+ *  [0]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN     
+ *  [1]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN  
+ *  [2]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN 
+ *  [3]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN
+ *  [4]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN     
+ *  [5]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN  
+ *  [6]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN 
+ *  [7]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN
+ *  [8]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN     
+ *  [9]     | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN  
+ *  [10]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN 
+ *  [11]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN
+ *  [31:12] | ???    | Unknown | *UNDEFINED*                                                                                             
  * 
  */
 /*
- * Field : FLAGINEN0
+ * Field : FPGA2SDRAM0_IDLE_EN
  * 
- * FlagIn Enable register #0
+ * FlagIn Enable register #0.FPGA2SDRAM0_IDLE_EN
  * 
  * Field Access Macros:
  * 
  */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0_MSB        11
-/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0_WIDTH      12
-/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0_SET_MSK    0x00000fff
-/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0_CLR_MSK    0xfffff000
-/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0_RESET      0x0
-/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0 field value from a register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0_GET(value) (((value) & 0x00000fff) >> 0)
-/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0 register field value suitable for setting the register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0_SET(value) (((value) << 0) & 0x00000fff)
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN_MSB        0
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN_SET_MSK    0x00000001
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : FPGA2SDRAM0_IDLEACK_EN
+ * 
+ * FlagIn Enable register #1.FPGA2SDRAM0_IDLEACK_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN_MSB        1
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN_SET_MSK    0x00000002
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : FPGA2SDRAM0_CMD_IDLE_EN
+ * 
+ * FlagIn Enable register #2.FPGA2SDRAM0_CMD_IDLE_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN_MSB        2
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN_SET_MSK    0x00000004
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : FPGA2SDRAM0_RESP_IDLE_EN
+ * 
+ * FlagIn Enable register #3.FPGA2SDRAM0_RESP_IDLE_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN_MSB        3
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN_SET_MSK    0x00000008
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN_SET(value) (((value) << 3) & 0x00000008)
+
+/*
+ * Field : FPGA2SDRAM1_IDLE_EN
+ * 
+ * FlagIn Enable register #4.FPGA2SDRAM1_IDLE_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN_MSB        4
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN_SET_MSK    0x00000010
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN_CLR_MSK    0xffffffef
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN_SET(value) (((value) << 4) & 0x00000010)
+
+/*
+ * Field : FPGA2SDRAM1_IDLEACK_EN
+ * 
+ * FlagIn Enable register #5.FPGA2SDRAM1_IDLEACK_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN_MSB        5
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN_SET_MSK    0x00000020
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN_CLR_MSK    0xffffffdf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN_GET(value) (((value) & 0x00000020) >> 5)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN_SET(value) (((value) << 5) & 0x00000020)
+
+/*
+ * Field : FPGA2SDRAM1_CMD_IDLE_EN
+ * 
+ * FlagIn Enable register #6.FPGA2SDRAM1_CMD_IDLE_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN_LSB        6
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN_MSB        6
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN_SET_MSK    0x00000040
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN_CLR_MSK    0xffffffbf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN_GET(value) (((value) & 0x00000040) >> 6)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN_SET(value) (((value) << 6) & 0x00000040)
+
+/*
+ * Field : FPGA2SDRAM1_RESP_IDLE_EN
+ * 
+ * FlagIn Enable register #7.FPGA2SDRAM1_RESP_IDLE_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN_LSB        7
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN_MSB        7
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN_SET_MSK    0x00000080
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN_CLR_MSK    0xffffff7f
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN_GET(value) (((value) & 0x00000080) >> 7)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN_SET(value) (((value) << 7) & 0x00000080)
+
+/*
+ * Field : FPGA2SDRAM2_IDLE_EN
+ * 
+ * FlagIn Enable register #8.FPGA2SDRAM2_IDLE_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN_MSB        8
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN_SET_MSK    0x00000100
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN_SET(value) (((value) << 8) & 0x00000100)
+
+/*
+ * Field : FPGA2SDRAM2_IDLEACK_EN
+ * 
+ * FlagIn Enable register #9.FPGA2SDRAM2_IDLEACK_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN_LSB        9
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN_MSB        9
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN_SET_MSK    0x00000200
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN_CLR_MSK    0xfffffdff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN_GET(value) (((value) & 0x00000200) >> 9)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN_SET(value) (((value) << 9) & 0x00000200)
+
+/*
+ * Field : FPGA2SDRAM2_CMD_IDLE_EN
+ * 
+ * FlagIn Enable register #10.FPGA2SDRAM2_CMD_IDLE_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN_LSB        10
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN_MSB        10
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN_SET_MSK    0x00000400
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN_CLR_MSK    0xfffffbff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN_GET(value) (((value) & 0x00000400) >> 10)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN_SET(value) (((value) << 10) & 0x00000400)
+
+/*
+ * Field : FPGA2SDRAM2_RESP_IDLE_EN
+ * 
+ * FlagIn Enable register #11.FPGA2SDRAM2_RESP_IDLE_EN
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN_LSB        11
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN_MSB        11
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN_SET_MSK    0x00000800
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN_CLR_MSK    0xfffff7ff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN_GET(value) (((value) & 0x00000800) >> 11)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN_SET(value) (((value) << 11) & 0x00000800)
 
 #ifndef __ASSEMBLY__
 /*
@@ -32893,8 +32580,19 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  */
 struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_s
 {
-    volatile uint32_t  FLAGINEN0 : 12;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FLAGINEN0 */
-    uint32_t                     : 20;  /* *UNDEFINED* */
+    volatile uint32_t  FPGA2SDRAM0_IDLE_EN      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLE_EN */
+    volatile uint32_t  FPGA2SDRAM0_IDLEACK_EN   :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_IDLEACK_EN */
+    volatile uint32_t  FPGA2SDRAM0_CMD_IDLE_EN  :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_CMD_IDLE_EN */
+    volatile uint32_t  FPGA2SDRAM0_RESP_IDLE_EN :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM0_RESP_IDLE_EN */
+    volatile uint32_t  FPGA2SDRAM1_IDLE_EN      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLE_EN */
+    volatile uint32_t  FPGA2SDRAM1_IDLEACK_EN   :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_IDLEACK_EN */
+    volatile uint32_t  FPGA2SDRAM1_CMD_IDLE_EN  :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_CMD_IDLE_EN */
+    volatile uint32_t  FPGA2SDRAM1_RESP_IDLE_EN :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM1_RESP_IDLE_EN */
+    volatile uint32_t  FPGA2SDRAM2_IDLE_EN      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLE_EN */
+    volatile uint32_t  FPGA2SDRAM2_IDLEACK_EN   :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_IDLEACK_EN */
+    volatile uint32_t  FPGA2SDRAM2_CMD_IDLE_EN  :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_CMD_IDLE_EN */
+    volatile uint32_t  FPGA2SDRAM2_RESP_IDLE_EN :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0_FPGA2SDRAM2_RESP_IDLE_EN */
+    uint32_t                                    : 20;  /* *UNDEFINED* */
 };
 
 /* The typedef declaration for register ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINEN0. */
@@ -32911,36 +32609,322 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  * 
  * Register Layout
  * 
- *  Bits    | Access | Reset   | Description                                                                                      
- * :--------|:-------|:--------|:--------------------------------------------------------------------------------------------------
- *  [11:0]  | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0
- *  [31:12] | ???    | Unknown | *UNDEFINED*                                                                                      
+ *  Bits    | Access | Reset   | Description                                                                                                     
+ * :--------|:-------|:--------|:-----------------------------------------------------------------------------------------------------------------
+ *  [0]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS     
+ *  [1]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS  
+ *  [2]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS 
+ *  [3]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS
+ *  [4]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS     
+ *  [5]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS  
+ *  [6]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS 
+ *  [7]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS
+ *  [8]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS     
+ *  [9]     | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS  
+ *  [10]    | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS 
+ *  [11]    | R      | Unknown | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS
+ *  [31:12] | ???    | Unknown | *UNDEFINED*                                                                                                     
  * 
  */
 /*
- * Field : FLAGINSTATUS0
+ * Field : FPGA2SDRAM0_IDLE_STATUS
  * 
- * FlagIn Status register #0
+ * FlagIn Status register #0.FPGA2SDRAM0_IDLE_STATUS
  * 
  * Field Access Macros:
  * 
  */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0_MSB        11
-/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0_WIDTH      12
-/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0_SET_MSK    0x00000fff
-/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0_CLR_MSK    0xfffff000
-/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0 register field is UNKNOWN. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0_RESET      0x0
-/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0 field value from a register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0_GET(value) (((value) & 0x00000fff) >> 0)
-/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0 register field value suitable for setting the register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0_SET(value) (((value) << 0) & 0x00000fff)
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS_MSB        0
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS_SET_MSK    0x00000001
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : FPGA2SDRAM0_IDLEACK_STATUS
+ * 
+ * FlagIn Status register #1.FPGA2SDRAM0_IDLEACK_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS_MSB        1
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS_SET_MSK    0x00000002
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : FPGA2SDRAM0_CMD_IDLE_STATUS
+ * 
+ * FlagIn Status register #2.FPGA2SDRAM0_CMD_IDLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS_MSB        2
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS_SET_MSK    0x00000004
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : FPGA2SDRAM0_RESP_IDLE_STATUS
+ * 
+ * FlagIn Status register #3.FPGA2SDRAM0_RESP_IDLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS_MSB        3
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS_SET_MSK    0x00000008
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS_SET(value) (((value) << 3) & 0x00000008)
+
+/*
+ * Field : FPGA2SDRAM1_IDLE_STATUS
+ * 
+ * FlagIn Status register #4.FPGA2SDRAM1_IDLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS_MSB        4
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS_SET_MSK    0x00000010
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS_CLR_MSK    0xffffffef
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS_SET(value) (((value) << 4) & 0x00000010)
+
+/*
+ * Field : FPGA2SDRAM1_IDLEACK_STATUS
+ * 
+ * FlagIn Status register #5.FPGA2SDRAM1_IDLEACK_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS_MSB        5
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS_SET_MSK    0x00000020
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS_CLR_MSK    0xffffffdf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS_GET(value) (((value) & 0x00000020) >> 5)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS_SET(value) (((value) << 5) & 0x00000020)
+
+/*
+ * Field : FPGA2SDRAM1_CMD_IDLE_STATUS
+ * 
+ * FlagIn Status register #6.FPGA2SDRAM1_CMD_IDLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS_LSB        6
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS_MSB        6
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS_SET_MSK    0x00000040
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS_CLR_MSK    0xffffffbf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS_GET(value) (((value) & 0x00000040) >> 6)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS_SET(value) (((value) << 6) & 0x00000040)
+
+/*
+ * Field : FPGA2SDRAM1_RESP_IDLE_STATUS
+ * 
+ * FlagIn Status register #7.FPGA2SDRAM1_RESP_IDLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS_LSB        7
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS_MSB        7
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS_SET_MSK    0x00000080
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS_CLR_MSK    0xffffff7f
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS_GET(value) (((value) & 0x00000080) >> 7)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS_SET(value) (((value) << 7) & 0x00000080)
+
+/*
+ * Field : FPGA2SDRAM2_IDLE_STATUS
+ * 
+ * FlagIn Status register #8.FPGA2SDRAM2_IDLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS_MSB        8
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS_SET_MSK    0x00000100
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS_SET(value) (((value) << 8) & 0x00000100)
+
+/*
+ * Field : FPGA2SDRAM2_IDLEACK_STATUS
+ * 
+ * FlagIn Status register #9.FPGA2SDRAM2_IDLEACK_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS_LSB        9
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS_MSB        9
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS_SET_MSK    0x00000200
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS_CLR_MSK    0xfffffdff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS_GET(value) (((value) & 0x00000200) >> 9)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS_SET(value) (((value) << 9) & 0x00000200)
+
+/*
+ * Field : FPGA2SDRAM2_CMD_IDLE_STATUS
+ * 
+ * FlagIn Status register #10.FPGA2SDRAM2_CMD_IDLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS_LSB        10
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS_MSB        10
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS_SET_MSK    0x00000400
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS_CLR_MSK    0xfffffbff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS_GET(value) (((value) & 0x00000400) >> 10)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS_SET(value) (((value) << 10) & 0x00000400)
+
+/*
+ * Field : FPGA2SDRAM2_RESP_IDLE_STATUS
+ * 
+ * FlagIn Status register #11.FPGA2SDRAM2_RESP_IDLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS_LSB        11
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS_MSB        11
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS_SET_MSK    0x00000800
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS_CLR_MSK    0xfffff7ff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS register field is UNKNOWN. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS_GET(value) (((value) & 0x00000800) >> 11)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS_SET(value) (((value) << 11) & 0x00000800)
 
 #ifndef __ASSEMBLY__
 /*
@@ -32956,8 +32940,19 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  */
 struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_s
 {
-    const volatile uint32_t  FLAGINSTATUS0 : 12;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FLAGINSTATUS0 */
-    uint32_t                               : 20;  /* *UNDEFINED* */
+    const volatile uint32_t  FPGA2SDRAM0_IDLE_STATUS      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM0_IDLEACK_STATUS   :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_IDLEACK_STATUS */
+    const volatile uint32_t  FPGA2SDRAM0_CMD_IDLE_STATUS  :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_CMD_IDLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM0_RESP_IDLE_STATUS :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM0_RESP_IDLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM1_IDLE_STATUS      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM1_IDLEACK_STATUS   :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_IDLEACK_STATUS */
+    const volatile uint32_t  FPGA2SDRAM1_CMD_IDLE_STATUS  :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_CMD_IDLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM1_RESP_IDLE_STATUS :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM1_RESP_IDLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM2_IDLE_STATUS      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM2_IDLEACK_STATUS   :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_IDLEACK_STATUS */
+    const volatile uint32_t  FPGA2SDRAM2_CMD_IDLE_STATUS  :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_CMD_IDLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM2_RESP_IDLE_STATUS :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0_FPGA2SDRAM2_RESP_IDLE_STATUS */
+    uint32_t                                              : 20;  /* *UNDEFINED* */
 };
 
 /* The typedef declaration for register ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGINSTATUS0. */
@@ -32974,36 +32969,244 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  * 
  * Register Layout
  * 
- *  Bits   | Access | Reset   | Description                                                                                  
- * :-------|:-------|:--------|:----------------------------------------------------------------------------------------------
- *  [8:0]  | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0
- *  [31:9] | ???    | Unknown | *UNDEFINED*                                                                                  
+ *  Bits   | Access | Reset   | Description                                                                                                  
+ * :-------|:-------|:--------|:--------------------------------------------------------------------------------------------------------------
+ *  [0]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET    
+ *  [1]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET     
+ *  [2]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET
+ *  [3]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET    
+ *  [4]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET     
+ *  [5]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET
+ *  [6]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET    
+ *  [7]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET     
+ *  [8]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET
+ *  [31:9] | ???    | Unknown | *UNDEFINED*                                                                                                  
  * 
  */
 /*
- * Field : FLAGOUTSET0
+ * Field : FPGA2SDRAM0_IDLEREQ_SET
  * 
- * FlagOut Set register #0
+ * FlagOut Set register #0.FPGA2SDRAM0_IDLEREQ_SET
  * 
  * Field Access Macros:
  * 
  */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0_MSB        8
-/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0_WIDTH      9
-/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0_SET_MSK    0x000001ff
-/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0_CLR_MSK    0xfffffe00
-/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0_RESET      0x0
-/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0 field value from a register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0_GET(value) (((value) & 0x000001ff) >> 0)
-/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0 register field value suitable for setting the register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0_SET(value) (((value) << 0) & 0x000001ff)
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET_MSB        0
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET_SET_MSK    0x00000001
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : FPGA2SDRAM0_ENABLE_SET
+ * 
+ * FlagOut Set register #1.FPGA2SDRAM0_ENABLE_SET
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET_MSB        1
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET_SET_MSK    0x00000002
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : FPGA2SDRAM0_FORCE_DRAIN_SET
+ * 
+ * FlagOut Set register #2.FPGA2SDRAM0_FORCE_DRAIN_SET
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET_MSB        2
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET_SET_MSK    0x00000004
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : FPGA2SDRAM1_IDLEREQ_SET
+ * 
+ * FlagOut Set register #3.FPGA2SDRAM1_IDLEREQ_SET
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET_MSB        3
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET_SET_MSK    0x00000008
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET_SET(value) (((value) << 3) & 0x00000008)
+
+/*
+ * Field : FPGA2SDRAM1_ENABLE_SET
+ * 
+ * FlagOut Set register #4.FPGA2SDRAM1_ENABLE_SET
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET_MSB        4
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET_SET_MSK    0x00000010
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET_CLR_MSK    0xffffffef
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET_SET(value) (((value) << 4) & 0x00000010)
+
+/*
+ * Field : FPGA2SDRAM1_FORCE_DRAIN_SET
+ * 
+ * FlagOut Set register #5.FPGA2SDRAM1_FORCE_DRAIN_SET
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET_MSB        5
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET_SET_MSK    0x00000020
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET_CLR_MSK    0xffffffdf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET_GET(value) (((value) & 0x00000020) >> 5)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET_SET(value) (((value) << 5) & 0x00000020)
+
+/*
+ * Field : FPGA2SDRAM2_IDLEREQ_SET
+ * 
+ * FlagOut Set register #6.FPGA2SDRAM2_IDLEREQ_SET
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET_LSB        6
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET_MSB        6
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET_SET_MSK    0x00000040
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET_CLR_MSK    0xffffffbf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET_GET(value) (((value) & 0x00000040) >> 6)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET_SET(value) (((value) << 6) & 0x00000040)
+
+/*
+ * Field : FPGA2SDRAM2_ENABLE_SET
+ * 
+ * FlagOut Set register #7.FPGA2SDRAM2_ENABLE_SET
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET_LSB        7
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET_MSB        7
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET_SET_MSK    0x00000080
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET_CLR_MSK    0xffffff7f
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET_GET(value) (((value) & 0x00000080) >> 7)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET_SET(value) (((value) << 7) & 0x00000080)
+
+/*
+ * Field : FPGA2SDRAM2_FORCE_DRAIN_SET
+ * 
+ * FlagOut Set register #8.FPGA2SDRAM2_FORCE_DRAIN_SET
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET_MSB        8
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET_SET_MSK    0x00000100
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET_SET(value) (((value) << 8) & 0x00000100)
 
 #ifndef __ASSEMBLY__
 /*
@@ -33019,8 +33222,16 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  */
 struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_s
 {
-    volatile uint32_t  FLAGOUTSET0 :  9;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FLAGOUTSET0 */
-    uint32_t                       : 23;  /* *UNDEFINED* */
+    volatile uint32_t  FPGA2SDRAM0_IDLEREQ_SET     :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_IDLEREQ_SET */
+    volatile uint32_t  FPGA2SDRAM0_ENABLE_SET      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_ENABLE_SET */
+    volatile uint32_t  FPGA2SDRAM0_FORCE_DRAIN_SET :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM0_FORCE_DRAIN_SET */
+    volatile uint32_t  FPGA2SDRAM1_IDLEREQ_SET     :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_IDLEREQ_SET */
+    volatile uint32_t  FPGA2SDRAM1_ENABLE_SET      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_ENABLE_SET */
+    volatile uint32_t  FPGA2SDRAM1_FORCE_DRAIN_SET :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM1_FORCE_DRAIN_SET */
+    volatile uint32_t  FPGA2SDRAM2_IDLEREQ_SET     :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_IDLEREQ_SET */
+    volatile uint32_t  FPGA2SDRAM2_ENABLE_SET      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_ENABLE_SET */
+    volatile uint32_t  FPGA2SDRAM2_FORCE_DRAIN_SET :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0_FPGA2SDRAM2_FORCE_DRAIN_SET */
+    uint32_t                                       : 23;  /* *UNDEFINED* */
 };
 
 /* The typedef declaration for register ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSET0. */
@@ -33037,36 +33248,244 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  * 
  * Register Layout
  * 
- *  Bits   | Access | Reset   | Description                                                                                  
- * :-------|:-------|:--------|:----------------------------------------------------------------------------------------------
- *  [8:0]  | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0
- *  [31:9] | ???    | Unknown | *UNDEFINED*                                                                                  
+ *  Bits   | Access | Reset   | Description                                                                                                  
+ * :-------|:-------|:--------|:--------------------------------------------------------------------------------------------------------------
+ *  [0]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR    
+ *  [1]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR     
+ *  [2]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR
+ *  [3]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR    
+ *  [4]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR     
+ *  [5]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR
+ *  [6]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR    
+ *  [7]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR     
+ *  [8]    | RW     | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR
+ *  [31:9] | ???    | Unknown | *UNDEFINED*                                                                                                  
  * 
  */
 /*
- * Field : FLAGOUTCLR0
+ * Field : FPGA2SDRAM0_IDLEREQ_CLR
  * 
- * FlagOut Clr register #0
+ * FlagOut Clr register #0.FPGA2SDRAM0_IDLEREQ_CLR
  * 
  * Field Access Macros:
  * 
  */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0_MSB        8
-/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0_WIDTH      9
-/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0_SET_MSK    0x000001ff
-/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0_CLR_MSK    0xfffffe00
-/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0_RESET      0x0
-/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0 field value from a register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0_GET(value) (((value) & 0x000001ff) >> 0)
-/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0 register field value suitable for setting the register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0_SET(value) (((value) << 0) & 0x000001ff)
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR_MSB        0
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR_SET_MSK    0x00000001
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : FPGA2SDRAM0_ENABLE_CLR
+ * 
+ * FlagOut Clr register #1.FPGA2SDRAM0_ENABLE_CLR
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR_MSB        1
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR_SET_MSK    0x00000002
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : FPGA2SDRAM0_FORCE_DRAIN_CLR
+ * 
+ * FlagOut Clr register #2.FPGA2SDRAM0_FORCE_DRAIN_CLR
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR_MSB        2
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR_SET_MSK    0x00000004
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : FPGA2SDRAM1_IDLEREQ_CLR
+ * 
+ * FlagOut Clr register #3.FPGA2SDRAM1_IDLEREQ_CLR
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR_MSB        3
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR_SET_MSK    0x00000008
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR_SET(value) (((value) << 3) & 0x00000008)
+
+/*
+ * Field : FPGA2SDRAM1_ENABLE_CLR
+ * 
+ * FlagOut Clr register #4.FPGA2SDRAM1_ENABLE_CLR
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR_MSB        4
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR_SET_MSK    0x00000010
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR_CLR_MSK    0xffffffef
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR_SET(value) (((value) << 4) & 0x00000010)
+
+/*
+ * Field : FPGA2SDRAM1_FORCE_DRAIN_CLR
+ * 
+ * FlagOut Clr register #5.FPGA2SDRAM1_FORCE_DRAIN_CLR
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR_MSB        5
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR_SET_MSK    0x00000020
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR_CLR_MSK    0xffffffdf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR_GET(value) (((value) & 0x00000020) >> 5)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR_SET(value) (((value) << 5) & 0x00000020)
+
+/*
+ * Field : FPGA2SDRAM2_IDLEREQ_CLR
+ * 
+ * FlagOut Clr register #6.FPGA2SDRAM2_IDLEREQ_CLR
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR_LSB        6
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR_MSB        6
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR_SET_MSK    0x00000040
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR_CLR_MSK    0xffffffbf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR_GET(value) (((value) & 0x00000040) >> 6)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR_SET(value) (((value) << 6) & 0x00000040)
+
+/*
+ * Field : FPGA2SDRAM2_ENABLE_CLR
+ * 
+ * FlagOut Clr register #7.FPGA2SDRAM2_ENABLE_CLR
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR_LSB        7
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR_MSB        7
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR_SET_MSK    0x00000080
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR_CLR_MSK    0xffffff7f
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR_GET(value) (((value) & 0x00000080) >> 7)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR_SET(value) (((value) << 7) & 0x00000080)
+
+/*
+ * Field : FPGA2SDRAM2_FORCE_DRAIN_CLR
+ * 
+ * FlagOut Clr register #8.FPGA2SDRAM2_FORCE_DRAIN_CLR
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR_MSB        8
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR_SET_MSK    0x00000100
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR_SET(value) (((value) << 8) & 0x00000100)
 
 #ifndef __ASSEMBLY__
 /*
@@ -33082,8 +33501,16 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  */
 struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_s
 {
-    volatile uint32_t  FLAGOUTCLR0 :  9;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FLAGOUTCLR0 */
-    uint32_t                       : 23;  /* *UNDEFINED* */
+    volatile uint32_t  FPGA2SDRAM0_IDLEREQ_CLR     :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_IDLEREQ_CLR */
+    volatile uint32_t  FPGA2SDRAM0_ENABLE_CLR      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_ENABLE_CLR */
+    volatile uint32_t  FPGA2SDRAM0_FORCE_DRAIN_CLR :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM0_FORCE_DRAIN_CLR */
+    volatile uint32_t  FPGA2SDRAM1_IDLEREQ_CLR     :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_IDLEREQ_CLR */
+    volatile uint32_t  FPGA2SDRAM1_ENABLE_CLR      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_ENABLE_CLR */
+    volatile uint32_t  FPGA2SDRAM1_FORCE_DRAIN_CLR :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM1_FORCE_DRAIN_CLR */
+    volatile uint32_t  FPGA2SDRAM2_IDLEREQ_CLR     :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_IDLEREQ_CLR */
+    volatile uint32_t  FPGA2SDRAM2_ENABLE_CLR      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_ENABLE_CLR */
+    volatile uint32_t  FPGA2SDRAM2_FORCE_DRAIN_CLR :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0_FPGA2SDRAM2_FORCE_DRAIN_CLR */
+    uint32_t                                       : 23;  /* *UNDEFINED* */
 };
 
 /* The typedef declaration for register ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTCLR0. */
@@ -33100,36 +33527,244 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  * 
  * Register Layout
  * 
- *  Bits   | Access | Reset   | Description                                                                                        
- * :-------|:-------|:--------|:----------------------------------------------------------------------------------------------------
- *  [8:0]  | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0
- *  [31:9] | ???    | Unknown | *UNDEFINED*                                                                                        
+ *  Bits   | Access | Reset   | Description                                                                                                        
+ * :-------|:-------|:--------|:--------------------------------------------------------------------------------------------------------------------
+ *  [0]    | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS    
+ *  [1]    | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS     
+ *  [2]    | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS
+ *  [3]    | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS    
+ *  [4]    | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS     
+ *  [5]    | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS
+ *  [6]    | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS    
+ *  [7]    | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS     
+ *  [8]    | R      | 0x0     | ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS
+ *  [31:9] | ???    | Unknown | *UNDEFINED*                                                                                                        
  * 
  */
 /*
- * Field : FLAGOUTSTATUS0
+ * Field : FPGA2SDRAM0_IDLEREQ_STATUS
  * 
- * FlagOut Status register #0
+ * FlagOut Status register #0.FPGA2SDRAM0_IDLEREQ_STATUS
  * 
  * Field Access Macros:
  * 
  */
-/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0_LSB        0
-/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0_MSB        8
-/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0_WIDTH      9
-/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0_SET_MSK    0x000001ff
-/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0 register field value. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0_CLR_MSK    0xfffffe00
-/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0 register field. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0_RESET      0x0
-/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0 field value from a register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0_GET(value) (((value) & 0x000001ff) >> 0)
-/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0 register field value suitable for setting the register. */
-#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0_SET(value) (((value) << 0) & 0x000001ff)
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS_LSB        0
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS_MSB        0
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS_SET_MSK    0x00000001
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS_CLR_MSK    0xfffffffe
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS_GET(value) (((value) & 0x00000001) >> 0)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS_SET(value) (((value) << 0) & 0x00000001)
+
+/*
+ * Field : FPGA2SDRAM0_ENABLE_STATUS
+ * 
+ * FlagOut Status register #1.FPGA2SDRAM0_ENABLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS_LSB        1
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS_MSB        1
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS_SET_MSK    0x00000002
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS_CLR_MSK    0xfffffffd
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS_GET(value) (((value) & 0x00000002) >> 1)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS_SET(value) (((value) << 1) & 0x00000002)
+
+/*
+ * Field : FPGA2SDRAM0_FORCE_DRAIN_STATUS
+ * 
+ * FlagOut Status register #2.FPGA2SDRAM0_FORCE_DRAIN_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS_LSB        2
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS_MSB        2
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS_SET_MSK    0x00000004
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS_CLR_MSK    0xfffffffb
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS_GET(value) (((value) & 0x00000004) >> 2)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS_SET(value) (((value) << 2) & 0x00000004)
+
+/*
+ * Field : FPGA2SDRAM1_IDLEREQ_STATUS
+ * 
+ * FlagOut Status register #3.FPGA2SDRAM1_IDLEREQ_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS_LSB        3
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS_MSB        3
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS_SET_MSK    0x00000008
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS_CLR_MSK    0xfffffff7
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS_GET(value) (((value) & 0x00000008) >> 3)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS_SET(value) (((value) << 3) & 0x00000008)
+
+/*
+ * Field : FPGA2SDRAM1_ENABLE_STATUS
+ * 
+ * FlagOut Status register #4.FPGA2SDRAM1_ENABLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS_LSB        4
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS_MSB        4
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS_SET_MSK    0x00000010
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS_CLR_MSK    0xffffffef
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS_GET(value) (((value) & 0x00000010) >> 4)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS_SET(value) (((value) << 4) & 0x00000010)
+
+/*
+ * Field : FPGA2SDRAM1_FORCE_DRAIN_STATUS
+ * 
+ * FlagOut Status register #5.FPGA2SDRAM1_FORCE_DRAIN_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS_LSB        5
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS_MSB        5
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS_SET_MSK    0x00000020
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS_CLR_MSK    0xffffffdf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS_GET(value) (((value) & 0x00000020) >> 5)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS_SET(value) (((value) << 5) & 0x00000020)
+
+/*
+ * Field : FPGA2SDRAM2_IDLEREQ_STATUS
+ * 
+ * FlagOut Status register #6.FPGA2SDRAM2_IDLEREQ_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS_LSB        6
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS_MSB        6
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS_SET_MSK    0x00000040
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS_CLR_MSK    0xffffffbf
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS_GET(value) (((value) & 0x00000040) >> 6)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS_SET(value) (((value) << 6) & 0x00000040)
+
+/*
+ * Field : FPGA2SDRAM2_ENABLE_STATUS
+ * 
+ * FlagOut Status register #7.FPGA2SDRAM2_ENABLE_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS_LSB        7
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS_MSB        7
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS_SET_MSK    0x00000080
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS_CLR_MSK    0xffffff7f
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS_GET(value) (((value) & 0x00000080) >> 7)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS_SET(value) (((value) << 7) & 0x00000080)
+
+/*
+ * Field : FPGA2SDRAM2_FORCE_DRAIN_STATUS
+ * 
+ * FlagOut Status register #8.FPGA2SDRAM2_FORCE_DRAIN_STATUS
+ * 
+ * Field Access Macros:
+ * 
+ */
+/* The Least Significant Bit (LSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS_LSB        8
+/* The Most Significant Bit (MSB) position of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS_MSB        8
+/* The width in bits of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS_WIDTH      1
+/* The mask used to set the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS_SET_MSK    0x00000100
+/* The mask used to clear the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS register field value. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS_CLR_MSK    0xfffffeff
+/* The reset value of the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS register field. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS_RESET      0x0
+/* Extracts the ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS field value from a register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS_GET(value) (((value) & 0x00000100) >> 8)
+/* Produces a ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS register field value suitable for setting the register. */
+#define ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS_SET(value) (((value) << 8) & 0x00000100)
 
 #ifndef __ASSEMBLY__
 /*
@@ -33145,8 +33780,16 @@ typedef struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMAN
  */
 struct ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_s
 {
-    const volatile uint32_t  FLAGOUTSTATUS0 :  9;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FLAGOUTSTATUS0 */
-    uint32_t                                : 23;  /* *UNDEFINED* */
+    const volatile uint32_t  FPGA2SDRAM0_IDLEREQ_STATUS     :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_IDLEREQ_STATUS */
+    const volatile uint32_t  FPGA2SDRAM0_ENABLE_STATUS      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_ENABLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM0_FORCE_DRAIN_STATUS :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM0_FORCE_DRAIN_STATUS */
+    const volatile uint32_t  FPGA2SDRAM1_IDLEREQ_STATUS     :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_IDLEREQ_STATUS */
+    const volatile uint32_t  FPGA2SDRAM1_ENABLE_STATUS      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_ENABLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM1_FORCE_DRAIN_STATUS :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM1_FORCE_DRAIN_STATUS */
+    const volatile uint32_t  FPGA2SDRAM2_IDLEREQ_STATUS     :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_IDLEREQ_STATUS */
+    const volatile uint32_t  FPGA2SDRAM2_ENABLE_STATUS      :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_ENABLE_STATUS */
+    const volatile uint32_t  FPGA2SDRAM2_FORCE_DRAIN_STATUS :  1;  /* ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0_FPGA2SDRAM2_FORCE_DRAIN_STATUS */
+    uint32_t                                                : 23;  /* *UNDEFINED* */
 };
 
 /* The typedef declaration for register ALT_MPFE_F2SDR_MGR_MAIN_SBMGR_FPGA2SDRAM_MANAGER_MAIN_SIDEBANDMANAGER_FLAGOUTSTATUS0. */
