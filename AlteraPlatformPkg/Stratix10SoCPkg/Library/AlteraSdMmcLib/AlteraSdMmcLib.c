@@ -52,6 +52,34 @@ volatile IDMA_DES mDmaDes;
 // ==================================================================
 // Functions Implementation:
 // ==================================================================
+EFI_STATUS UpdateClkCmd (VOID)
+{
+  UINTN Count;
+  UINT32 Data32;
+
+    // 3. Write the cmdarg register and cmd register
+   MmioWrite32 (
+    ALT_HPS_SDMMC_OFST +
+    ALT_SDMMC_CMD_OFST,
+    ALT_SDMMC_CMD_START_CMD_SET_MSK |ALT_SDMMC_CMD_UPDATE_CLOCK_REGISTERS_ONLY_SET_MSK |ALT_SDMMC_CMD_WAIT_PRVDATA_COMPLETE_SET_MSK
+    );
+
+  // 4. Wait for the start_cmd bit changes to 0 or timeout.
+  Count = 0;
+  do {
+    Data32 = MmioRead32 (ALT_HPS_SDMMC_OFST + ALT_SDMMC_CMD_OFST);
+    if (ALT_SDMMC_CMD_START_CMD_GET(Data32) == ALT_SDMMC_CMD_START_CMD_E_FALSE)
+      break;
+  } while (Count++ < SEND_CMD_WAIT_TIMEOUT);
+
+  // Check if timeout
+  if (Count >= SEND_CMD_WAIT_TIMEOUT) {
+    return EFI_TIMEOUT;
+  }
+
+   return EFI_SUCCESS;
+
+}
 
 BOOLEAN
 EFIAPI
@@ -61,6 +89,7 @@ IsCardPresent (
 {
   BOOLEAN  Result;
   UINT32   Data32;
+
   Data32 = MmioRead32 (
     ALT_HPS_SDMMC_OFST +
     ALT_SDMMC_STATUS_OFST
@@ -69,6 +98,7 @@ IsCardPresent (
     ALT_SDMMC_STATUS_DATA_3_STATUS_GET(Data32) ==
     ALT_SDMMC_STATUS_DATA_3_STATUS_E_HIGH
     );
+
   return (Result);
 }
 
@@ -119,23 +149,18 @@ InitializeSdMmc (
   mSetBitMode_started = FALSE;
   //#endif
 
-  // Issues a Reset Commands
-  MmioOr32  (
-    ALT_RSTMGR_OFST +
-    ALT_RSTMGR_PER0MODRST_OFST,
-    ALT_RSTMGR_PER0MODRST_SDMMC_SET_MSK
-    );
-
-  MicroSecondDelay(1000);
-  MmioAnd32 (
-    ALT_RSTMGR_OFST +
-    ALT_RSTMGR_PER0MODRST_OFST,
-    ALT_RSTMGR_PER0MODRST_SDMMC_CLR_MSK);
 
   //
   // Power-On Reset Sequence (as per a10_5v4.pdf 2014.12.15)
   // Software must perform the following steps after the power-on-reset:
   //
+  /* Reset controller and FIFO */
+  MmioOr32(ALT_HPS_SDMMC_OFST + ALT_SDMMC_CTRL_OFST,  (ALT_SDMMC_CTRL_CONTROLLER_RESET_SET_MSK| ALT_SDMMC_CTRL_FIFO_RESET_SET_MSK));
+
+  /* Polling until reset bit and FIFO reset bit are cleared. */
+  while ((MmioRead32( ALT_HPS_SDMMC_OFST + ALT_SDMMC_CTRL_OFST) & ( ALT_SDMMC_CTRL_CONTROLLER_RESET_SET_MSK| ALT_SDMMC_CTRL_FIFO_RESET_SET_MSK)) != 0);
+
+
   //  1. Before enabling power to the card, confirm that the voltage setting to the voltage regulator is correct.
   Status = InitOnboardSdmmcVoltageRegulator ();
   if (Status != EFI_SUCCESS) return Status;
@@ -309,9 +334,7 @@ ChangeCardClockFrequency(
   )
 {
   EFI_STATUS Status;
-  UINT32     Data32;
-  UINTN      Count;
-  UINT32     smplsel, drvsel;
+  //UINT32     smplsel, drvsel;
 
   if (PcdGet32 (PcdDebugMsg_SdMmc) != 0)
     SerialPortPrint ("\tSDMMC: %a ( 0x%02x ) \r\n", __FUNCTION__, clkdiv);
@@ -342,32 +365,9 @@ ChangeCardClockFrequency(
   //    a) update_clk_regs_only — Specifies the update clocks command
   //    b) wait_prvdata_complete — Wait until any ongoing data transfer is complete
   //    c) start_cmd — Initiates the command
-  Data32 = ALT_SDMMC_CMD_UPDATE_CLOCK_REGISTERS_ONLY_SET (ALT_SDMMC_CMD_UPDATE_CLOCK_REGISTERS_ONLY_E_TRUE) |
-           ALT_SDMMC_CMD_WAIT_PRVDATA_COMPLETE_SET(ALT_SDMMC_CMD_WAIT_PRVDATA_COMPLETE_E_WAIT) |
-           ALT_SDMMC_CMD_START_CMD_SET    ((UINT32)ALT_SDMMC_CMD_START_CMD_E_TRUE);
-  MmioWrite32 (
-    ALT_HPS_SDMMC_OFST +
-    ALT_SDMMC_CMD_OFST,
-    Data32
-    );
+  UpdateClkCmd ();
 
-  // 5. Wait until the start_cmd and update_clk_regs_only bits change to 0. There is no interrupt when the
-  //    clock modification completes. The controller does not set the command_done bit in the rintsts register
-  //    upon command completion. The controller might signal a hardware lock error if it already has another
-  //    command in the queue. In this case, return to Step 4.
-  Count = 0;
-  do {
-    Data32 = MmioRead32 (ALT_HPS_SDMMC_OFST + ALT_SDMMC_CMD_OFST);
-    if (ALT_SDMMC_CMD_START_CMD_GET(Data32) == ALT_SDMMC_CMD_START_CMD_E_FALSE)
-      break;
-  } while (Count++ < SEND_CMD_WAIT_TIMEOUT);
-  // Check if timeout
-  if (Count >= SEND_CMD_WAIT_TIMEOUT) {
-    if (PcdGet32 (PcdDebugMsg_SdMmc) != 0)
-      SerialPortPrint ("\tSDMMC: %a () Timeout\r\n", __FUNCTION__);
-    return EFI_TIMEOUT;
-  }
-  // 6. Reset the sdmmcclken enable bit to 0 in the enable register of the clock manager peripheral PLL group (perpllgrp).
+  /*// 6. Reset the sdmmcclken enable bit to 0 in the enable register of the clock manager peripheral PLL group (perpllgrp).
   MmioAnd32 (
     ALT_CLKMGR_PERPLL_OFST +
     ALT_CLKMGR_PERPLL_EN_OFST,
@@ -380,6 +380,7 @@ ChangeCardClockFrequency(
 
   if (PcdGet32 (PcdSdmmcSweepAllDrvselAndSmplselValues) != 1)
   {
+    SerialPortPrint("change smpsel\n");
     // Default value need to be consistent with value found in soc_system.dts
     //  --> altr,dw-mshc-sdr-timing = <0(smplsel) 3(drvsel)>;
     smplsel = PcdGet32 (PcdSdmmcSmplSel);
@@ -399,7 +400,7 @@ ChangeCardClockFrequency(
     ALT_CLKMGR_PERPLL_OFST +
     ALT_CLKMGR_PERPLL_EN_OFST,
     ALT_CLKMGR_PERPLL_EN_SDMMCCLKEN_SET_MSK
-    );
+    );*/
 
   // 9. Set the clkdiv register of the controller to the correct divider value for the required clock frequency.
   // Divides Clock sdmmc_clk (12.5 MHz max, See Table A-8: SD/MMC Controller CLKSEL Pin Settings)
@@ -409,29 +410,23 @@ ChangeCardClockFrequency(
     ALT_SDMMC_CLKDIV_CLK_DIVIDER0_CLR_MSK,
     ALT_SDMMC_CLKDIV_CLK_DIVIDER0_SET(clkdiv)
     );
-
+  UpdateClkCmd ();
   //10. Set the cclk_enable bit of the clkena register to 1, to enable the card clock generation.
   //    You can also use the clkena register to enable low-power mode, which automatically stops the
   //    sdmmc_cclk_out clock when the card is idle for more than eight clock cycles.
   MmioOr32 (
     ALT_HPS_SDMMC_OFST +
     ALT_SDMMC_CLKENA_OFST,
-    ALT_SDMMC_CLKENA_CCLK_ENABLE_0_E_ENABLED
+     ALT_SDMMC_CLKENA_CCLK_ENABLE_0_SET_MSK |
+    ALT_SDMMC_CLKENA_CCLK_LOW_POWER_0_SET_MSK
     );
 
   //11. Set the following bits in the cmd register to 1:
   //    a) update_clk_regs_only — Specifies the update clocks command
   //    b) wait_prvdata_complete — Wait until any ongoing data transfer is complete
   //    c) start_cmd — Initiates the command
-  Data32 = ALT_SDMMC_CMD_UPDATE_CLOCK_REGISTERS_ONLY_SET (ALT_SDMMC_CMD_UPDATE_CLOCK_REGISTERS_ONLY_E_TRUE) |
-           ALT_SDMMC_CMD_WAIT_PRVDATA_COMPLETE_SET(ALT_SDMMC_CMD_WAIT_PRVDATA_COMPLETE_E_WAIT) |
-           ALT_SDMMC_CMD_START_CMD_SET            ((UINT32)ALT_SDMMC_CMD_START_CMD_E_TRUE);
-  MmioWrite32 (
-    ALT_HPS_SDMMC_OFST +
-    ALT_SDMMC_CMD_OFST,
-    Data32
-    );
 
+  UpdateClkCmd ();
   return EFI_SUCCESS;
 }
 
@@ -598,7 +593,7 @@ SendCommand (
     Data32 |= ALT_SDMMC_CMD_DATA_EXPECTED_SET (ALT_SDMMC_CMD_DATA_EXPECTED_E_TRUE);
     Data32 |= ALT_SDMMC_CMD_READ_WRITE_SET (ALT_SDMMC_CMD_READ_WRITE_E_WRITE);
     Data32 |= ALT_SDMMC_CMD_SEND_AUTO_STOP_SET(ALT_SDMMC_CMD_SEND_AUTO_STOP_E_FALSE);
-  } else if ((MmcCmd == MMC_CMD17) || (MmcCmd == MMC_CMD18) || (MmcCmd == MMC_CMD8)) {
+  } else if ((MmcCmd == MMC_CMD17) || (MmcCmd == MMC_CMD18) ) { //|| (MmcCmd == MMC_CMD8)) {
     // Read Data Command
     Data32 |= ALT_SDMMC_CMD_DATA_EXPECTED_SET (ALT_SDMMC_CMD_DATA_EXPECTED_E_TRUE);
     Data32 |= ALT_SDMMC_CMD_READ_WRITE_SET (ALT_SDMMC_CMD_READ_WRITE_E_READ);
@@ -682,6 +677,7 @@ SendCommand (
     Data32
     );
 
+
   // 4. Wait for the start_cmd bit changes to 0 or timeout.
   Count = 0;
   do {
@@ -745,7 +741,7 @@ SendCommand (
       (ALT_SDMMC_RINTSTS_DATA_READ_TIMEOUT_STATUS_GET(Data32) == ALT_SDMMC_RINTSTS_DATA_READ_TIMEOUT_STATUS_E_ENABLED) ||
       (ALT_SDMMC_RINTSTS_HOST_TIMEOUT_STATUS_GET(Data32) == ALT_SDMMC_RINTSTS_HOST_TIMEOUT_STATUS_E_ENABLED)) {
     if (PcdGet32 (PcdDebugMsg_SdMmc) >= 2)
-      SerialPortPrint ("\tTimeout\n\r");
+      SerialPortPrint ("\tResponse Timeout\n\r");
     return EFI_TIMEOUT;
   }
   if ((ALT_SDMMC_RINTSTS_FIFO_UNDER_OVER_RUN_STATUS_GET(Data32) == ALT_SDMMC_RINTSTS_FIFO_UNDER_OVER_RUN_STATUS_E_ENABLED) ||
@@ -754,6 +750,7 @@ SendCommand (
       (ALT_SDMMC_RINTSTS_RESPONSE_ERROR_STATUS_GET(Data32) == ALT_SDMMC_RINTSTS_RESPONSE_ERROR_STATUS_E_ENABLED)) {
     return EFI_DEVICE_ERROR;
   }
+  MicroSecondDelay(100);
 
   return EFI_SUCCESS;
 }

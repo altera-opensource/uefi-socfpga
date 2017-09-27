@@ -198,19 +198,19 @@ ArmPlatformInitialize (
   //
 
   // Assert the reset to Disable Watchdog Timer 0 which has been enabled by BootROM
-  AssertWatchDogTimerZeroReset ();
+  //AssertWatchDogTimerZeroReset ();
 
   // Reset is asserted here and not in PlatformInit PEI module because of
   // PeiMain first init Sys Timer 0 and install MicroSecondDelay/NanoSecondDelay functions
-  AssertPeripheralsReset ();
-  DeassertSystemTimerZeroReset ();
+  //AssertPeripheralsReset ();
+  //DeassertSystemTimerZeroReset ();
 
   // BootRom is mapped to address 0x0 when handover.
   // Define the MPU DRAM window boundaries.
-  InitMpuDramWindowBoundary ();
+  //InitMpuDramWindowBoundary ();
 
   // Set Security Control Registers
-  SetSecurityControlRegisters ();
+  //SetSecurityControlRegisters ();
 
   return EFI_SUCCESS;
 }
