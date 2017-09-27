@@ -58,11 +58,11 @@
 ################################################################################
 
 [FD.ALTERA_HPS_OCRAM_EFI_PART1]
-BaseAddress   = 0xffe00000  # The base address of the Firmware in OCRAM.
-Size          = 0x00026000  # The size in bytes
+BaseAddress   = 0xFFE00000  # The base address of the Firmware in OCRAM.
+Size          = 0x00030FFC  # The size in bytes
 ErasePolarity = 1
 BlockSize     = 0x00000001
-NumBlocks     = 0x00026000
+NumBlocks     = 0x00030FFC
 
 ################################################################################
 #
@@ -79,20 +79,37 @@ NumBlocks     = 0x00026000
 #
 ################################################################################
 
-0x00000000|8192
+0x00000000|200700
 gArmTokenSpaceGuid.PcdSecureFvBaseAddress|gArmTokenSpaceGuid.PcdSecureFvSize
-FV = FV_SEC_UNCOMPRESSED
-
-0x00002000|131072
-gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
-FV = FV_PEI_UNCOMPRESSED
-
-0x00022000|16384
-gAlteraHpsTokenSpaceGuid.PcdFvDtbBaseAddress|gAlteraHpsTokenSpaceGuid.PcdDtbFvSize
-FILE = AlteraPlatformPkg/Stratix10SoCPkg/Stratix10SoCPkg.dtb
-
+FV = FV_SEC
 
 [FD.ALTERA_HPS_DRAM_EFI_PART2]
+BaseAddress   = 0x050000  # The base address of the Firmware in remapped DRAM.
+Size          = 0x00020000         # The size in bytes
+ErasePolarity = 1
+BlockSize     = 0x00000001
+NumBlocks     = 0x00020000
+
+################################################################################
+#
+# FD Region layout
+#
+# A Layout Region start with a eight digit hex offset (leading "0x" required)
+# followed by the pipe "|" character,
+# followed by the size of the region, also in hex with the leading "0x" characters.
+# Must be defined in ascending order and may not overlap.
+# Like:
+# Offset|Size
+# PcdOffsetCName|PcdSizeCName
+# RegionType <FV, DATA, or FILE>
+#
+################################################################################
+
+0x00000000|0x00020000
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
+FV = FV_PEI
+
+[FD.ALTERA_HPS_DRAM_EFI_PART3]
 BaseAddress   = 0x01000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
 Size          = 0x00100000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes
 ErasePolarity = 1
@@ -116,10 +133,10 @@ NumBlocks     = 0x00100000
 
 0x00000000|0x00100000
 gAlteraHpsTokenSpaceGuid.PcdFvDxeBaseAddress|gAlteraHpsTokenSpaceGuid.PcdDxeFvSize
-FV = FV_DXE_COMPRESSED
+FV = FV_DXE_COMPRESS
 
 
-[FD.FD_DXE_BEFORE_COMPRESSION]
+[FD.ALTERA_HPS_DRAM_EFI_PART4]
 BaseAddress   = 0x01000000|gArmTokenSpaceGuid.PcdFdBaseAddress  # The base address of the Firmware in remapped DRAM.
 Size          = 0x00400000|gArmTokenSpaceGuid.PcdFdSize         # The size in bytes
 ErasePolarity = 1
@@ -140,9 +157,10 @@ NumBlocks     = 0x00400000
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-
 0x00000000|0x00400000
-FV = FV_DXE_BEFORE_COMPRESSION
+FV = FV_DXE
+
+
 
 ################################################################################
 #
@@ -155,7 +173,7 @@ FV = FV_DXE_BEFORE_COMPRESSION
 #
 ################################################################################
 
-[FV.FV_SEC_UNCOMPRESSED]
+[FV.FV_SEC]
 FvAlignment        = 8
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
@@ -173,10 +191,9 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
-  INF AlteraPlatformPkg/Sec/Sec.inf
+  INF AlteraPlatformPkg/Stratix10SoCPkg/Sec/Sec.inf
 
-
-[FV.FV_PEI_UNCOMPRESSED]
+[FV.FV_PEI]
 FvAlignment        = 8
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
@@ -197,8 +214,7 @@ READ_LOCK_STATUS   = TRUE
   INF AlteraPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf
   INF AlteraPlatformPkg/Stratix10SoCPkg/PlatformPei/AlteraSocFpgaPeiMain.inf
 
-
-[FV.FV_DXE_COMPRESSED]
+[FV.FV_DXE_COMPRESS]
 FvAlignment        = 8
 ERASE_POLARITY     = 1
 MEMORY_MAPPED      = TRUE
@@ -218,12 +234,12 @@ READ_LOCK_STATUS   = TRUE
 
   FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
     SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
-      SECTION FV_IMAGE = FV_DXE_BEFORE_COMPRESSION
+	  SECTION FV_IMAGE = FV_DXE
     }
   }
 
 
-[FV.FV_DXE_BEFORE_COMPRESSION]
+[FV.FV_DXE]
 BlockSize          = 0x00000001
 NumBlocks          = 0         # This FV gets compressed so make it just big enough
 FvAlignment        = 8         # FV alignment and FV attributes setting.
@@ -356,6 +372,7 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
   }
 
 
+
 ################################################################################
 #
 # Rules are use with the [FV] section's module INF type to define
@@ -385,20 +402,20 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
 ############################################################################
 
 [Rule.Common.SEC]
-  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
-    TE  TE    Align = 32                $(INF_OUTPUT)/$(MODULE_NAME).efi
+  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED FIXED {
+    TE  TE Align = Auto                 $(INF_OUTPUT)/$(MODULE_NAME).efi
   }
 
 [Rule.Common.PEI_CORE]
-  FILE PEI_CORE = $(NAMED_GUID) {
-    TE     TE                           $(INF_OUTPUT)/$(MODULE_NAME).efi
+  FILE PEI_CORE = $(NAMED_GUID) FIXED {
+    TE     TE Align = Auto              $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI     STRING ="$(MODULE_NAME)" Optional
   }
 
 [Rule.Common.PEIM]
-  FILE PEIM = $(NAMED_GUID) {
+  FILE PEIM = $(NAMED_GUID) FIXED {
      PEI_DEPEX PEI_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
-     TE       TE                        $(INF_OUTPUT)/$(MODULE_NAME).efi
+     TE       TE Align = Auto           $(INF_OUTPUT)/$(MODULE_NAME).efi
      UI       STRING="$(MODULE_NAME)" Optional
   }
 

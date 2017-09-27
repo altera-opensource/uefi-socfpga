@@ -89,7 +89,7 @@
   #
   gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSweepAllDrvselAndSmplselValues|0
   gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcDrvSel|3
-  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSmplSel|2
+  gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSmplSel|0
   gAlteraSocFpgaTokenSpaceGuid.PcdSdmmcSupport4BitMode|1
   gAlteraSocFpgaTokenSpaceGuid.PcdEnableMemoryTest|1
   gAlteraSocFpgaTokenSpaceGuid.PcdRemapOnChipRamTo1stOneMB|0
@@ -111,6 +111,10 @@
   #
   # QSPI Clock Frequency
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiClkFreq|54
+
+  #
+  # Nand will not erase/read/write if more than this defined numbers of bad block are detected
+  gAlteraSocFpgaTokenSpaceGuid.PcdNandStopIfMoreThanThisNumberBadBlocks|1
 
   #
   # Semihosting Support
@@ -224,7 +228,7 @@
   gArmPlatformTokenSpaceGuid.PcdCoreCount|2
 
   # Stacks for MPCores in PEI Phase
-  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0xFFE32000
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x6d000
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0xC000
 
   # Stacks for MPCores in SEC Phase
@@ -258,13 +262,6 @@
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x40000000
 
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
-
-  # Arm Core ID
-  # Use ClusterId + CoreId to identify the PrimaryCore
-  #gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
-  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0x00000031
-  # The Primary Core is ClusterId[0] & CoreId[0]
-  gArmTokenSpaceGuid.PcdArmPrimaryCore|0
 
   # Arm Architectural Timer
   gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|24000000
@@ -371,12 +368,12 @@
   # Altera SoC FPGA HPS UART1 is 0xFFC02100.
   # To disable set 0 as base address
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0xFFC02000
-
+  #gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x60000
   ## UART clock frequency is for the baud rate configuration.
   # @Prompt Serial Port Clock Rate.
   # On PC this is 1.8432 MHz - 1843200
   # On Altera SoC FPGA HPS UART clock source is l4_sp_clk
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|50000000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|100000000
 
   ## Baud rate for the 16550 serial port.  Default is 115200 baud.
   # @Prompt Baud rate for serial port.
@@ -532,7 +529,11 @@
   SerialPortLib|AlteraPlatformPkg/Library/Mmio16550SerialPortLib/Mmio16550SerialPortLib.inf
   SerialPortPrintLib|AlteraPlatformPkg/Library/SerialPortPrintLib/SerialPortPrintLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
-  TimerLib|AlteraPlatformPkg/Library/AlteraHpsTimerLib/AlteraHpsTimerLib.inf
+
+  # replace hps timer by arm timer
+  #TimerLib|AlteraPlatformPkg/Library/AlteraHpsTimerLib/AlteraHpsTimerLib.inf
+  TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
+
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
@@ -623,6 +624,7 @@
   ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
 
 [LibraryClasses.common.PEI_CORE]
+  ArmLib|ArmPkg/Library/ArmLib/AArch64/AArch64Lib.inf
   ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
@@ -638,6 +640,7 @@
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
   UefiDecompressLib|MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
+  PeiCrc32GuidedSectionExtractLib|MdeModulePkg/Library/PeiCrc32GuidedSectionExtractLib/PeiCrc32GuidedSectionExtractLib.inf
 
 [LibraryClasses.common.PEIM]
   ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
@@ -731,7 +734,7 @@
   #
   # SEC
   #
-  AlteraPlatformPkg/Sec/Sec.inf {
+  AlteraPlatformPkg/Stratix10SoCPkg/Sec/Sec.inf {
     <LibraryClasses>
       # Use the implementation which set the Secure bits
       ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
@@ -744,28 +747,13 @@
     <LibraryClasses>
       ArmPlatformGlobalVariableLib|ArmPlatformPkg/Library/ArmPlatformGlobalVariableLib/Pei/PeiArmPlatformGlobalVariableLib.inf
   }
-
   #
   # PEI Phase modules
   #
-  #MdeModulePkg/Core/Pei/PeiMain.inf
   AlteraPlatformPkg/Stratix10SoCPkg/PlatformPei/AlteraSocFpgaPeiMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
-
-  #MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
-
-  #MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
-  #  <LibraryClasses>
-  #    PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-  #}
-  #AlteraPlatformPkg/MemoryInitPei/MemoryInitPeim.inf
-  #ArmPkg/Drivers/CpuPei/CpuPei.inf
-  #IntelFrameworkModulePkg/Universal/StatusCode/Pei/StatusCodePei.inf
-  #Nt32Pkg/BootModePei/BootModePei.inf
-  #MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
-
   #
   # DXE
   #
@@ -858,21 +846,19 @@
 
   # Standard EFI HelloWorld Application
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
-
 [BuildOptions]
   #-------------------------------
   # Common
   #-------------------------------
   CLANG35:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
-  GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG -fstack-protector -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security
-  GCC:RELEASE_*_*_DLINK_FLAGS  = -z noexecstack -z relro -z now
+  GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
 
   #-------------------------------
   # AlteraPlatformPkg/...
   #-------------------------------
   CLANG35:*_*_AARCH64_PLATFORM_FLAGS   == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include
-  GCC:DEBUG_*_AARCH64_PLATFORM_FLAGS   == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -DMDEPKG_NDEBUG -Wno-unused-but-set-variable
-  GCC:RELEASE_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include
+  GCC:DEBUG_*_AARCH64_PLATFORM_FLAGS   == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -O0 -DMDEPKG_NDEBUG -Wno-unused-but-set-variable -mstrict-align
+  GCC:RELEASE_*_AARCH64_PLATFORM_FLAGS == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -O0 -mstrict-align
   XCODE:*_*_AARCH64_PLATFORM_FLAGS     == -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include -I$(WORKSPACE)/AlteraPlatformPkg/Stratix10SoCPkg/Include
 
 [BuildOptions.AARCH64.EDKII.DXE_RUNTIME_DRIVER]
