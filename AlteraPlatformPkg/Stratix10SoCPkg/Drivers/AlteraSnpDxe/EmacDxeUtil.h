@@ -159,18 +159,6 @@ EmacReadMacAddress (
   OUT EFI_MAC_ADDRESS *MacAddress
   );
 
-VOID
-EFIAPI
-AlteraHpsInitialization (
-  VOID
-  );
-
-VOID
-EFIAPI
-EmacConfigPhyInterface (
-  IN UINT32 PhyMode
-  );
-
 EFI_STATUS
 EFIAPI
 EmacDxeInitialization (

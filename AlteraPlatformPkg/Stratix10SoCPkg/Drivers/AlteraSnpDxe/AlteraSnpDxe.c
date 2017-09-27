@@ -384,7 +384,7 @@ SnpInitialize (
   }
 
   // Init HPS
-  AlteraHpsInitialization ();
+  //AlteraHpsInitialization ();
 
   // Init PHY
   Status = PhyDxeInitialization (&Driver->PhyDriver);
