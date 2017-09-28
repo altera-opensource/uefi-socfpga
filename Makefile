@@ -188,15 +188,60 @@ ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "
   else
   $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
   endif
+
+  #-----------------------------------------------------------------------------
+  # Device Tree
+  #-----------------------------------------------------------------------------
+  # Update handoff DTB ?
+  # Check error: Same file?
+  ifeq ($(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb), $(FDF_LINK_DTB_PATH))
+    $(error ERROR: Same file (HANDOFF_DTB == default .FDF DTB) plese remove the HANDOFF_DTB arguement)
+  endif
+  ifneq ("$(wildcard $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))","")
+    # FILE_EXISTS = 1
+    export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(ECHO_END)
+    export CMD_UPDATE_HANDOFF_DTB_1=$(CP) $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(FDF_LINK_DTB_PATH)
+    export CMD_UPDATE_HANDOFF_DTB_2=$(CMD_UPDATE_HANDOFF_DTB_1) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts -o $(FDF_LINK_DTS_PATH)
+    export CMD_UPDATE_HANDOFF_DTB_3=$(CMD_UPDATE_HANDOFF_DTB_2) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
+    export CMD_UPDATE_HANDOFF_DTB=$(CMD_UPDATE_HANDOFF_DTB_3)
+  else ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
+    # FILE_EXISTS = 0
+    export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(FDF_LINK_DTB_PATH)$(ECHO_END)
+    export CMD_UPDATE_HANDOFF_DTB=@$(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
+  else
+    export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : ERROR! FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)$(ECHO_END)
+    export CMD_UPDATE_HANDOFF_DTB=
+    $(error ERROR: FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))
+  endif
+
+  # If no DTB but got DTS, help to compile the DTS and copy to replace default DTB
+  ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
+    ifneq ("$(wildcard $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts))","")
+    # FILE_EXISTS = 1
+    export CMD_ECHO_HANDOFF_DTS=$(ECHO_START) HANDOFF_DTS    : $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
+    export CMD_COMPILE_HANDOFF_DTS_1=$(CAT_TYPE) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)
+    export CMD_COMPILE_HANDOFF_DTS_2=$(CMD_COMPILE_HANDOFF_DTS_1) $(NEXT_CMD) $(DTC) --space 16384 -I dts $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) -O dtb -o $(FDF_LINK_DTB_PATH)
+    export CMD_COMPILE_HANDOFF_DTS_3=$(CMD_COMPILE_HANDOFF_DTS_2) $(NEXT_CMD) $(CP) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) $(FDF_LINK_DTS_PATH)
+    export CMD_COMPILE_HANDOFF_DTS=$(CMD_COMPILE_HANDOFF_DTS_3)
+    # Make sure CMD_UPDATE_HANDOFF_DTB is clear to avoid dump DTC twice
+    export CMD_UPDATE_HANDOFF_DTB=
+    else ifeq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
+    # FILE_EXISTS = 0
+    export CMD_ECHO_HANDOFF_DTS=
+    export CMD_COMPILE_HANDOFF_DTS=
+    else
+    export CMD_ECHO_HANDOFF_DTS=
+    export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) HANDOFF_DTS    : ERROR! FILE NOT FOUND - $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
+    endif
+  else
+     ifneq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
+     #export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) ERROR! You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.  In this case HANDOFF_DTS will be ignored and only HANDOFF_DTB will be used.$(ECHO_END)
+     $(error ERROR: You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.)
+     endif
+  endif
 else ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","s10" "S10"))
   # Processor architecture which is AARCH64 for SOCFPGA
   export EDK2_ARCH=AARCH64
-
-  # DTB path as defined in .FDF
-  # (do no change, it must match the on in .FDF file)
-  FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dtb
-  # DTS path
-  FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dts
 
   # ENTRY_MINUS_40HEX = 0x188 (SEC EntryPoint) - 0x40
   ENTRY_MINUS_40HEX := 328
@@ -233,56 +278,7 @@ else
 $(error ERROR: No .DSC for unsupported device in command-line argument DEVICE="$(DEVICE)$(device)$(D)$(d))"
 endif
 
-#-----------------------------------------------------------------------------
-# Device Tree
-#-----------------------------------------------------------------------------
-# Update handoff DTB ?
-# Check error: Same file?
-ifeq ($(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb), $(FDF_LINK_DTB_PATH))
-$(error ERROR: Same file (HANDOFF_DTB == default .FDF DTB) plese remove the HANDOFF_DTB arguement)
-endif
-ifneq ("$(wildcard $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))","")
-# FILE_EXISTS = 1
-export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(ECHO_END)
-export CMD_UPDATE_HANDOFF_DTB_1=$(CP) $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(FDF_LINK_DTB_PATH)
-export CMD_UPDATE_HANDOFF_DTB_2=$(CMD_UPDATE_HANDOFF_DTB_1) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts -o $(FDF_LINK_DTS_PATH)
-export CMD_UPDATE_HANDOFF_DTB_3=$(CMD_UPDATE_HANDOFF_DTB_2) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
-export CMD_UPDATE_HANDOFF_DTB=$(CMD_UPDATE_HANDOFF_DTB_3)
-else ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
-# FILE_EXISTS = 0
-export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(FDF_LINK_DTB_PATH)$(ECHO_END)
-export CMD_UPDATE_HANDOFF_DTB=@$(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
-else
-export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : ERROR! FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)$(ECHO_END)
-export CMD_UPDATE_HANDOFF_DTB=
-$(error ERROR: FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))
-endif
 
-# If no DTB but got DTS, help to compile the DTS and copy to replace default DTB
-ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
-    ifneq ("$(wildcard $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts))","")
-    # FILE_EXISTS = 1
-	export CMD_ECHO_HANDOFF_DTS=$(ECHO_START) HANDOFF_DTS    : $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
-	export CMD_COMPILE_HANDOFF_DTS_1=$(CAT_TYPE) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)
-	export CMD_COMPILE_HANDOFF_DTS_2=$(CMD_COMPILE_HANDOFF_DTS_1) $(NEXT_CMD) $(DTC) --space 16384 -I dts $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) -O dtb -o $(FDF_LINK_DTB_PATH)
-	export CMD_COMPILE_HANDOFF_DTS_3=$(CMD_COMPILE_HANDOFF_DTS_2) $(NEXT_CMD) $(CP) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) $(FDF_LINK_DTS_PATH)
-	export CMD_COMPILE_HANDOFF_DTS=$(CMD_COMPILE_HANDOFF_DTS_3)
-	# Make sure CMD_UPDATE_HANDOFF_DTB is clear to avoid dump DTC twice
-	export CMD_UPDATE_HANDOFF_DTB=
-    else ifeq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
-    # FILE_EXISTS = 0
-	export CMD_ECHO_HANDOFF_DTS=
-    export CMD_COMPILE_HANDOFF_DTS=
-    else
-	export CMD_ECHO_HANDOFF_DTS=
-    export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) HANDOFF_DTS    : ERROR! FILE NOT FOUND - $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
-    endif
-else
-   ifneq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
-   #export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) ERROR! You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.  In this case HANDOFF_DTS will be ignored and only HANDOFF_DTB will be used.$(ECHO_END)
-   $(error ERROR: You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.)
-   endif
-endif
 
 #-----------------------------------------------------------------------------
 # DS-5 Script Setup
