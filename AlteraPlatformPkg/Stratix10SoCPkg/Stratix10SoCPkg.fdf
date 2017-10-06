@@ -348,7 +348,7 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
   #
   # UEFI application (Shell Embedded Boot Loader)
   #
-  INF AlteraPlatformPkg/ShellBinPkg/UefiShell.inf
+  INF ShellBinPkg/UefiShell/UefiShell.inf
 
   #
   # Bds
