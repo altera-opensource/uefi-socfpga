@@ -41,7 +41,7 @@ wait
 # Disable MMU to ensure we don't download to cache
 set var $CP15::$System::$SCTLR.M = 0
 # Load the 256KB UEFI Binary Image to HPS's 256KB On-Chip RAM
-restore Build/PEI.256 binary 0xFFE00000
+restore SEC.ROM binary 0xFFE00000
 # Set CPU program counter to On-Chip RAM entry point
 set var $PC=0xFFE00000
 

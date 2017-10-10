@@ -172,10 +172,16 @@ ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "
   PEI_FINAL_ROM            := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)PEI.ROM
   DXE_FINAL_ROM            := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)DXE.ROM
 
-  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
-  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
-  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
+  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
+  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
+  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
 
+  SNR_BUILD_PEI  := $(SED_START)Build/PEI.256$(SED_END)
+  FILE_BUILD_PEI := $(mkfile_path)$(PEI_SMALLER_x1_ROM)
+
+  ENTRY_ArmPlatformSec        := $(SED_START)0x00ffe00164$(SED_END)
+  ENTRY_ArmPlatformPrePeiCore := $(SED_START)0x00ffe01164$(SED_END)
+  ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)0x00ffe041ad$(SED_END)
   # DS5 script path
   DS5_SCRIPT_PATH            := AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.ds5
   DS_SCRIPT                  := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)load_uefi_fw.ds
@@ -184,7 +190,7 @@ ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "
   export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dsc
   else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
   export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
-  EFIAPP_FILENAME_FULLPATH := Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)*.efi
+  EFIAPP_FILENAME_FULLPATH := Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)*.efi
   else
   $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
   endif
@@ -258,10 +264,16 @@ else ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","s
   DXE_FINAL_ROM            := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)DXE.ROM
   SEC_FINAL_ROM            := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)SEC.ROM
 
-  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
-  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
-  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
+  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
+  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
+  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
 
+  SNR_BUILD_PEI  := $(SED_START)SEC.ROM$(SED_END)
+  FILE_BUILD_PEI := $(mkfile_path)$(SEC_FINAL_ROM)
+
+  ENTRY_ArmPlatformSec        := $(SED_START)0x00ffe00188$(SED_END)
+  ENTRY_ArmPlatformPrePeiCore := $(SED_START)0x0000050808$(SED_END)
+  ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)0x0000056180$(SED_END)
   # DS5 script path
   DS5_SCRIPT_PATH            := AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.ds5
   DS_SCRIPT                  := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)load_uefi_fw.ds
@@ -270,7 +282,7 @@ else ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","s
   export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkg.dsc
   else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
   export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
-  EFIAPP_FILENAME_FULLPATH := Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)*.efi
+  EFIAPP_FILENAME_FULLPATH := Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)*.efi
   else
   $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
   endif
@@ -283,10 +295,6 @@ endif
 #-----------------------------------------------------------------------------
 # DS-5 Script Setup
 #-----------------------------------------------------------------------------
-
-SNR_BUILD_PEI  := $(SED_START)Build/PEI.256$(SED_END)
-FILE_BUILD_PEI := $(mkfile_path)$(PEI_SMALLER_x1_ROM)
-
 SNR_ENTRY_ArmPlatformSec        := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformSec_entrypoint$(SED_END)
 SNR_ENTRY_ArmPlatformPrePeiCore := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_entrypoint$(SED_END)
 SNR_ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_entrypoint$(SED_END)
@@ -294,16 +302,6 @@ SNR_ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)SEARCH_AND_REPLACE_AlteraSocFpgaP
 SNR_FILE_ArmPlatformSec        := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformSec_dll$(SED_END)
 SNR_FILE_ArmPlatformPrePeiCore := $(SED_START)SEARCH_AND_REPLACE_ArmPlatformPrePeiCore_dll$(SED_END)
 SNR_FILE_AlteraSocFpgaPeiMain  := $(SED_START)SEARCH_AND_REPLACE_AlteraSocFpgaPeiMain_dll$(SED_END)
-
-
-ENTRY_ArmPlatformSec        := $(SED_START)0x00ffe00164$(SED_END)
-ENTRY_ArmPlatformPrePeiCore := $(SED_START)0x00ffe01164$(SED_END)
-ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)0x00ffe041ad$(SED_END)
-
-FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
-FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
-FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
-
 
 HWLIB_SOCEDS_PATH := $(SOCEDS_DEST_ROOT)$(PATHSEP)ip$(PATHSEP)altera$(PATHSEP)hps$(PATHSEP)altera_hps$(PATHSEP)hwlib$(PATHSEP)*
 HWLIB_UEFI_PATH   := AlteraPlatformPkg$(PATHSEP)HwLib
