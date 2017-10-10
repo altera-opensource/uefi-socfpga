@@ -68,7 +68,7 @@
 
 VOID
 EFIAPI
-LoadBootImage (
+LoadPei (
   IN  BOOT_SOURCE_TYPE  BootSourceType
   )
 {
@@ -89,14 +89,12 @@ LoadBootImage (
   switch (BootSourceType)
   {
     case BOOT_SOURCE_SDMMC:
- 
-        // Read binary image file of Baremetal Application or RTOS into memory
         // If the file contain an MKIMAGE header,
         // it will utilize the LoadAddr and EntryPoint value from the MKIMAGE header
         // otherwiser, value from the PCDs will be used
-        LoadAddr = PcdGet32 (PcdBoot_BOOTIMAGE_MEM_LOAD_ADDR);
+        LoadAddr = PcdGet64 (PcdFvBaseAddress);
 		Status = LoadBootImageFile (
-          (CHAR8*) PcdGetPtr (PcdFileName_BOOTIMAGE_BIN),
+          (CHAR8*) PcdGetPtr (PcdFileName_PEI_ROM),
           &LoadAddr,
           &EntryPoint,
           &DataSize
@@ -112,7 +110,7 @@ LoadBootImage (
 
     case BOOT_SOURCE_NAND:
     // case BOOT_SOURCE_QSPI:
-      FlashOffset = PcdGet64 (PcdQspiOrNand_BOOTIMAGE_ADDR);
+      FlashOffset = PcdGet64 (PcdQspiOrNand_BOOTLOADER_PEIROM_ADDR);
 
       // Check if MKIMAGE header exist
       // if MKIMAGE header exist, image size and entry point will be based on MKIMAGE header
@@ -135,7 +133,7 @@ LoadBootImage (
       Status = ValidateMkimageHeader(&ImgHdr);
       if (EFI_ERROR(Status)) {
         // Boot Image do not use mkimage header
-        DataSize    = PcdGet32 (PcdQspiOrNand_BOOTIMAGE_SIZE);
+        DataSize    = PcdGet32 (PcdFvSize);
       } else {
         // Boot Image have mkimage header
         FlashOffset = FlashOffset + sizeof(ImgHdr);
@@ -145,7 +143,7 @@ LoadBootImage (
       }
 
       // Print message that we are going to read BootImage from QSPI or NAND flash
-      ProgressPrint ("Copying BootImage from Flash Offset 0x%08lx to Memory Address 0x%08lx where BootImage's size is 0x%08x bytes\r\n",
+      ProgressPrint ("Copying PEI Image from Flash Offset 0x%08lx to Memory Address 0x%08lx where Image's size is 0x%08x bytes\r\n",
         (UINT64) FlashOffset,
         (UINT64) LoadAddr,
         (UINT32) DataSize);

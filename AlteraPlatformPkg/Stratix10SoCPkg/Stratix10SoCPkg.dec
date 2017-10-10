@@ -196,6 +196,7 @@
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiOrNand_BOOTIMAGE_SIZE         |0x01000000|UINT32|0xFEDC0114
 
   ## Various Filename in root directory of the SD/MMC FAT32 partition
+  gAlteraSocFpgaTokenSpaceGuid.PcdFileName_PEI_ROM                 |"PEI.ROM"|VOID*|0xFEDC0200
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_DXE_ROM                 |"DXE.ROM"|VOID*|0xFEDC0201
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_LINUX_DTB               |"socfpga_stratix10_socdk.dtb"|VOID*|0xFEDC0202
   gAlteraSocFpgaTokenSpaceGuid.PcdFileName_BOOTIMAGE_BIN           |"bootimage.bin"|VOID*|0xFEDC0203

@@ -205,7 +205,7 @@ PlatformInit (
     PitStopCmdLine ();
   }
   
-  LoadBootImage (BootSourceType);
+  LoadPei (BootSourceType);
    
   return Status;
 }

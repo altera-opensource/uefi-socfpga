@@ -43,7 +43,7 @@ typedef enum {
 
 VOID
 EFIAPI
-LoadBootImage (
+LoadPei (
   IN  BOOT_SOURCE_TYPE  BootSourceType
   );
 
