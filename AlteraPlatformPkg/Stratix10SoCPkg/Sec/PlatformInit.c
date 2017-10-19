@@ -90,6 +90,40 @@ EnableNonsecureAccess (
   MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
               ALT_NOC_FW_L4_SYS_SCR_EMAC0TX_ECC_OFST,
   			  0x1 | BIT24 | BIT16 );
+
+  // enables nonsecure access to i2c0 and i2c1
+  MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
+              ALT_NOC_FW_L4_PER_SCR_I2C0_OFST,
+              0x1 | BIT24 | BIT16 );
+  MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
+              ALT_NOC_FW_L4_PER_SCR_I2C1_OFST,
+              0x1 | BIT24 | BIT16 );
+
+  // enables nonsecure access to usb0 and usb1
+  MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
+              ALT_NOC_FW_L4_PER_SCR_USB0_REGISTER_OFST,
+              0x1 | BIT24 | BIT16 );
+  MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
+              ALT_NOC_FW_L4_PER_SCR_USB1_REGISTER_OFST,
+              0x1 | BIT24 | BIT16 );
+
+  // enables nonsecure access to gpio0 and gpio1
+  MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
+              ALT_NOC_FW_L4_PER_SCR_GPIO0_OFST,
+              0x1 | BIT24 | BIT16 );
+  MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
+              ALT_NOC_FW_L4_PER_SCR_GPIO1_OFST,
+              0x1 | BIT24 | BIT16 );
+
+  // enables nonsecure access to clock manager
+  MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
+              ALT_NOC_FW_L4_SYS_SCR_CLOCK_MANAGER_OFST,
+              0x1 | BIT24 | BIT16 );
+
+  // enables nonsecure access to reset manager
+  MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
+              ALT_NOC_FW_L4_SYS_SCR_RESET_MANAGER_OFST,
+              0x1 | BIT24 | BIT16 );
   
   // this enables nonsecure access to OCRAM ECC for flash DMA transaction AXI API & MPU
   MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
