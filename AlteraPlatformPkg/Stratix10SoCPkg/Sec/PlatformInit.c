@@ -67,12 +67,15 @@ EnableNonsecureAccess (
   MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
               ALT_NOC_FW_L4_PER_SCR_UART0_OFST,
   			  0x1);
-  
-         // enables nonsecure MPU accesses to SDMMC
+
+  // enables nonsecure MPU accesses to SDMMC
   MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
               ALT_NOC_FW_L4_PER_SCR_SDMMC_OFST,
-              0x1);
-  
+              0x1 | BIT24 | BIT16);
+  MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
+              ALT_NOC_FW_L4_SYS_SCR_SDMMC_ECC_OFST,
+              0x1 | BIT24 | BIT16);
+
   // enables nonsecure access to all the emacs
   MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
               ALT_NOC_FW_L4_PER_SCR_EMAC0_OFST,
@@ -90,6 +93,18 @@ EnableNonsecureAccess (
   MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
               ALT_NOC_FW_L4_SYS_SCR_EMAC0TX_ECC_OFST,
   			  0x1 | BIT24 | BIT16 );
+  MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
+              ALT_NOC_FW_L4_SYS_SCR_EMAC1RX_ECC_OFST,
+              0x1 | BIT24 | BIT16 );
+  MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
+              ALT_NOC_FW_L4_SYS_SCR_EMAC1TX_ECC_OFST,
+              0x1 | BIT24 | BIT16 );
+  MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
+              ALT_NOC_FW_L4_SYS_SCR_EMAC2RX_ECC_OFST,
+              0x1 | BIT24 | BIT16 );
+  MmioWrite32(ALT_NOC_FW_L4_SYS_SCR_OFST +
+              ALT_NOC_FW_L4_SYS_SCR_EMAC2TX_ECC_OFST,
+              0x1 | BIT24 | BIT16 );
 
   // enables nonsecure access to i2c0 and i2c1
   MmioWrite32(ALT_NOC_FW_L4_PER_SCR_OFST +
