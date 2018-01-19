@@ -127,7 +127,7 @@
   # Remember to disable Semihosting for production release, set to value 0
   # To turn off Semihosting, set to value 0
   # To turn  on Semihosting, set to value 1
-  gAlteraHpsTokenSpaceGuid.PcdEnableSemihosting|1
+  gAlteraHpsTokenSpaceGuid.PcdEnableSemihosting|0
 
   #
   # Platform Init Debug Message
@@ -226,7 +226,7 @@
   #-------------------------------
   gArmPlatformTokenSpaceGuid.PcdFirmwareVendor|""
 
-  gArmPlatformTokenSpaceGuid.PcdCoreCount|2
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|1
 
   # Stacks for MPCores in PEI Phase
   gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x6d000
