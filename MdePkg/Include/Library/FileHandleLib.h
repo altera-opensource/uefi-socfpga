@@ -1,7 +1,7 @@
 /** @file
   Provides interface to EFI_FILE_HANDLE functionality.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,7 @@
 #define _FILE_HANDLE_LIBRARY_HEADER_
 
 #include <Protocol/SimpleFileSystem.h>
+#include <Guid/FileInfo.h>
 
 /// The tag for use in identifying UNICODE files.
 /// If the file is UNICODE, the first 16 bits of the file will equal this value.
@@ -184,9 +185,9 @@ FileHandleDelete (
   has the effect of starting the read process of the directory entries over again.
 
   @param[in] FileHandle         The file handle on which the position is being set.
-  @param[in] Position           The byte position from the begining of the file.
+  @param[in] Position           The byte position from the beginning of the file.
 
-  @retval EFI_SUCCESS           The operation completed sucessfully.
+  @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_UNSUPPORTED       The request for non-zero is not valid on
                                 directories.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
@@ -207,7 +208,7 @@ FileHandleSetPosition (
   if FileHandle is a directory.
 
   @param[in] FileHandle         The open file handle on which to get the position.
-  @param[out] Position          The byte position from begining of file.
+  @param[out] Position          The byte position from beginning of file.
 
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
@@ -322,7 +323,7 @@ FileHandleFindNextFile(
   @param[in] FileHandle         The file handle from which size is retrieved.
   @param[out] Size              The pointer to size.
 
-  @retval EFI_SUCCESS           Operation was completed sucessfully.
+  @retval EFI_SUCCESS           Operation was completed successfully.
   @retval EFI_DEVICE_ERROR      Cannot access the file.
   @retval EFI_INVALID_PARAMETER FileHandle is NULL.
                                 Size is NULL.

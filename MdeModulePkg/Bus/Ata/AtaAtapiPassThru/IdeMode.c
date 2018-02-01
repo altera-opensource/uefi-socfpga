@@ -467,9 +467,18 @@ DRQClear2 (
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
   @param Timeout          The time to complete the command, uses 100ns as a unit.
 
-  @retval EFI_SUCCESS          DRQ bit set within the time out.
-  @retval EFI_TIMEOUT          DRQ bit not set within the time out.
-  @retval EFI_ABORTED          DRQ bit not set caused by the command abort.
+  @retval EFI_SUCCESS           BSY bit cleared and DRQ bit set within the
+                                timeout.
+
+  @retval EFI_TIMEOUT           BSY bit not cleared within the timeout.
+
+  @retval EFI_ABORTED           Polling abandoned due to command abort.
+
+  @retval EFI_DEVICE_ERROR      Polling abandoned due to a non-abort error.
+
+  @retval EFI_NOT_READY         BSY bit cleared within timeout, and device
+                                reported "command complete" by clearing DRQ
+                                bit.
 
   @note  Read Status Register will clear interrupt status.
 
@@ -542,9 +551,19 @@ DRQReady (
   @param IdeRegisters     A pointer to EFI_IDE_REGISTERS data structure.
   @param Timeout          The time to complete the command, uses 100ns as a unit.
 
-  @retval EFI_SUCCESS           DRQ bit set within the time out.
-  @retval EFI_TIMEOUT           DRQ bit not set within the time out.
-  @retval EFI_ABORTED           DRQ bit not set caused by the command abort.
+  @retval EFI_SUCCESS           BSY bit cleared and DRQ bit set within the
+                                timeout.
+
+  @retval EFI_TIMEOUT           BSY bit not cleared within the timeout.
+
+  @retval EFI_ABORTED           Polling abandoned due to command abort.
+
+  @retval EFI_DEVICE_ERROR      Polling abandoned due to a non-abort error.
+
+  @retval EFI_NOT_READY         BSY bit cleared within timeout, and device
+                                reported "command complete" by clearing DRQ
+                                bit.
+
   @note  Read Alternate Status Register will not clear interrupt status.
 
 **/
@@ -1917,7 +1936,7 @@ AtaPacketReadWrite (
   IN     EFI_PCI_IO_PROTOCOL       *PciIo,
   IN     EFI_IDE_REGISTERS         *IdeRegisters,
   IN OUT VOID                      *Buffer,
-  IN     UINT64                    ByteCount,
+  IN OUT UINT32                    *ByteCount,
   IN     BOOLEAN                   Read,
   IN     UINT64                    Timeout
   )
@@ -1928,17 +1947,18 @@ AtaPacketReadWrite (
   EFI_STATUS  Status;
   UINT16      *PtrBuffer;
 
+  PtrBuffer         = Buffer;
+  RequiredWordCount = *ByteCount >> 1;
+
   //
   // No data transfer is premitted.
   //
-  if (ByteCount == 0) {
+  if (RequiredWordCount == 0) {
     return EFI_SUCCESS;
   }
 
-  PtrBuffer         = Buffer;
-  RequiredWordCount = (UINT32)RShiftU64(ByteCount, 1);
   //
-  // ActuralWordCount means the word count of data really transferred.
+  // ActualWordCount means the word count of data really transferred.
   //
   ActualWordCount = 0;
 
@@ -1949,7 +1969,15 @@ AtaPacketReadWrite (
     //
     Status = DRQReady2 (PciIo, IdeRegisters, Timeout);
     if (EFI_ERROR (Status)) {
-      return CheckStatusRegister (PciIo, IdeRegisters);
+      if (Status == EFI_NOT_READY) {
+        //
+        // Device provided less data than we intended to read, or wanted less
+        // data than we intended to write, but it may still be successful.
+        //
+        break;
+      } else {
+        return Status;
+      }
     }
 
     //
@@ -2015,6 +2043,7 @@ AtaPacketReadWrite (
     return EFI_DEVICE_ERROR;
   }
 
+  *ByteCount = ActualWordCount << 1;
   return Status;
 }
 
@@ -2113,7 +2142,7 @@ AtaPacketCommandExecute (
                PciIo,
                IdeRegisters,
                Packet->InDataBuffer,
-               Packet->InTransferLength,
+               &Packet->InTransferLength,
                TRUE,
                Packet->Timeout
                );
@@ -2122,7 +2151,7 @@ AtaPacketCommandExecute (
                PciIo,
                IdeRegisters,
                Packet->OutDataBuffer,
-               Packet->OutTransferLength,
+               &Packet->OutTransferLength,
                FALSE,
                Packet->Timeout
                );
@@ -2613,6 +2642,11 @@ DetectAndConfigIdeDevice (
   PciIo        = Instance->PciIo;
 
   for (IdeDevice = 0; IdeDevice < EfiIdeMaxDevice; IdeDevice++) {
+    //
+    // Select Master or Slave device to get the return signature for ATA DEVICE DIAGNOSTIC cmd.
+    //
+    IdeWritePortB (PciIo, IdeRegisters->Head, (UINT8)((IdeDevice << 4) | 0xe0));
+
     //
     // Send ATA Device Execut Diagnostic command.
     // This command should work no matter DRDY is ready or not

@@ -1,7 +1,7 @@
 /** @file
   Image signature database are defined for the signed image validation.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,9 +43,9 @@
 
 #define SECURE_BOOT_MODE_ENABLE           1
 #define SECURE_BOOT_MODE_DISABLE          0
+
 #define SETUP_MODE                        1
 #define USER_MODE                         0
-
 
 //***********************************************************************
 // Signature Database

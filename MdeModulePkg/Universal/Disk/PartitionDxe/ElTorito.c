@@ -1,7 +1,7 @@
 /** @file
   Decode an El Torito formatted CD-ROM
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,22 +44,23 @@ PartitionInstallElToritoChildHandles (
   IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath
   )
 {
-  EFI_STATUS              Status;
-  UINT64                  VolDescriptorOffset;
-  UINT32                  Lba2KB;
-  EFI_BLOCK_IO_MEDIA      *Media;
-  CDROM_VOLUME_DESCRIPTOR *VolDescriptor;
-  ELTORITO_CATALOG        *Catalog;
-  UINTN                   Check;
-  UINTN                   Index;
-  UINTN                   BootEntry;
-  UINTN                   MaxIndex;
-  UINT16                  *CheckBuffer;
-  CDROM_DEVICE_PATH       CdDev;
-  UINT32                  SubBlockSize;
-  UINT32                  SectorCount;
-  EFI_STATUS              Found;
-  UINT32                  VolSpaceSize;
+  EFI_STATUS                   Status;
+  UINT64                       VolDescriptorOffset;
+  UINT32                       Lba2KB;
+  EFI_BLOCK_IO_MEDIA           *Media;
+  CDROM_VOLUME_DESCRIPTOR      *VolDescriptor;
+  ELTORITO_CATALOG             *Catalog;
+  UINTN                        Check;
+  UINTN                        Index;
+  UINTN                        BootEntry;
+  UINTN                        MaxIndex;
+  UINT16                       *CheckBuffer;
+  CDROM_DEVICE_PATH            CdDev;
+  UINT32                       SubBlockSize;
+  UINT32                       SectorCount;
+  EFI_STATUS                   Found;
+  UINT32                       VolSpaceSize;
+  EFI_PARTITION_INFO_PROTOCOL  PartitionInfo;
 
   Found         = EFI_NOT_FOUND;
   Media         = BlockIo->Media;
@@ -183,7 +184,7 @@ PartitionInstallElToritoChildHandles (
       }
 
       SubBlockSize  = 512;
-      SectorCount   = Catalog->Boot.SectorCount * (SIZE_2KB / Media->BlockSize);
+      SectorCount   = Catalog->Boot.SectorCount;
 
       switch (Catalog->Boot.MediaType) {
 
@@ -233,20 +234,24 @@ PartitionInstallElToritoChildHandles (
         //
         // When the SectorCount < 2, set the Partition as the whole CD.
         //
-        if (VolSpaceSize > (Media->LastBlock + 1)) {
-          CdDev.PartitionSize = (UINT32)(Media->LastBlock - Catalog->Boot.Lba + 1);
+        if (VolSpaceSize * (SIZE_2KB / Media->BlockSize) > (Media->LastBlock + 1)) {
+          CdDev.PartitionSize = (UINT32)(Media->LastBlock - Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize) + 1);
         } else {
-          CdDev.PartitionSize = (UINT32)(VolSpaceSize - Catalog->Boot.Lba);
+          CdDev.PartitionSize = (UINT32)(VolSpaceSize - Catalog->Boot.Lba) * (SIZE_2KB / Media->BlockSize);
         }
       } else {
         CdDev.PartitionSize = DivU64x32 (
                                 MultU64x32 (
-                                  SectorCount,
+                                  SectorCount * (SIZE_2KB / Media->BlockSize),
                                   SubBlockSize
                                   ) + Media->BlockSize - 1,
                                 Media->BlockSize
                                 );
       }
+
+      ZeroMem (&PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
+      PartitionInfo.Revision = EFI_PARTITION_INFO_PROTOCOL_REVISION;
+      PartitionInfo.Type     = PARTITION_TYPE_OTHER;
 
       Status = PartitionInstallChildHandle (
                 This,
@@ -257,10 +262,10 @@ PartitionInstallElToritoChildHandles (
                 BlockIo2,
                 DevicePath,
                 (EFI_DEVICE_PATH_PROTOCOL *) &CdDev,
+                &PartitionInfo,
                 Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize),
-                MultU64x32 (Catalog->Boot.Lba + CdDev.PartitionSize - 1, SIZE_2KB / Media->BlockSize),
-                SubBlockSize,
-                FALSE
+                Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize) + CdDev.PartitionSize - 1,
+                SubBlockSize
                 );
       if (!EFI_ERROR (Status)) {
         Found = EFI_SUCCESS;

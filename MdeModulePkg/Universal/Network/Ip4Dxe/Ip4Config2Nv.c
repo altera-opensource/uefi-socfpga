@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to Ip4.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -293,8 +293,12 @@ Ip4Config2IpToStr (
   @param[in]   IpCount   The size of IPv4 address list.
   @param[out]  Str       The string contains several decimal dotted
                          IPv4 addresses separated by space.       
+
+  @retval EFI_SUCCESS           Operation is success.
+  @retval EFI_OUT_OF_RESOURCES  Error occurs in allocating memory.
+
 **/
-VOID
+EFI_STATUS
 Ip4Config2IpListToStr (
   IN  EFI_IPv4_ADDRESS  *Ip,
   IN  UINTN             IpCount,
@@ -317,7 +321,9 @@ Ip4Config2IpListToStr (
     TempIp = Ip + Index;
     if (TempStr == NULL) {
       TempStr = AllocateZeroPool(2 * IP4_STR_MAX_SIZE);
-      ASSERT(TempStr != NULL);
+      if (TempStr == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
     }
 
     UnicodeSPrint (
@@ -347,6 +353,8 @@ Ip4Config2IpListToStr (
   if (TempStr != NULL) {
     FreePool(TempStr);
   }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -518,7 +526,7 @@ Ip4Config2ConvertConfigNvDataToIfrNvData (
   Ip4Config2IpToStr (&Ip4Info->StationAddress, IfrNvData->StationAddress);
   Ip4Config2IpToStr (&Ip4Info->SubnetMask, IfrNvData->SubnetMask);
   Ip4Config2IpToStr (&GatewayAddress, IfrNvData->GatewayAddress);
-  Ip4Config2IpListToStr (DnsAddress, DnsCount, IfrNvData->DnsAddress);
+  Status = Ip4Config2IpListToStr (DnsAddress, DnsCount, IfrNvData->DnsAddress);
 
 Exit:
 
@@ -608,20 +616,23 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
     //
     Ip4NvData->Policy = Ip4Config2PolicyStatic;
 
-    Status = Ip4Config2StrToIp (IfrFormNvData->StationAddress, &StationAddress.v4);
-    if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (StationAddress.Addr[0]), 0)) {
-      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
-      return EFI_INVALID_PARAMETER;
-    }
-    
     Status = Ip4Config2StrToIp (IfrFormNvData->SubnetMask, &SubnetMask.v4);
     if (EFI_ERROR (Status) || ((SubnetMask.Addr[0] != 0) && (GetSubnetMaskPrefixLength (&SubnetMask.v4) == 0))) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Subnet Mask!", NULL);
       return EFI_INVALID_PARAMETER;
     }
+
+    Status = Ip4Config2StrToIp (IfrFormNvData->StationAddress, &StationAddress.v4);
+    if (EFI_ERROR (Status) || 
+        (SubnetMask.Addr[0] != 0 && !NetIp4IsUnicast (NTOHL (StationAddress.Addr[0]), NTOHL (SubnetMask.Addr[0]))) || 
+        !Ip4StationAddressValid (NTOHL (StationAddress.Addr[0]), NTOHL (SubnetMask.Addr[0]))) {
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
+      return EFI_INVALID_PARAMETER;
+    }
     
     Status = Ip4Config2StrToIp (IfrFormNvData->GatewayAddress, &Gateway.v4);
-    if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
+    if (EFI_ERROR (Status) || 
+        (Gateway.Addr[0] != 0 && SubnetMask.Addr[0] != 0 && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), NTOHL (SubnetMask.Addr[0])))) {
       CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
       return EFI_INVALID_PARAMETER;
     }
@@ -630,7 +641,7 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
     if (!EFI_ERROR (Status) && DnsCount > 0) {
       for (Index = 0; Index < DnsCount; Index ++) {
         CopyMem (&Ip, &DnsAddress[Index], sizeof (IP4_ADDR));
-        if (!NetIp4IsUnicast (NTOHL (Ip), 0)) {
+        if (IP4_IS_UNSPECIFIED (NTOHL (Ip)) || IP4_IS_LOCAL_BROADCAST (NTOHL (Ip))) {
           CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Dns Server!", NULL);
           FreePool(DnsAddress);
           return EFI_INVALID_PARAMETER;
@@ -911,7 +922,10 @@ Ip4FormExtractConfig (
       ConfigRequestHdr = HiiConstructConfigHdr (&gIp4Config2NvDataGuid, mIp4Config2StorageName, Private->ChildHandle);
       Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
       ConfigRequest = AllocateZeroPool (Size);
-      ASSERT (ConfigRequest != NULL);
+      if (ConfigRequest == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Failure;
+      }
       AllocatedRequest = TRUE;
       
       UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
@@ -1134,7 +1148,7 @@ Ip4FormCallback (
     }
 
     //
-    // Retrive uncommitted data from Browser
+    // Retrieve uncommitted data from Browser
     //
     if (!HiiGetBrowserData (&gIp4Config2NvDataGuid, mIp4Config2StorageName, sizeof (IP4_CONFIG2_IFR_NVDATA), (UINT8 *) IfrFormNvData)) {
       FreePool (IfrFormNvData);
@@ -1146,7 +1160,7 @@ Ip4FormCallback (
     switch (QuestionId) {
     case KEY_LOCAL_IP:
       Status = Ip4Config2StrToIp (IfrFormNvData->StationAddress, &StationAddress.v4);
-      if (EFI_ERROR (Status) || !NetIp4IsUnicast (NTOHL (StationAddress.Addr[0]), 0)) {
+      if (EFI_ERROR (Status) || IP4_IS_UNSPECIFIED (NTOHL (StationAddress.Addr[0])) || IP4_IS_LOCAL_BROADCAST (NTOHL (StationAddress.Addr[0]))) {
         CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid IP address!", NULL);
         Status = EFI_INVALID_PARAMETER;
       }
@@ -1162,7 +1176,7 @@ Ip4FormCallback (
 
     case KEY_GATE_WAY:
       Status = Ip4Config2StrToIp (IfrFormNvData->GatewayAddress, &Gateway.v4);
-      if (EFI_ERROR (Status) || ((Gateway.Addr[0] != 0) && !NetIp4IsUnicast (NTOHL (Gateway.Addr[0]), 0))) {
+      if (EFI_ERROR (Status) || IP4_IS_LOCAL_BROADCAST(NTOHL(Gateway.Addr[0]))) {
         CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Gateway!", NULL);
         Status = EFI_INVALID_PARAMETER;
       }
@@ -1173,7 +1187,7 @@ Ip4FormCallback (
       if (!EFI_ERROR (Status) && DnsCount > 0) {
         for (Index = 0; Index < DnsCount; Index ++) {
           CopyMem (&Ip, &DnsAddress[Index], sizeof (IP4_ADDR));
-          if (!NetIp4IsUnicast (NTOHL (Ip), 0)) {
+          if (IP4_IS_UNSPECIFIED (NTOHL (Ip)) || IP4_IS_LOCAL_BROADCAST (NTOHL (Ip))) {
             CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, L"Invalid Dns Server!", NULL);
             Status = EFI_INVALID_PARAMETER;
             break;

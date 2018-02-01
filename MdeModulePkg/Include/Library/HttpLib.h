@@ -2,7 +2,8 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to parse the HTTP message byte stream.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -17,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _HTTP_LIB_H_
 
 #include <Protocol/Http.h>
+
 
 /**
   Decode a percent-encoded URI component to the ASCII character.
@@ -164,6 +166,30 @@ HttpUrlGetPort (
   );
 
 /**
+  Get the Path from a HTTP URL.
+
+  This function will return the Path according to the Url and previous parse result,and
+  it is the caller's responsibility to free the buffer returned in *Path.
+
+  @param[in]    Url                The pointer to a HTTP URL string.
+  @param[in]    UrlParser          URL Parse result returned by NetHttpParseUrl().
+  @param[out]   Path               Pointer to a buffer to store the Path.
+
+  @retval EFI_SUCCESS              Successfully get the required component.
+  @retval EFI_INVALID_PARAMETER    Uri is NULL or HostName is NULL or UrlParser is invalid.
+  @retval EFI_NOT_FOUND            No hostName component in the URL.
+  @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
+  
+**/
+EFI_STATUS
+EFIAPI
+HttpUrlGetPath (
+  IN      CHAR8              *Url,
+  IN      VOID               *UrlParser,
+     OUT  CHAR8              **Path
+  );
+
+/**
   Release the resource of the URL parser.
 
   @param[in]    UrlParser            Pointer to the parser.
@@ -260,8 +286,9 @@ HttpInitMsgParser (
 
   @retval EFI_SUCCESS                Successfully parse the message-body.
   @retval EFI_INVALID_PARAMETER      MsgParser is NULL or Body is NULL or BodyLength is 0.
-  @retval Others                     Operation aborted.
-
+  @retval EFI_ABORTED                Operation aborted.
+  @retval Other                      Error happened while parsing message body.
+  
 **/
 EFI_STATUS
 EFIAPI
@@ -316,6 +343,143 @@ VOID
 EFIAPI
 HttpFreeMsgParser (
   IN  VOID           *MsgParser
+  );
+
+
+/**
+  Find a specified header field according to the field name.
+
+  @param[in]   HeaderCount      Number of HTTP header structures in Headers list.
+  @param[in]   Headers          Array containing list of HTTP headers.
+  @param[in]   FieldName        Null terminated string which describes a field name.
+
+  @return    Pointer to the found header or NULL.
+
+**/
+EFI_HTTP_HEADER *
+EFIAPI
+HttpFindHeader (
+  IN  UINTN                HeaderCount,
+  IN  EFI_HTTP_HEADER      *Headers,
+  IN  CHAR8                *FieldName
+  );
+
+/**
+  Set FieldName and FieldValue into specified HttpHeader.
+
+  @param[in,out]  HttpHeader          Specified HttpHeader.
+  @param[in]      FieldName           FieldName of this HttpHeader, a NULL terminated ASCII string.
+  @param[in]      FieldValue          FieldValue of this HttpHeader, a NULL terminated ASCII string.
+
+
+  @retval EFI_SUCCESS             The FieldName and FieldValue are set into HttpHeader successfully.
+  @retval EFI_INVALID_PARAMETER   The parameter is invalid.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
+
+**/
+EFI_STATUS
+EFIAPI
+HttpSetFieldNameAndValue (
+   IN  OUT   EFI_HTTP_HEADER       *HttpHeader,
+   IN  CONST CHAR8                 *FieldName,
+   IN  CONST CHAR8                 *FieldValue
+  );
+
+/**
+  Get one key/value header pair from the raw string.
+
+  @param[in]  String             Pointer to the raw string.
+  @param[out] FieldName          Points directly to field name within 'HttpHeader'.
+  @param[out] FieldValue         Points directly to field value within 'HttpHeader'.
+
+  @return     Pointer to the next raw string.
+  @return     NULL if no key/value header pair from this raw string.
+
+**/
+CHAR8 *
+EFIAPI
+HttpGetFieldNameAndValue (
+  IN     CHAR8   *String,
+     OUT CHAR8   **FieldName,
+     OUT CHAR8   **FieldValue
+  );
+
+/**
+  Free existing HeaderFields.
+
+  @param[in]  HeaderFields       Pointer to array of key/value header pairs waiting for free.
+  @param[in]  FieldCount         The number of header pairs in HeaderFields.
+
+**/
+VOID
+EFIAPI
+HttpFreeHeaderFields (
+  IN  EFI_HTTP_HEADER  *HeaderFields,
+  IN  UINTN            FieldCount
+  );
+
+/**
+  Generate HTTP request message.
+
+  This function will allocate memory for the whole HTTP message and generate a
+  well formatted HTTP Request message in it, include the Request-Line, header
+  fields and also the message body. It is the caller's responsibility to free
+  the buffer returned in *RequestMsg.
+
+  @param[in]   Message            Pointer to the EFI_HTTP_MESSAGE structure which
+                                  contains the required information to generate
+                                  the HTTP request message.
+  @param[in]   Url                The URL of a remote host.
+  @param[out]  RequestMsg         Pointer to the created HTTP request message.
+                                  NULL if any error occured.
+  @param[out]  RequestMsgSize     Size of the RequestMsg (in bytes).
+
+  @retval EFI_SUCCESS             If HTTP request string was created successfully.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
+  @retval EFI_INVALID_PARAMETER   The input arguments are invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+HttpGenRequestMessage (
+  IN     CONST EFI_HTTP_MESSAGE        *Message,
+  IN     CONST CHAR8                   *Url,
+     OUT CHAR8                         **RequestMsg,
+     OUT UINTN                         *RequestMsgSize
+  );
+
+/**
+  Translate the status code in HTTP message to EFI_HTTP_STATUS_CODE defined
+  in UEFI 2.5 specification.
+
+  @param[in]  StatusCode         The status code value in HTTP message.
+
+  @return                        Value defined in EFI_HTTP_STATUS_CODE .
+
+**/
+EFI_HTTP_STATUS_CODE
+EFIAPI
+HttpMappingToStatusCode (
+  IN UINTN                  StatusCode
+  );
+
+/**
+  Check whether header field called FieldName is in DeleteList.
+
+  @param[in]  DeleteList        Pointer to array of key/value header pairs.
+  @param[in]  DeleteCount       The number of header pairs.
+  @param[in]  FieldName         Pointer to header field's name.
+
+  @return     TRUE if FieldName is not in DeleteList, that means this header field is valid.
+  @return     FALSE if FieldName is in DeleteList, that means this header field is invalid.
+
+**/
+BOOLEAN
+EFIAPI
+HttpIsValidHttpHeader (
+  IN  CHAR8            *DeleteList[],
+  IN  UINTN            DeleteCount,
+  IN  CHAR8            *FieldName
   );
 
 

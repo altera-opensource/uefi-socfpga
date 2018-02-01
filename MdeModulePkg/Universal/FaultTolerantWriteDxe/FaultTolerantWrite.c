@@ -3,7 +3,7 @@
   These are the common Fault Tolerant Write (FTW) functions that are shared 
   by DXE FTW driver and SMM FTW driver.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -373,7 +373,7 @@ FtwWrite (
   //
   // If Record is out of the range of Header, return access denied.
   //
-  if (((UINTN)((UINT8 *) Record - (UINT8 *) Header)) > FTW_WRITE_TOTAL_SIZE (Header->NumberOfWrites - 1, Header->PrivateDataSize)) {
+  if (((UINTN) Record - (UINTN) Header) > FTW_WRITE_TOTAL_SIZE (Header->NumberOfWrites - 1, Header->PrivateDataSize)) {
     return EFI_ACCESS_DENIED;
   }
 
@@ -720,7 +720,7 @@ FtwRestart (
     return EFI_ABORTED;
   }
 
-  DEBUG ((EFI_D_ERROR, "Ftw: Restart() success \n"));
+  DEBUG ((EFI_D_INFO, "%a(): success\n", __FUNCTION__));
   return EFI_SUCCESS;
 }
 
@@ -775,7 +775,7 @@ FtwAbort (
 
   FtwDevice->FtwLastWriteHeader->Complete = FTW_VALID_STATE;
 
-  DEBUG ((EFI_D_ERROR, "Ftw: Abort() success \n"));
+  DEBUG ((EFI_D_INFO, "%a(): success\n", __FUNCTION__));
   return EFI_SUCCESS;
 }
 
@@ -886,7 +886,7 @@ FtwGetLastWrite (
     Status = EFI_SUCCESS;
   }
 
-  DEBUG ((EFI_D_ERROR, "Ftw: GetLasetWrite() success\n"));
+  DEBUG ((EFI_D_INFO, "%a(): success\n", __FUNCTION__));
 
   return Status;
 }

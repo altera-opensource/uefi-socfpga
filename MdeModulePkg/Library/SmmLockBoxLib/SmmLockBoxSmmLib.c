@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -29,6 +29,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 SMM_LOCK_BOX_CONTEXT mSmmLockBoxContext;
 LIST_ENTRY           mLockBoxQueue = INITIALIZE_LIST_HEAD_VARIABLE (mLockBoxQueue);
+
+BOOLEAN              mSmmConfigurationTableInstalled = FALSE;
 
 /**
   This function return SmmLockBox context from SMST.
@@ -73,7 +75,7 @@ InternalGetSmmLockBoxContext (
 **/
 EFI_STATUS
 EFIAPI
-SmmLockBoxSmmConstructuor (
+SmmLockBoxSmmConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
@@ -81,7 +83,7 @@ SmmLockBoxSmmConstructuor (
   EFI_STATUS           Status;
   SMM_LOCK_BOX_CONTEXT *SmmLockBoxContext;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructuor - Enter\n"));
+  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Enter\n"));
 
   //
   // Check if gEfiSmmLockBoxCommunicationGuid is installed by someone
@@ -93,7 +95,7 @@ SmmLockBoxSmmConstructuor (
     // No need to install again, just return.
     //
     DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxContext - already installed\n"));
-    DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructuor - Exit\n"));
+    DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Exit\n"));
     return EFI_SUCCESS;
   }
 
@@ -114,12 +116,49 @@ SmmLockBoxSmmConstructuor (
                     sizeof(mSmmLockBoxContext)
                     );
   ASSERT_EFI_ERROR (Status);
+  mSmmConfigurationTableInstalled = TRUE;
 
   DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxContext - %x\n", (UINTN)&mSmmLockBoxContext));
   DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib LockBoxDataAddress - %x\n", (UINTN)&mLockBoxQueue));
-  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructuor - Exit\n"));
+  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmConstructor - Exit\n"));
 
   return Status;
+}
+
+/**
+  Destructor for SmmLockBox library.
+  This is used to uninstall SmmLockBoxCommunication configuration table
+  if it has been installed in Constructor.
+
+  @param[in] ImageHandle    Image handle of this driver.
+  @param[in] SystemTable    A Pointer to the EFI System Table.
+
+  @retval EFI_SUCEESS       The destructor always returns EFI_SUCCESS.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmLockBoxSmmDestructor (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  )
+{
+  EFI_STATUS            Status;
+
+  DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib SmmLockBoxSmmDestructor in %a module\n", gEfiCallerBaseName));
+
+  if (mSmmConfigurationTableInstalled) {
+    Status = gSmst->SmmInstallConfigurationTable (
+                      gSmst,
+                      &gEfiSmmLockBoxCommunicationGuid,
+                      NULL,
+                      0
+                      );
+    ASSERT_EFI_ERROR (Status);
+    DEBUG ((EFI_D_INFO, "SmmLockBoxSmmLib uninstall SmmLockBoxCommunication configuration table\n"));
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**

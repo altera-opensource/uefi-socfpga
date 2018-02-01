@@ -265,6 +265,7 @@ MmcIoBlocks (
       CmdArg = Lba * This->Media->BlockSize;
     }
 
+    Cmd = 0;
     if (Transfer == MMC_IOBLOCKS_READ) {
       if (BlockCount == 1) {
         // Read a single block

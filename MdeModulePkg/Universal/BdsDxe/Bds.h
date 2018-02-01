@@ -1,7 +1,7 @@
 /** @file
   Head file for BDS Architectural Protocol implementation
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,13 +20,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/ConnectConInEvent.h>
 #include <Guid/Performance.h>
 #include <Guid/StatusCodeDataTypeVariable.h>
+#include <Guid/EventGroup.h>
 
 #include <Protocol/Bds.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/VariableLock.h>
-#include <Protocol/BlockIo.h>
-#include <Protocol/LoadFile.h>
-#include <Protocol/SimpleFileSystem.h>
+#include <Protocol/DeferredImageLoad.h>
 
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DebugLib.h>
@@ -44,6 +43,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Library/UefiBootManagerLib.h>
 #include <Library/PlatformBootManagerLib.h>
+
+#if !defined (EFI_REMOVABLE_MEDIA_FILE_NAME)
+    #if defined (MDE_CPU_EBC)
+        //
+        // Uefi specification only defines the default boot file name for IA32, X64
+        // and IPF processor, so need define boot file name for EBC architecture here.
+        //
+        #define EFI_REMOVABLE_MEDIA_FILE_NAME L"\\EFI\\BOOT\\BOOTEBC.EFI"
+    #else
+        #error "Can not determine the default boot file name for unknown processor type!"
+    #endif
+#endif
 
 /**
 
@@ -69,8 +80,7 @@ BdsEntry (
   @param  VendorGuid             A unique identifier for the vendor.
   @param  Attributes             Attributes bitmask to set for the variable.
   @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
-                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or 
-                                 EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero 
+                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero
                                  causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
                                  set, then a SetVariable() call with a DataSize of zero will not cause any change to 
                                  the variable value (the timestamp associated with the variable may be updated however 
@@ -88,9 +98,8 @@ BdsEntry (
   @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
   @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
   @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
-  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS 
-                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo 
-                                 does NOT pass the validation check carried out by the firmware.
+  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS
+                                 being set, but the AuthInfo does NOT pass the validation check carried out by the firmware.
 
   @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
 **/

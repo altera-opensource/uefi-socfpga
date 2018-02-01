@@ -783,6 +783,10 @@ class DscParser(MetaFileParser):
         "FIX_LOAD_TOP_MEMORY_ADDRESS"
     ]
 
+    SubSectionDefineKeywords = [
+        "FILE_GUID"
+    ]
+
     SymbolPattern = ValueExpression.SymbolPattern
 
     ## Constructor of DscParser
@@ -993,7 +997,8 @@ class DscParser(MetaFileParser):
         if not self._ValueList[2]:
             EdkLogger.error('Parser', FORMAT_INVALID, "No value specified",
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex+1)
-        if not self._ValueList[1] in self.DefineKeywords:
+        if (not self._ValueList[1] in self.DefineKeywords and
+            (self._InSubsection and self._ValueList[1] not in self.SubSectionDefineKeywords)):
             EdkLogger.error('Parser', FORMAT_INVALID,
                             "Unknown keyword found: %s. "
                             "If this is a macro you must "
@@ -2000,9 +2005,11 @@ class UniParser(object):
     
     def __read(self):
         try:
-            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode = 'rb', Encoding = 'utf_16').read()
+            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode='rb', Encoding='utf_8').read()
         except UnicodeError:
-            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode = 'rb', Encoding = 'utf_16_le').read()
+            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode='rb', Encoding='utf_16').read()
+        except UnicodeError:
+            self.FileIn = CodecOpenLongFilePath(self.FilePath, Mode='rb', Encoding='utf_16_le').read()
         except IOError:
             self.FileIn = ""
     

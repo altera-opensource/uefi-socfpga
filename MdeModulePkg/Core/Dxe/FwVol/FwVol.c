@@ -3,7 +3,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -554,7 +554,7 @@ FvCheck (
         DEBUG ((EFI_D_ERROR, "Found a FFS3 formatted file: %g in a non-FFS3 formatted FV.\n", &CacheFfsHeader->Name));
         FfsHeader = (EFI_FFS_FILE_HEADER *) ((UINT8 *) FfsHeader + FFS_FILE2_SIZE (CacheFfsHeader));
         //
-        // Adjust pointer to the next 8-byte aligned boundry.
+        // Adjust pointer to the next 8-byte aligned boundary.
         //
         FfsHeader = (EFI_FFS_FILE_HEADER *) (((UINTN) FfsHeader + 7) & ~0x07);
         continue;
@@ -589,7 +589,7 @@ FvCheck (
     }
 
     //
-    // Adjust pointer to the next 8-byte aligned boundry.
+    // Adjust pointer to the next 8-byte aligned boundary.
     //
     FfsHeader = (EFI_FFS_FILE_HEADER *)(((UINTN)FfsHeader + 7) & ~0x07);
 
@@ -711,13 +711,10 @@ NotifyFwVolBlock (
       FvDevice->FwVolHeader     = FwVolHeader;
       FvDevice->IsFfs3Fv        = CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiFirmwareFileSystem3Guid);
       FvDevice->Fv.ParentHandle = Fvb->ParentHandle;
-
-      if (Fvb->ParentHandle != NULL) {
-        //
-        // Inherit the authentication status from FVB.
-        //
-        FvDevice->AuthenticationStatus = GetFvbAuthenticationStatus (Fvb);
-      }
+      //
+      // Inherit the authentication status from FVB.
+      //
+      FvDevice->AuthenticationStatus = GetFvbAuthenticationStatus (Fvb);
       
       if (!EFI_ERROR (FvCheck (FvDevice))) {
         //

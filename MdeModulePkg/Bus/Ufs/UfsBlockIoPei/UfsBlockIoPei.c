@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -107,13 +107,20 @@ UFS_PEIM_HC_PRIVATE_DATA   gUfsHcPeimTemplate = {
       0
     }
   },
+  {                               // EndOfPeiNotifyList
+    (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiEndOfPeiSignalPpiGuid,
+    UfsEndOfPei
+  },
   0,                              // UfsHcBase
   0,                              // Capabilities
   0,                              // TaskTag
   0,                              // UtpTrlBase
   0,                              // Nutrs
+  NULL,                           // TrlMapping
   0,                              // UtpTmrlBase
   0,                              // Nutmrs
+  NULL,                           // TmrlMapping
   {                               // Luns
     {
       UFS_LUN_0,                      // Ufs Common Lun 0
@@ -737,11 +744,11 @@ UfsBlockIoPeimGetMediaInfo (
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
-    Private->Media[DeviceIndex].LastBlock  = (Capacity16.LastLba3 << 24) | (Capacity16.LastLba2 << 16) | (Capacity16.LastLba1 << 8) | Capacity16.LastLba0;
-    Private->Media[DeviceIndex].LastBlock |= ((UINT64)Capacity16.LastLba7 << 56) | ((UINT64)Capacity16.LastLba6 << 48) | ((UINT64)Capacity16.LastLba5 << 40) | ((UINT64)Capacity16.LastLba4 << 32);
+    Private->Media[DeviceIndex].LastBlock  = ((UINT32)Capacity16.LastLba3 << 24) | (Capacity16.LastLba2 << 16) | (Capacity16.LastLba1 << 8) | Capacity16.LastLba0;
+    Private->Media[DeviceIndex].LastBlock |= LShiftU64 ((UINT64)Capacity16.LastLba7, 56) | LShiftU64((UINT64)Capacity16.LastLba6, 48) | LShiftU64 ((UINT64)Capacity16.LastLba5, 40) | LShiftU64 ((UINT64)Capacity16.LastLba4, 32);
     Private->Media[DeviceIndex].BlockSize  = (Capacity16.BlockSize3 << 24) | (Capacity16.BlockSize2 << 16) | (Capacity16.BlockSize1 << 8) | Capacity16.BlockSize0;
   } else {
-    Private->Media[DeviceIndex].LastBlock  = (Capacity.LastLba3 << 24) | (Capacity.LastLba2 << 16) | (Capacity.LastLba1 << 8) | Capacity.LastLba0;
+    Private->Media[DeviceIndex].LastBlock  = ((UINT32)Capacity.LastLba3 << 24) | (Capacity.LastLba2 << 16) | (Capacity.LastLba1 << 8) | Capacity.LastLba0;
     Private->Media[DeviceIndex].BlockSize  = (Capacity.BlockSize3 << 24) | (Capacity.BlockSize2 << 16) | (Capacity.BlockSize1 << 8) | Capacity.BlockSize0;
   }
 
@@ -1062,6 +1069,54 @@ UfsBlockIoPeimReadBlocks2 (
 }
 
 /**
+  One notified function to cleanup the allocated DMA buffers at the end of PEI.
+
+  @param[in]  PeiServices        Pointer to PEI Services Table.
+  @param[in]  NotifyDescriptor   Pointer to the descriptor for the Notification
+                                 event that caused this function to execute.
+  @param[in]  Ppi                Pointer to the PPI data associated with this function.
+
+  @retval     EFI_SUCCESS  The function completes successfully
+
+**/
+EFI_STATUS
+EFIAPI
+UfsEndOfPei (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  UFS_PEIM_HC_PRIVATE_DATA    *Private;
+
+  Private = GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS_NOTIFY (NotifyDescriptor);
+
+  if ((Private->Pool != NULL) && (Private->Pool->Head != NULL)) {
+    UfsPeimFreeMemPool (Private->Pool);
+  }
+
+  if (Private->UtpTmrlBase != NULL) {
+    IoMmuFreeBuffer (
+      EFI_SIZE_TO_PAGES (Private->Nutmrs * sizeof (UTP_TMRD)),
+      Private->UtpTmrlBase,
+      Private->TmrlMapping
+      );
+  }
+
+  if (Private->UtpTrlBase != NULL) {
+    IoMmuFreeBuffer (
+      EFI_SIZE_TO_PAGES (Private->Nutrs * sizeof (UTP_TRD)),
+      Private->UtpTrlBase,
+      Private->TrlMapping
+      );
+  }
+
+  UfsControllerStop (Private);
+
+  return EFI_SUCCESS;
+}
+
+/**
   The user code starts with this function.
   
   @param  FileHandle             Handle of the file being invoked.
@@ -1105,6 +1160,8 @@ InitializeUfsBlockIoPeim (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
+
+  IoMmuInit ();
 
   Controller = 0;
   MmioBase   = 0;
@@ -1185,7 +1242,8 @@ InitializeUfsBlockIoPeim (
       }
     }
     
-    Status = PeiServicesInstallPpi (&Private->BlkIoPpiList);
+    PeiServicesInstallPpi (&Private->BlkIoPpiList);
+    PeiServicesNotifyPpi (&Private->EndOfPeiNotifyList);
     Controller++;
   }
 

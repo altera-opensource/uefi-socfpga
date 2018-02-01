@@ -13,7 +13,7 @@
 
   InitCommunicateBuffer() is really function to check the variable data size.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,6 +44,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/EventGroup.h>
 #include <Guid/SmmVariableCommon.h>
 
+#include "PrivilegePolymorphic.h"
+
 EFI_HANDLE                       mHandle                    = NULL;
 EFI_SMM_VARIABLE_PROTOCOL       *mSmmVariable               = NULL;
 EFI_EVENT                        mVirtualAddressChangeEvent = NULL;
@@ -57,17 +59,14 @@ EDKII_VARIABLE_LOCK_PROTOCOL     mVariableLock;
 EDKII_VAR_CHECK_PROTOCOL         mVarCheck;
 
 /**
-  SecureBoot Hook for SetVariable.
-
-  @param[in] VariableName                 Name of Variable to be found.
-  @param[in] VendorGuid                   Variable vendor GUID.
+  Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).
+  Record their initial State when variable write service is ready.
 
 **/
 VOID
 EFIAPI
-SecureBootHook (
-  IN CHAR16                                 *VariableName,
-  IN EFI_GUID                               *VendorGuid
+RecordSecureBootPolicyVarData(
+  VOID
   );
 
 /**
@@ -1078,6 +1077,12 @@ SmmVariableWriteReady (
   if (EFI_ERROR (Status)) {
     return;
   }
+
+  //
+  // Some Secure Boot Policy Var (SecureBoot, etc) updates following other
+  // Secure Boot Policy Variable change.  Record their initial value.
+  //
+  RecordSecureBootPolicyVarData();
 
   Status = gBS->InstallProtocolInterface (
                   &mHandle,

@@ -2,7 +2,7 @@
   This code produces the Smbios protocol. It also responsible for constructing 
   SMBIOS table into system table.
   
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1127,7 +1127,7 @@ SmbiosCreateTable (
   // Create End-Of-Table structure
   //
   GetMaxSmbiosHandle(SmbiosProtocol, &SmbiosHandle);
-  EndStructure.Header.Type = EFI_SMBIOS_TYPE_END_OF_TABLE;
+  EndStructure.Header.Type = SMBIOS_TYPE_END_OF_TABLE;
   EndStructure.Header.Length = (UINT8) sizeof (EFI_SMBIOS_TABLE_HEADER);
   EndStructure.Header.Handle = SmbiosHandle;
   EndStructure.Tailing[0] = 0;
@@ -1138,12 +1138,13 @@ SmbiosCreateTable (
     EntryPointStructure->MaxStructureSize = (UINT16) sizeof (EndStructure);
   }
 
-  if ((UINTN) EFI_SIZE_TO_PAGES (EntryPointStructure->TableLength) > mPreAllocatedPages) {
+  if (EFI_SIZE_TO_PAGES ((UINT32) EntryPointStructure->TableLength) > mPreAllocatedPages) {
     //
     // If new SMBIOS table size exceeds the previous allocated page, 
     // it is time to re-allocate memory (below 4GB).
     // 
-    DEBUG ((EFI_D_ERROR, "SmbiosCreateTable() re-allocate SMBIOS 32-bit table\n"));
+    DEBUG ((EFI_D_INFO, "%a() re-allocate SMBIOS 32-bit table\n",
+      __FUNCTION__));
     if (EntryPointStructure->TableAddress != 0) {
       //
       // Free the previous allocated page
@@ -1299,19 +1300,20 @@ SmbiosCreate64BitTable (
   // Create End-Of-Table structure
   //
   GetMaxSmbiosHandle(SmbiosProtocol, &SmbiosHandle);
-  EndStructure.Header.Type = EFI_SMBIOS_TYPE_END_OF_TABLE;
+  EndStructure.Header.Type = SMBIOS_TYPE_END_OF_TABLE;
   EndStructure.Header.Length = (UINT8) sizeof (EFI_SMBIOS_TABLE_HEADER);
   EndStructure.Header.Handle = SmbiosHandle;
   EndStructure.Tailing[0] = 0;
   EndStructure.Tailing[1] = 0;
   Smbios30EntryPointStructure->TableMaximumSize = (UINT32) (Smbios30EntryPointStructure->TableMaximumSize + sizeof (EndStructure));
 
-  if ((UINTN) EFI_SIZE_TO_PAGES (Smbios30EntryPointStructure->TableMaximumSize) > mPre64BitAllocatedPages) {
+  if (EFI_SIZE_TO_PAGES (Smbios30EntryPointStructure->TableMaximumSize) > mPre64BitAllocatedPages) {
     //
     // If new SMBIOS table size exceeds the previous allocated page, 
     // it is time to re-allocate memory at anywhere.
     //
-    DEBUG ((EFI_D_ERROR, "SmbiosCreate64BitTable() re-allocate SMBIOS 64-bit table\n"));
+    DEBUG ((EFI_D_INFO, "%a() re-allocate SMBIOS 64-bit table\n",
+      __FUNCTION__));
     if (Smbios30EntryPointStructure->TableAddress != 0) {
       //
       // Free the previous allocated page

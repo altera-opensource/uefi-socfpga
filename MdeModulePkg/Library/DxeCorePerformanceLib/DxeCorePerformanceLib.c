@@ -10,7 +10,8 @@
   This library is mainly used by DxeCore to start performance logging to ensure that
   Performance Protocol is installed at the very beginning of DXE phase.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -59,6 +60,13 @@ PERFORMANCE_EX_PROTOCOL mPerformanceExInterface = {
   EndGaugeEx,
   GetGaugeEx
   };
+
+PERFORMANCE_PROPERTY  mPerformanceProperty;
+
+//
+//  Gauge record lock to avoid data corruption or even memory overflow
+//
+STATIC EFI_LOCK mPerfRecordLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 
 /**
   Searches in the gauge array with keyword Handle, Token, Module and Identifier.
@@ -109,8 +117,7 @@ InternalSearchForGaugeEntry (
     if (GaugeEntryExArray[Index2].EndTimeStamp == 0 &&
         (GaugeEntryExArray[Index2].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
         AsciiStrnCmp (GaugeEntryExArray[Index2].Token, Token, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
-        AsciiStrnCmp (GaugeEntryExArray[Index2].Module, Module, DXE_PERFORMANCE_STRING_LENGTH) == 0 &&
-        (GaugeEntryExArray[Index2].Identifier == Identifier)) {
+        AsciiStrnCmp (GaugeEntryExArray[Index2].Module, Module, DXE_PERFORMANCE_STRING_LENGTH) == 0) {
       Index = Index2;
       break;
     }
@@ -160,6 +167,12 @@ StartGaugeEx (
   UINTN                     OldGaugeDataSize;
   GAUGE_DATA_HEADER         *OldGaugeData;
   UINT32                    Index;
+  EFI_STATUS                Status;
+
+  Status = EfiAcquireLockOrFail (&mPerfRecordLock);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   Index = mGaugeData->NumberOfEntries;
   if (Index >= mMaxGaugeRecords) {
@@ -173,6 +186,7 @@ StartGaugeEx (
 
     NewGaugeData = AllocateZeroPool (GaugeDataSize);
     if (NewGaugeData == NULL) {
+      EfiReleaseLock (&mPerfRecordLock);
       return EFI_OUT_OF_RESOURCES;
     }
 
@@ -207,6 +221,8 @@ StartGaugeEx (
 
   mGaugeData->NumberOfEntries++;
 
+  EfiReleaseLock (&mPerfRecordLock);
+
   return EFI_SUCCESS;
 }
 
@@ -215,7 +231,7 @@ StartGaugeEx (
   for the first matching record that contains a zero end time and fills in a valid end time.
 
   Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token, Module and Identifier and has an end time value of zero.
+  for the first record that matches Handle, Token and Module and has an end time value of zero.
   If the record can not be found then return EFI_NOT_FOUND.
   If the record is found and TimeStamp is not zero,
   then the end time in the record is filled in with the value specified by TimeStamp.
@@ -248,6 +264,12 @@ EndGaugeEx (
 {
   GAUGE_DATA_ENTRY_EX *GaugeEntryExArray;
   UINT32              Index;
+  EFI_STATUS          Status;
+
+  Status = EfiAcquireLockOrFail (&mPerfRecordLock);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if (TimeStamp == 0) {
     TimeStamp = GetPerformanceCounter ();
@@ -255,10 +277,62 @@ EndGaugeEx (
 
   Index = InternalSearchForGaugeEntry (Handle, Token, Module, Identifier);
   if (Index >= mGaugeData->NumberOfEntries) {
+    EfiReleaseLock (&mPerfRecordLock);
     return EFI_NOT_FOUND;
   }
   GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
   GaugeEntryExArray[Index].EndTimeStamp = TimeStamp;
+
+  EfiReleaseLock (&mPerfRecordLock);
+  return EFI_SUCCESS;
+}
+
+/**
+  Retrieves a previously logged performance measurement.
+  It can also retrieve the log created by StartGauge and EndGauge of PERFORMANCE_PROTOCOL,
+  and then assign the Identifier with 0.
+
+  Retrieves the performance log entry from the performance log specified by LogEntryKey.
+  If it stands for a valid entry, then EFI_SUCCESS is returned and
+  GaugeDataEntryEx stores the pointer to that entry.
+
+  This internal function is added to avoid releasing lock before each return statement.
+
+  @param  LogEntryKey             The key for the previous performance measurement log entry.
+                                  If 0, then the first performance measurement log entry is retrieved.
+  @param  GaugeDataEntryEx        The indirect pointer to the extended gauge data entry specified by LogEntryKey
+                                  if the retrieval is successful.
+
+  @retval EFI_SUCCESS             The GuageDataEntryEx is successfully found based on LogEntryKey.
+  @retval EFI_NOT_FOUND           The LogEntryKey is the last entry (equals to the total entry number).
+  @retval EFI_INVALIDE_PARAMETER  The LogEntryKey is not a valid entry (greater than the total entry number).
+  @retval EFI_INVALIDE_PARAMETER  GaugeDataEntryEx is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+InternalGetGaugeEx (
+  IN  UINTN                 LogEntryKey,
+  OUT GAUGE_DATA_ENTRY_EX   **GaugeDataEntryEx
+  )
+{
+  UINTN               NumberOfEntries;
+  GAUGE_DATA_ENTRY_EX *GaugeEntryExArray;
+
+  NumberOfEntries = (UINTN) (mGaugeData->NumberOfEntries);
+  if (LogEntryKey > NumberOfEntries) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (LogEntryKey == NumberOfEntries) {
+    return EFI_NOT_FOUND;
+  }
+
+  GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
+
+  if (GaugeDataEntryEx == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *GaugeDataEntryEx = &GaugeEntryExArray[LogEntryKey];
 
   return EFI_SUCCESS;
 }
@@ -290,25 +364,18 @@ GetGaugeEx (
   OUT GAUGE_DATA_ENTRY_EX   **GaugeDataEntryEx
   )
 {
-  UINTN               NumberOfEntries;
-  GAUGE_DATA_ENTRY_EX *GaugeEntryExArray;
+  EFI_STATUS                Status;
 
-  NumberOfEntries = (UINTN) (mGaugeData->NumberOfEntries);
-  if (LogEntryKey > NumberOfEntries) {
-    return EFI_INVALID_PARAMETER;
-  }
-  if (LogEntryKey == NumberOfEntries) {
-    return EFI_NOT_FOUND;
+  Status = EfiAcquireLockOrFail (&mPerfRecordLock);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
-  GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
+  Status = InternalGetGaugeEx (LogEntryKey, GaugeDataEntryEx);
 
-  if (GaugeDataEntryEx == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-  *GaugeDataEntryEx = &GaugeEntryExArray[LogEntryKey];
+  EfiReleaseLock (&mPerfRecordLock);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -502,6 +569,8 @@ DxeCorePerformanceLibConstructor (
   )
 {
   EFI_STATUS                Status;
+  PERFORMANCE_PROPERTY      *PerformanceProperty;
+
 
   if (!PerformanceMeasurementEnabled ()) {
     //
@@ -522,14 +591,31 @@ DxeCorePerformanceLibConstructor (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  mMaxGaugeRecords = INIT_DXE_GAUGE_DATA_ENTRIES + PcdGet8 (PcdMaxPeiPerformanceLogEntries);
+  mMaxGaugeRecords = INIT_DXE_GAUGE_DATA_ENTRIES + (UINT16) (PcdGet16 (PcdMaxPeiPerformanceLogEntries16) != 0 ?
+                                                             PcdGet16 (PcdMaxPeiPerformanceLogEntries16) :
+                                                             PcdGet8 (PcdMaxPeiPerformanceLogEntries));
 
   mGaugeData = AllocateZeroPool (sizeof (GAUGE_DATA_HEADER) + (sizeof (GAUGE_DATA_ENTRY_EX) * mMaxGaugeRecords));
   ASSERT (mGaugeData != NULL);
 
   InternalGetPeiPerformance ();
 
-  return Status;
+  Status = EfiGetSystemConfigurationTable (&gPerformanceProtocolGuid, (VOID **) &PerformanceProperty);
+  if (EFI_ERROR (Status)) {
+    //
+    // Install configuration table for performance property.
+    //
+    mPerformanceProperty.Revision  = PERFORMANCE_PROPERTY_REVISION;
+    mPerformanceProperty.Reserved  = 0;
+    mPerformanceProperty.Frequency = GetPerformanceCounterProperties (
+                                       &mPerformanceProperty.TimerStartValue,
+                                       &mPerformanceProperty.TimerEndValue
+                                       );
+    Status = gBS->InstallConfigurationTable (&gPerformanceProtocolGuid, &mPerformanceProperty);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -575,7 +661,7 @@ StartPerformanceMeasurementEx (
   for the first matching record that contains a zero end time and fills in a valid end time.
 
   Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token, Module and Identifier and has an end time value of zero.
+  for the first record that matches Handle, Token and Module and has an end time value of zero.
   If the record can not be found then return RETURN_NOT_FOUND.
   If the record is found and TimeStamp is not zero,
   then the end time in the record is filled in with the value specified by TimeStamp.

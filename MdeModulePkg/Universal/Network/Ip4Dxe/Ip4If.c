@@ -1,7 +1,7 @@
 /** @file
   Implement IP4 pesudo interface.
   
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -560,9 +560,6 @@ Ip4SetAddress (
 {
   EFI_ARP_CONFIG_DATA       ArpConfig;
   EFI_STATUS                Status;
-  INTN                      Type;
-  INTN                      Len;
-  IP4_ADDR                  Netmask;
 
   NET_CHECK_SIGNATURE (Interface, IP4_INTERFACE_SIGNATURE);
 
@@ -577,13 +574,7 @@ Ip4SetAddress (
   Interface->Ip             = IpAddr;
   Interface->SubnetMask     = SubnetMask;
   Interface->SubnetBrdcast  = (IpAddr | ~SubnetMask);
-
-  Type                      = NetGetIpClass (IpAddr);
-  ASSERT (Type <= IP4_ADDR_CLASSC);
-  Len                       = NetGetMaskLength (SubnetMask);
-  ASSERT (Len < IP4_MASK_NUM);
-  Netmask                   = gIp4AllMasks[MIN (Len, Type << 3)];
-  Interface->NetBrdcast     = (IpAddr | ~Netmask);
+  Interface->NetBrdcast     = (IpAddr | ~SubnetMask);
 
   //
   // Do clean up for Arp child
@@ -864,7 +855,7 @@ Ip4OnArpResolvedDpc (
 
     Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
     if (EFI_ERROR (Status)) {
-      RemoveEntryList (Entry);
+      RemoveEntryList (&Token->Link);
       Token->CallBack (Token->IpInstance, Token->Packet, Status, 0, Token->Context);
 
       Ip4FreeLinkTxToken (Token);
@@ -1090,7 +1081,7 @@ SEND_NOW:
   InsertTailList (&Interface->SentFrames, &Token->Link);
   Status = Interface->Mnp->Transmit (Interface->Mnp, &Token->MnpToken);
   if (EFI_ERROR (Status)) {
-    RemoveEntryList (&Interface->SentFrames);
+    RemoveEntryList (&Token->Link);
     goto ON_ERROR;
   }
 

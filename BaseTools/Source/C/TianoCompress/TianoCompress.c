@@ -5,7 +5,7 @@ and Pointers to repeated strings.
 This sequence is further divided into Blocks and Huffman codings are applied to 
 each Block.
   
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -240,6 +240,10 @@ Returns:
   UINT32  Index;
 
   mText = malloc (WNDSIZ * 2 + MAXMATCH);
+  if (mText == NULL) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    return EFI_OUT_OF_RESOURCES;
+  }
   for (Index = 0; Index < WNDSIZ * 2 + MAXMATCH; Index++) {
     mText[Index] = 0;
   }
@@ -250,6 +254,11 @@ Returns:
   mParent     = malloc (WNDSIZ * 2 * sizeof (*mParent));
   mPrev       = malloc (WNDSIZ * 2 * sizeof (*mPrev));
   mNext       = malloc ((MAX_HASH_VAL + 1) * sizeof (*mNext));
+  if (mLevel == NULL || mChildCount == NULL || mPosition == NULL ||
+    mParent == NULL || mPrev == NULL || mNext == NULL) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   mBufSiz     = BLKSIZ;
   mBuf        = malloc (mBufSiz);
@@ -1755,6 +1764,8 @@ Returns:
   InputLength = 0;
   InputFileName = NULL;
   OutputFileName = NULL;
+  InputFile = NULL;
+  OutputFile = NULL;
   DstSize=0;
   DebugLevel = 0;
   DebugMode = FALSE;
@@ -1897,7 +1908,7 @@ Returns:
     FileBuffer = (UINT8 *) malloc (InputLength);
     if (FileBuffer == NULL) {
       Error (NULL, 0, 4001, "Resource:", "Memory cannot be allocated!");
-      return 1;
+      goto ERROR;
     }
 
     Status = GetFileContents (
@@ -1908,23 +1919,18 @@ Returns:
   }
 
   if (EFI_ERROR(Status)) {
-    free(FileBuffer);
-    return 1;
+    Error (NULL, 0, 0004, "Error getting contents of file: %s", InputFileName);
+    goto ERROR;
   }
-   
-  if (OutputFileName != NULL) {
-    OutputFile = fopen (LongFilePath (OutputFileName), "wb");
-    if (OutputFile == NULL) {
-      Error (NULL, 0, 0001, "Error opening output file for writing", OutputFileName);
-    if (InputFile != NULL) {
-      fclose (InputFile);
-      }
-      goto ERROR;
-      }
-    } else {
-      OutputFileName = DEFAULT_OUTPUT_FILE;
-      OutputFile = fopen (LongFilePath (OutputFileName), "wb");
-    }
+
+  if (OutputFileName == NULL) {
+    OutputFileName = DEFAULT_OUTPUT_FILE;
+  }
+  OutputFile = fopen (LongFilePath (OutputFileName), "wb");
+  if (OutputFile == NULL) {
+    Error (NULL, 0, 0001, "Error opening output file for writing", OutputFileName);
+    goto ERROR;
+  }
     
   if (ENCODE) {
   //
@@ -1942,13 +1948,21 @@ Returns:
       goto ERROR;
     }
   }
+
   Status = TianoCompress ((UINT8 *)FileBuffer, InputLength, OutBuffer, &DstSize);
   if (Status != EFI_SUCCESS) {
     Error (NULL, 0, 0007, "Error compressing file", NULL);
     goto ERROR;
   }
 
+  if (OutBuffer == NULL) {
+    Error (NULL, 0, 4001, "Resource:", "Memory cannot be allocated!");
+    goto ERROR;
+  }
+
   fwrite(OutBuffer,(size_t)DstSize, 1, OutputFile);
+  fclose(OutputFile);
+  fclose(InputFile);
   free(Scratch);
   free(FileBuffer);
   free(OutBuffer);
@@ -1986,6 +2000,8 @@ Returns:
   }
 
   fwrite(OutBuffer, (size_t)(Scratch->mOrigSize), 1, OutputFile);
+  fclose(OutputFile);
+  fclose(InputFile);
   free(Scratch);
   free(FileBuffer);
   free(OutBuffer);
@@ -2007,6 +2023,12 @@ ERROR:
     } else if (DECODE) {
       DebugMsg(UTILITY_NAME, 0, DebugLevel, "Decoding Error\n", NULL);
     }
+  }
+  if (OutputFile != NULL) {
+    fclose(OutputFile);
+  }
+  if (InputFile != NULL) {
+    fclose (InputFile);
   }
   if (Scratch != NULL) {
     free(Scratch);
@@ -2044,11 +2066,11 @@ Returns: (VOID)
 
 --*/
 {
-  Sd->mBitBuf = (UINT32) (Sd->mBitBuf << NumOfBits);
+  Sd->mBitBuf = (UINT32) (((UINT64)Sd->mBitBuf) << NumOfBits);
 
   while (NumOfBits > Sd->mBitCount) {
 
-    Sd->mBitBuf |= (UINT32) (Sd->mSubBitBuf << (NumOfBits = (UINT16) (NumOfBits - Sd->mBitCount)));
+    Sd->mBitBuf |= (UINT32) (((UINT64)Sd->mSubBitBuf) << (NumOfBits = (UINT16) (NumOfBits - Sd->mBitCount)));
 
     if (Sd->mCompSize > 0) {
       //
@@ -2140,7 +2162,7 @@ Returns:
   UINT16  Start[18];
   UINT16  *Pointer;
   UINT16  Index3;
-  volatile UINT16  Index;
+  UINT16  Index;
   UINT16  Len;
   UINT16  Char;
   UINT16  JuBits;
@@ -2150,7 +2172,7 @@ Returns:
   UINT16  WordOfStart;
   UINT16  WordOfCount;
 
-  for (Index = 1; Index <= 16; Index++) {
+  for (Index = 0; Index <= 16; Index++) {
     Count[Index] = 0;
   }
 
@@ -2158,6 +2180,7 @@ Returns:
     Count[BitLen[Index]]++;
   }
 
+  Start[0] = 0;
   Start[1] = 0;
 
   for (Index = 1; Index <= 16; Index++) {
@@ -2175,6 +2198,7 @@ Returns:
 
   JuBits = (UINT16) (16 - TableBits);
 
+  Weight[0] = 0;
   for (Index = 1; Index <= TableBits; Index++) {
     Start[Index] >>= JuBits;
     Weight[Index] = (UINT16) (1U << (TableBits - Index));
@@ -2200,7 +2224,7 @@ Returns:
   for (Char = 0; Char < NumOfChar; Char++) {
 
     Len = BitLen[Char];
-    if (Len == 0) {
+    if (Len == 0 || Len >= 17) {
       continue;
     }
 
@@ -2330,6 +2354,8 @@ Returns:
   UINT16  CharC;
   volatile UINT16  Index;
   UINT32  Mask;
+
+  assert (nn <= NPT);
 
   Number = (UINT16) GetBits (Sd, nbit);
 

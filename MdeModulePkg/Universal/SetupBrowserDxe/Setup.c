@@ -1,7 +1,7 @@
 /** @file
 Entry and initialization module for the browser.
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -53,7 +53,8 @@ LIST_ENTRY      gBrowserStorageList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserSto
 LIST_ENTRY      gBrowserSaveFailFormSetList = INITIALIZE_LIST_HEAD_VARIABLE (gBrowserSaveFailFormSetList);
 
 BOOLEAN               mSystemSubmit = FALSE;
-BOOLEAN               gResetRequired;
+BOOLEAN               gResetRequiredFormLevel;
+BOOLEAN               gResetRequiredSystemLevel = FALSE;
 BOOLEAN               gExitRequired;
 BOOLEAN               gFlagReconnect;
 BOOLEAN               gCallbackReconnect;
@@ -181,7 +182,7 @@ UiFindMenuList (
     // Find the same FromSet.
     //
     if (MenuList->HiiHandle == HiiHandle) {
-      if (CompareGuid (&MenuList->FormSetGuid, &gZeroGuid)) {
+      if (IsZeroGuid (&MenuList->FormSetGuid)) {
         //
         // FormSetGuid is not specified.
         //
@@ -499,7 +500,7 @@ SendForm (
   SaveBrowserContext ();
 
   gFlagReconnect = FALSE;
-  gResetRequired = FALSE;
+  gResetRequiredFormLevel = FALSE;
   gExitRequired  = FALSE;
   gCallbackReconnect = FALSE;
   Status         = EFI_SUCCESS;
@@ -579,7 +580,7 @@ SendForm (
 
   if (ActionRequest != NULL) {
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-    if (gResetRequired) {
+    if (gResetRequiredFormLevel) {
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_RESET;
     }
   }
@@ -938,7 +939,7 @@ InitializeSetup (
   
   Status = gBS->InstallProtocolInterface (
                   &mPrivateData.Handle,
-                  &gEfiFormBrowserExProtocolGuid,
+                  &gEdkiiFormBrowserExProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &mPrivateData.FormBrowserEx
                   );
@@ -1368,6 +1369,71 @@ ConfigRespToStorage (
 }
 
 /**
+  Get bit field value from the buffer and then set the value for the question.
+  Note: Data type UINT32 can cover all the bit field value.
+
+  @param  Question        The question refer to bit field.
+  @param  Buffer          Point to the buffer which the question value get from.
+
+**/
+VOID
+GetBitsQuestionValue (
+  IN  FORM_BROWSER_STATEMENT *Question,
+  IN  UINT8                  *Buffer
+  )
+{
+  UINTN    StartBit;
+  UINTN    EndBit;
+  UINT32   RetVal;
+  UINT32   BufferValue;
+
+  StartBit = Question->BitVarOffset % 8;
+  EndBit = StartBit + Question->BitStorageWidth - 1;
+
+  CopyMem ((UINT8 *) &BufferValue, Buffer, Question->StorageWidth);
+
+  RetVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
+
+  //
+  // Set question value.
+  // Note: Since Question with BufferValue (orderedlist, password, string)are not supported to refer bit field.
+  // Only oneof/checkbox/oneof can support bit field.So we can copy the value to the Hiivalue of Question directly.
+  //
+  CopyMem ((UINT8 *) &Question->HiiValue.Value, (UINT8 *) &RetVal, Question->StorageWidth);
+}
+
+/**
+  Set bit field value to the buffer.
+  Note: Data type UINT32 can cover all the bit field value.
+
+  @param  Question        The question refer to bit field.
+  @param  Buffer          Point to the buffer which the question value set to.
+  @param  Value           The bit field value need to set.
+
+**/
+VOID
+SetBitsQuestionValue (
+  IN     FORM_BROWSER_STATEMENT *Question,
+  IN OUT UINT8                  *Buffer,
+  IN     UINT32                 Value
+  )
+{
+  UINT32   Operand;
+  UINTN    StartBit;
+  UINTN    EndBit;
+  UINT32   RetVal;
+
+  StartBit = Question->BitVarOffset % 8;
+  EndBit = StartBit + Question->BitStorageWidth - 1;
+
+  CopyMem ((UINT8*) &Operand, Buffer, Question->StorageWidth);
+
+  RetVal = BitFieldWrite32 (Operand, StartBit, EndBit, Value);
+
+  CopyMem (Buffer, (UINT8*) &RetVal, Question->StorageWidth);
+}
+
+/**
   Convert the buffer value to HiiValue.
 
   @param  Question               The question.
@@ -1394,6 +1460,9 @@ BufferToValue (
   BOOLEAN                      IsString;
   UINTN                        Length;
   EFI_STATUS                   Status;
+  UINT8                        *Buffer;
+
+  Buffer = NULL;
 
   IsString = (BOOLEAN) ((Question->HiiValue.Type == EFI_IFR_TYPE_STRING) ?  TRUE : FALSE);
   if (Question->Storage->Type == EFI_HII_VARSTORE_BUFFER || 
@@ -1415,7 +1484,15 @@ BufferToValue (
     //
     // Other type of Questions
     //
-    Dst = (UINT8 *) &Question->HiiValue.Value;
+    if (Question->QuestionReferToBitField) {
+      Buffer = (UINT8 *)AllocateZeroPool (Question->StorageWidth);
+      if (Buffer == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+      Dst = Buffer;
+    } else {
+      Dst = (UINT8 *) &Question->HiiValue.Value;
+    }
   }
 
   //
@@ -1429,45 +1506,54 @@ BufferToValue (
   *StringPtr = L'\0';
 
   LengthStr = StrLen (Value);
+
+  //
+  // Value points to a Unicode hexadecimal string, we need to convert the string to the value with CHAR16/UINT8...type.
+  // When generating the Value string, we follow this rule: 1 byte -> 2 Unicode characters (for string: 2 byte(CHAR16) ->4 Unicode characters).
+  // So the maximum value string length of a question is : Question->StorageWidth * 2.
+  // If the value string length > Question->StorageWidth * 2, only set the string length as Question->StorageWidth * 2, then convert.
+  //
+  if (LengthStr > (UINTN) Question->StorageWidth * 2) {
+    Length = (UINTN) Question->StorageWidth * 2;
+  } else {
+    Length = LengthStr;
+  }
+
   Status    = EFI_SUCCESS;
   if (!IsBufferStorage && IsString) {
     //
     // Convert Config String to Unicode String, e.g "0041004200430044" => "ABCD"
     // Add string tail char L'\0' into Length
     //
-    Length    = Question->StorageWidth + sizeof (CHAR16);
-    if (Length < ((LengthStr / 4 + 1) * 2)) {
-      Status = EFI_BUFFER_TOO_SMALL;
-    } else {
-      DstBuf = (CHAR16 *) Dst;
-      ZeroMem (TemStr, sizeof (TemStr));
-      for (Index = 0; Index < LengthStr; Index += 4) {
-        StrnCpyS (TemStr, sizeof (TemStr) / sizeof (CHAR16), Value + Index, 4);
-        DstBuf[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
-      }
-      //
-      // Add tailing L'\0' character
-      //
-      DstBuf[Index/4] = L'\0';
+    DstBuf = (CHAR16 *) Dst;
+    ZeroMem (TemStr, sizeof (TemStr));
+    for (Index = 0; Index < Length; Index += 4) {
+      StrnCpyS (TemStr, sizeof (TemStr) / sizeof (CHAR16), Value + Index, 4);
+      DstBuf[Index/4] = (CHAR16) StrHexToUint64 (TemStr);
     }
+    //
+    // Add tailing L'\0' character
+    //
+    DstBuf[Index/4] = L'\0';
   } else {
-    if (Question->StorageWidth < ((LengthStr + 1) / 2)) {
-      Status = EFI_BUFFER_TOO_SMALL;
-    } else {
-      ZeroMem (TemStr, sizeof (TemStr));
-      for (Index = 0; Index < LengthStr; Index ++) {
-        TemStr[0] = Value[LengthStr - Index - 1];
-        DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
-        if ((Index & 1) == 0) {
-          Dst [Index/2] = DigitUint8;
-        } else {
-          Dst [Index/2] = (UINT8) ((DigitUint8 << 4) + Dst [Index/2]);
-        }
+    ZeroMem (TemStr, sizeof (TemStr));
+    for (Index = 0; Index < Length; Index ++) {
+      TemStr[0] = Value[LengthStr - Index - 1];
+      DigitUint8 = (UINT8) StrHexToUint64 (TemStr);
+      if ((Index & 1) == 0) {
+        Dst [Index/2] = DigitUint8;
+      } else {
+        Dst [Index/2] = (UINT8) ((DigitUint8 << 4) + Dst [Index/2]);
       }
     }
   }
 
   *StringPtr = TempChar;
+
+  if (Buffer != NULL && Question->QuestionReferToBitField) {
+    GetBitsQuestionValue (Question, Buffer);
+    FreePool (Buffer);
+  }
 
   return Status;
 }
@@ -1673,13 +1759,23 @@ GetQuestionValue (
       if (GetValueFrom == GetSetValueWithEditBuffer) {
         //
         // Copy from storage Edit buffer
+        // If the Question refer to bit filed, get the value in the related bit filed.
         //
-        CopyMem (Dst, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+        if (Question->QuestionReferToBitField) {
+          GetBitsQuestionValue (Question, Storage->EditBuffer + Question->VarStoreInfo.VarOffset);
+        } else {
+          CopyMem (Dst, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+        }
       } else {
         //
         // Copy from storage Edit buffer
+        // If the Question refer to bit filed, get the value in the related bit filed.
         //
-        CopyMem (Dst, Storage->Buffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+        if (Question->QuestionReferToBitField) {
+          GetBitsQuestionValue (Question, Storage->Buffer + Question->VarStoreInfo.VarOffset);
+        } else {
+          CopyMem (Dst, Storage->Buffer + Question->VarStoreInfo.VarOffset, StorageWidth);
+        }
       }
     } else {
       Value = NULL;
@@ -1945,13 +2041,23 @@ SetQuestionValue (
       if (SetValueTo == GetSetValueWithEditBuffer) {
         //
         // Copy to storage edit buffer
-        //      
-        CopyMem (Storage->EditBuffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+        // If the Question refer to bit filed, copy the value in related bit filed to storage edit buffer.
+        //
+        if (Question->QuestionReferToBitField) {
+          SetBitsQuestionValue (Question, Storage->EditBuffer + Question->VarStoreInfo.VarOffset, (UINT32)(*Src));
+        } else {
+          CopyMem (Storage->EditBuffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+        }
       } else if (SetValueTo == GetSetValueWithBuffer) {
         //
-        // Copy to storage edit buffer
-        //     
-        CopyMem (Storage->Buffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+        // Copy to storage buffer
+        // If the Question refer to bit filed, copy the value in related bit filed to storage buffer.
+        //
+        if (Question->QuestionReferToBitField) {
+          SetBitsQuestionValue (Question, Storage->Buffer + Question->VarStoreInfo.VarOffset, (UINT32)(*Src));
+        } else {
+          CopyMem (Storage->Buffer + Question->VarStoreInfo.VarOffset, Src, StorageWidth);
+        }
       }
     } else {
       if (IsString) {
@@ -1968,7 +2074,14 @@ SetQuestionValue (
         TemName = (CHAR16 *) Src;
         TemString = Value;
         for (; *TemName != L'\0'; TemName++) {
-          TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+          UnicodeValueToStringS (
+            TemString,
+            BufferLen - ((UINTN)TemString - (UINTN)Value),
+            PREFIX_ZERO | RADIX_HEX,
+            *TemName,
+            4
+            );
+          TemString += StrnLenS (TemString, (BufferLen - ((UINTN)TemString - (UINTN)Value)) / sizeof (CHAR16));
         }
       } else {
         BufferLen = StorageWidth * 2 + 1;
@@ -1980,7 +2093,14 @@ SetQuestionValue (
         TemBuffer = Src + StorageWidth - 1;
         TemString = Value;
         for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
-          TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+          UnicodeValueToStringS (
+            TemString,
+            BufferLen * sizeof (CHAR16) - ((UINTN)TemString - (UINTN)Value),
+            PREFIX_ZERO | RADIX_HEX,
+            *TemBuffer,
+            2
+            );
+          TemString += StrnLenS (TemString, BufferLen - ((UINTN)TemString - (UINTN)Value) / sizeof (CHAR16));
         }
       }
 
@@ -2030,7 +2150,14 @@ SetQuestionValue (
       TemName = (CHAR16 *) Src;
       TemString = Value;
       for (; *TemName != L'\0'; TemName++) {
-        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemName, 4);
+        UnicodeValueToStringS (
+          TemString,
+          MaxLen * sizeof (CHAR16) - ((UINTN)TemString - (UINTN)ConfigResp),
+          PREFIX_ZERO | RADIX_HEX,
+          *TemName,
+          4
+          );
+        TemString += StrnLenS (TemString, MaxLen - ((UINTN)TemString - (UINTN)ConfigResp) / sizeof (CHAR16));
       }
     } else {
       //
@@ -2039,7 +2166,14 @@ SetQuestionValue (
       TemBuffer = Src + StorageWidth - 1;
       TemString = Value;
       for (Index = 0; Index < StorageWidth; Index ++, TemBuffer --) {
-        TemString += UnicodeValueToString (TemString, PREFIX_ZERO | RADIX_HEX, *TemBuffer, 2);
+        UnicodeValueToStringS (
+          TemString,
+          MaxLen * sizeof (CHAR16) - ((UINTN)TemString - (UINTN)ConfigResp),
+          PREFIX_ZERO | RADIX_HEX,
+          *TemBuffer,
+          2
+          );
+        TemString += StrnLenS (TemString, MaxLen - ((UINTN)TemString - (UINTN)ConfigResp) / sizeof (CHAR16));
       }
     }
 
@@ -2426,6 +2560,10 @@ SendDiscardInfoToDriver (
     //
     GetQuestionValue (FormSet, Form, Question, GetSetValueWithEditBuffer);
 
+    if (Question->Operand == EFI_IFR_STRING_OP){
+      HiiSetString (FormSet->HiiHandle, Question->HiiValue.Value.string, (CHAR16*)Question->BufferValue, NULL);
+    }
+
     if (Question->HiiValue.Type == EFI_IFR_TYPE_BUFFER) {
       TypeValue = (EFI_IFR_TYPE_VALUE *) Question->BufferValue;
     } else {
@@ -2441,6 +2579,94 @@ SendDiscardInfoToDriver (
                              TypeValue,
                              &ActionRequest
                              );
+  }
+}
+
+/**
+  When submit the question value, call the callback function with Submitted type
+  to inform the hii driver.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+
+**/
+VOID
+SubmitCallbackForForm (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form
+  )
+{
+  LIST_ENTRY                  *Link;
+  FORM_BROWSER_STATEMENT      *Question;
+  EFI_IFR_TYPE_VALUE          *TypeValue;
+  EFI_BROWSER_ACTION_REQUEST  ActionRequest;
+
+  if (FormSet->ConfigAccess == NULL) {
+    return;
+  }
+
+  Link = GetFirstNode (&Form->StatementListHead);
+  while (!IsNull (&Form->StatementListHead, Link)) {
+    Question = FORM_BROWSER_STATEMENT_FROM_LINK (Link);
+    Link = GetNextNode (&Form->StatementListHead, Link);
+
+    if (Question->Storage == NULL || Question->Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE) {
+      continue;
+    }
+
+    if ((Question->QuestionFlags & EFI_IFR_FLAG_CALLBACK) != EFI_IFR_FLAG_CALLBACK) {
+       continue;
+    }
+
+    if (Question->Operand == EFI_IFR_PASSWORD_OP) {
+       continue;
+    }
+
+    if (Question->HiiValue.Type == EFI_IFR_TYPE_BUFFER) {
+      TypeValue = (EFI_IFR_TYPE_VALUE *) Question->BufferValue;
+    } else {
+      TypeValue = &Question->HiiValue.Value;
+    }
+
+    ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
+    FormSet->ConfigAccess->Callback (
+                             FormSet->ConfigAccess,
+                             EFI_BROWSER_ACTION_SUBMITTED,
+                             Question->QuestionId,
+                             Question->HiiValue.Type,
+                             TypeValue,
+                             &ActionRequest
+                             );
+  }
+}
+
+/**
+  When value set Success, call the submit callback function.
+
+  @param  FormSet                FormSet data structure.
+  @param  Form                   Form data structure.
+
+**/
+VOID
+SubmitCallback (
+  IN FORM_BROWSER_FORMSET             *FormSet,
+  IN FORM_BROWSER_FORM                *Form
+  )
+{
+  FORM_BROWSER_FORM       *CurrentForm;
+  LIST_ENTRY              *Link;
+
+  if (Form != NULL) {
+    SubmitCallbackForForm(FormSet, Form);
+    return;
+  }
+
+  Link = GetFirstNode (&FormSet->FormListHead);
+  while (!IsNull (&FormSet->FormListHead, Link)) {
+    CurrentForm = FORM_BROWSER_FORM_FROM_LINK (Link);
+    Link = GetNextNode (&FormSet->FormListHead, Link);
+
+    SubmitCallbackForForm(FormSet, CurrentForm);
   }
 }
 
@@ -2554,7 +2780,8 @@ UpdateFlagForForm (
     //
     if (SetFlag && OldValue && !Question->ValueChanged) {
       if ((Question->QuestionFlags & EFI_IFR_FLAG_RESET_REQUIRED) != 0) {
-        gResetRequired = TRUE;
+        gResetRequiredFormLevel = TRUE;
+        gResetRequiredSystemLevel = TRUE;
       }
 
       if ((Question->QuestionFlags & EFI_IFR_FLAG_RECONNECT_REQUIRED) != 0) {
@@ -2753,6 +2980,108 @@ FindQuestionFromProgress (
   }
 
   return (BOOLEAN) (*RetForm != NULL);
+}
+
+/**
+  Base on the return Progress string to get the SyncConfigRequest and RestoreConfigRequest
+  for form and formset.
+
+  @param  Storage                 Storage which has this Progress string.
+  @param  ConfigRequest           The ConfigRequest string.
+  @param  Progress                The Progress string which has the first fail string.
+  @param  RestoreConfigRequest    Return the RestoreConfigRequest string.
+  @param  SyncConfigRequest       Return the SyncConfigRequest string.
+
+**/
+VOID
+GetSyncRestoreConfigRequest(
+  IN  BROWSER_STORAGE   *Storage,
+  IN  EFI_STRING        ConfigRequest,
+  IN  EFI_STRING        Progress,
+  OUT EFI_STRING        *RestoreConfigRequest,
+  OUT EFI_STRING        *SyncConfigRequest
+  )
+{
+  EFI_STRING    EndStr;
+  EFI_STRING    ConfigHdrEndStr;
+  EFI_STRING    ElementStr;
+  UINTN         TotalSize;
+  UINTN         RestoreEleSize;
+  UINTN         SyncSize;
+
+  ASSERT ((*Progress == L'&') || (*Progress == L'G'));
+  //
+  // If the Progress starts with ConfigHdr, means the failure is in the first name / value pair.
+  // Need to restore all the fields in the ConfigRequest.
+  //
+  if (*Progress == L'G') {
+    *RestoreConfigRequest = AllocateCopyPool (StrSize (ConfigRequest), ConfigRequest);
+    ASSERT (*RestoreConfigRequest != NULL);
+    return;
+  }
+
+  //
+  // Find the first fail "NAME" or "OFFSET=0x####&WIDTH=0x####" string.
+  //
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    //
+    // For Name/Value type, the data is "&Fred=16&George=16&Ron=12" formset,
+    // here, just keep the "Fred" string.
+    //
+    EndStr = StrStr (Progress, L"=");
+    ASSERT (EndStr != NULL);
+    *EndStr = L'\0';
+    //
+    // Find the ConfigHdr in ConfigRequest.
+    //
+    ConfigHdrEndStr = StrStr (ConfigRequest, L"PATH=");
+    ASSERT (ConfigHdrEndStr != NULL);
+    while (*ConfigHdrEndStr != L'&') {
+      ConfigHdrEndStr++;
+    }
+  } else {
+    //
+    // For Buffer type, the data is "OFFSET=0x####&WIDTH=0x####&VALUE=0x####",
+    // here, just keep the "OFFSET=0x####&WIDTH=0x####" string.
+    //
+    EndStr = StrStr (Progress, L"&VALUE=");
+    ASSERT (EndStr != NULL);
+    *EndStr = L'\0';
+    //
+    // Find the ConfigHdr in ConfigRequest.
+    //
+    ConfigHdrEndStr = StrStr (ConfigRequest, L"&OFFSET=");
+  }
+  //
+  // Find the first fail pair in the ConfigRequest.
+  //
+  ElementStr = StrStr (ConfigRequest, Progress);
+  ASSERT (ElementStr != NULL);
+  //
+  // To get the RestoreConfigRequest.
+  //
+  RestoreEleSize = StrSize (ElementStr);
+  TotalSize = (ConfigHdrEndStr - ConfigRequest) * sizeof (CHAR16) + RestoreEleSize + sizeof (CHAR16);
+  *RestoreConfigRequest = AllocateZeroPool (TotalSize);
+  ASSERT (*RestoreConfigRequest != NULL);
+  StrnCpyS (*RestoreConfigRequest, TotalSize / sizeof (CHAR16), ConfigRequest, ConfigHdrEndStr - ConfigRequest);
+  StrCatS (*RestoreConfigRequest, TotalSize / sizeof (CHAR16), ElementStr);
+  //
+  // To get the SyncConfigRequest.
+  //
+  SyncSize = StrSize (ConfigRequest) - RestoreEleSize + sizeof (CHAR16);
+  *SyncConfigRequest = AllocateZeroPool (SyncSize);
+  ASSERT (*SyncConfigRequest != NULL);
+  StrnCpyS (*SyncConfigRequest, SyncSize / sizeof (CHAR16), ConfigRequest, SyncSize / sizeof (CHAR16) - 1);
+
+  //
+  // restore the Progress string to the original format.
+  //
+  if (Storage->Type == EFI_HII_VARSTORE_NAME_VALUE) {
+    *EndStr = L'=';
+  } else {
+    *EndStr = L'&';
+  }
 }
 
 /**
@@ -2988,6 +3317,9 @@ SubmitForForm (
   EFI_STRING              Progress;
   BROWSER_STORAGE         *Storage;
   FORM_BROWSER_CONFIG_REQUEST  *ConfigInfo;
+  BOOLEAN                 SubmitFormFail;
+
+  SubmitFormFail = FALSE;
 
   if (!IsNvUpdateRequiredForForm (Form)) {
     return EFI_SUCCESS;
@@ -3031,13 +3363,19 @@ SubmitForForm (
                                       ConfigResp,
                                       &Progress
                                       );
-    FreePool (ConfigResp);
 
     if (EFI_ERROR (Status)) {
+      //
+      // Submit fail, to get the RestoreConfigRequest and SyncConfigRequest.
+      //
+      SubmitFormFail = TRUE;
+      GetSyncRestoreConfigRequest (ConfigInfo->Storage, ConfigInfo->ConfigRequest, Progress, &ConfigInfo->RestoreConfigRequest, &ConfigInfo->SyncConfigRequest);
       InsertTailList (&gBrowserSaveFailFormSetList, &ConfigInfo->SaveFailLink);
+      FreePool (ConfigResp);
       continue;
     }
 
+    FreePool (ConfigResp);
     //
     // 3. Config success, update storage shadow Buffer, only update the data belong to this form.
     //
@@ -3053,11 +3391,22 @@ SubmitForForm (
       while (!IsNull (&gBrowserSaveFailFormSetList, Link)) {
         ConfigInfo = FORM_BROWSER_CONFIG_REQUEST_FROM_SAVE_FAIL_LINK (Link);
         Link = GetNextNode (&gBrowserSaveFailFormSetList, Link);
-
-        SynchronizeStorage(ConfigInfo->Storage, ConfigInfo->ConfigRequest, FALSE);
+        //
+        // Process the submit fail question, base on the RestoreConfigRequest to restore the EditBuffer
+        // base on the SyncConfigRequest to Sync the buffer.
+        //
+        SynchronizeStorage (ConfigInfo->Storage, ConfigInfo->RestoreConfigRequest, FALSE);
+        FreePool (ConfigInfo->RestoreConfigRequest);
+        ConfigInfo->RestoreConfigRequest = NULL;
+        if (ConfigInfo->SyncConfigRequest != NULL) {
+          SynchronizeStorage(ConfigInfo->Storage, ConfigInfo->SyncConfigRequest, TRUE);
+          FreePool (ConfigInfo->SyncConfigRequest);
+          ConfigInfo->SyncConfigRequest = NULL;
+        }
 
         Status = EFI_SUCCESS;
       }
+      SendDiscardInfoToDriver (FormSet,Form);
     } else {
       Status = EFI_UNSUPPORTED;
     }
@@ -3076,6 +3425,13 @@ SubmitForForm (
   // 5. Update the NV flag.
   //
   ValueChangeResetFlagUpdate(TRUE, FormSet, Form);
+
+  //
+  // 6 Call callback with Submitted type to inform the driver.
+  //
+  if (!SubmitFormFail) {
+    SubmitCallback (FormSet, Form);
+  }
 
   return Status;
 }
@@ -3111,8 +3467,12 @@ SubmitForFormSet (
   FORM_BROWSER_FORM       *Form;
   BOOLEAN                 HasInserted;
   FORM_BROWSER_STATEMENT  *Question;
+  BOOLEAN                 SubmitFormSetFail;
+  BOOLEAN                 DiscardChange;
 
   HasInserted = FALSE;
+  SubmitFormSetFail = FALSE;
+  DiscardChange     = FALSE;
 
   if (!IsNvUpdateRequiredForFormSet (FormSet)) {
     return EFI_SUCCESS;
@@ -3172,6 +3532,11 @@ SubmitForFormSet (
                                       &Progress
                                       );
     if (EFI_ERROR (Status)) {
+      //
+      // Submit fail, to get the RestoreConfigRequest and SyncConfigRequest.
+      //
+      SubmitFormSetFail = TRUE;
+      GetSyncRestoreConfigRequest (FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, Progress, &FormSetStorage->RestoreConfigRequest, &FormSetStorage->SyncConfigRequest);
       InsertTailList (&FormSet->SaveFailStorageListHead, &FormSetStorage->SaveFailLink);
       if (!HasInserted) {
         //
@@ -3208,13 +3573,24 @@ SubmitForFormSet (
       // If not in system level, just handl the save failed storage here.
       //
       if (ConfirmSaveFail (Form->FormTitle, FormSet->HiiHandle) == BROWSER_ACTION_DISCARD) {
+        DiscardChange = TRUE;
         Link = GetFirstNode (&FormSet->SaveFailStorageListHead);
         while (!IsNull (&FormSet->SaveFailStorageListHead, Link)) {
           FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (Link);
           Storage        = FormSetStorage->BrowserStorage;
           Link = GetNextNode (&FormSet->SaveFailStorageListHead, Link);
-
-          SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, FALSE);
+          //
+          // Process the submit fail question, base on the RestoreConfigRequest to restore the EditBuffer
+          // base on the SyncConfigRequest to Sync the buffer.
+          //
+          SynchronizeStorage (FormSetStorage->BrowserStorage, FormSetStorage->RestoreConfigRequest, FALSE);
+          FreePool (FormSetStorage->RestoreConfigRequest);
+          FormSetStorage->RestoreConfigRequest = NULL;
+          if (FormSetStorage->SyncConfigRequest != NULL) {
+            SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->SyncConfigRequest, TRUE);
+            FreePool (FormSetStorage->SyncConfigRequest);
+            FormSetStorage->SyncConfigRequest = NULL;
+          }
 
           Status = EFI_SUCCESS;
         }
@@ -3247,9 +3623,31 @@ SubmitForFormSet (
   }
 
   //
+  // If user discard the change, send the discard info to driver.
+  //
+  if (DiscardChange) {
+    Link = GetFirstNode (&FormSet->FormListHead);
+    while (!IsNull (&FormSet->FormListHead, Link)) {
+      Form = FORM_BROWSER_FORM_FROM_LINK (Link);
+      Link = GetNextNode (&FormSet->FormListHead, Link);
+      //
+      // Call callback with Changed type to inform the driver.
+      //
+      SendDiscardInfoToDriver (FormSet, Form);
+    }
+  }
+
+  //
   // 5. Update the NV flag.
   // 
   ValueChangeResetFlagUpdate(TRUE, FormSet, NULL);
+
+  //
+  // 6. Call callback with Submitted type to inform the driver.
+  //
+  if (!SubmitFormSetFail) {
+    SubmitCallback (FormSet, NULL);
+  }
 
   return Status;
 }
@@ -3268,6 +3666,7 @@ SubmitForSystem (
 {
   EFI_STATUS              Status;
   LIST_ENTRY              *Link;
+  LIST_ENTRY              *FormLink;
   LIST_ENTRY              *StorageLink;
   FORMSET_STORAGE         *FormSetStorage;
   FORM_BROWSER_FORM       *Form;
@@ -3343,9 +3742,29 @@ SubmitForSystem (
         while (!IsNull (&LocalFormSet->SaveFailStorageListHead, StorageLink)) {
           FormSetStorage = FORMSET_STORAGE_FROM_SAVE_FAIL_LINK (StorageLink);
           StorageLink = GetNextNode (&LocalFormSet->SaveFailStorageListHead, StorageLink);
-
-          SynchronizeStorage(FormSetStorage->BrowserStorage, FormSetStorage->ConfigRequest, FALSE);
+          //
+          // Process the submit fail question, base on the RestoreConfigRequest to restore the EditBuffer
+          // base on the SyncConfigRequest to Sync the buffer.
+          //
+          SynchronizeStorage (FormSetStorage->BrowserStorage, FormSetStorage->RestoreConfigRequest, FALSE);
+          FreePool (FormSetStorage->RestoreConfigRequest);
+          FormSetStorage->RestoreConfigRequest = NULL;
+          if ( FormSetStorage->SyncConfigRequest != NULL) {
+            SynchronizeStorage (FormSetStorage->BrowserStorage, FormSetStorage->SyncConfigRequest, TRUE);
+            FreePool (FormSetStorage->SyncConfigRequest);
+            FormSetStorage->SyncConfigRequest = NULL;
+          }
         }
+      }
+
+      FormLink = GetFirstNode (&LocalFormSet->FormListHead);
+      while (!IsNull (&LocalFormSet->FormListHead, FormLink)) {
+        Form = FORM_BROWSER_FORM_FROM_LINK (FormLink);
+        FormLink = GetNextNode (&LocalFormSet->FormListHead, FormLink);
+        //
+        // Call callback with Changed type to inform the driver.
+        //
+        SendDiscardInfoToDriver (LocalFormSet, Form);
       }
 
       if (!IsHiiHandleInBrowserContext (LocalFormSet->HiiHandle)) {
@@ -3501,6 +3920,11 @@ GetOffsetFromConfigResp (
   //
   // Type is EFI_HII_VARSTORE_EFI_VARIABLE or EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER
   //
+
+  //
+  // Convert all hex digits in ConfigResp to lower case before searching.
+  //
+  HiiToLower (ConfigResp);
 
   //
   // 1. Directly use Question->BlockName to find.
@@ -3795,9 +4219,15 @@ GetQuestionDefault (
   EFI_BROWSER_ACTION_REQUEST      ActionRequest;
   INTN                            Action;
   CHAR16                          *NewString;
+  EFI_IFR_TYPE_VALUE              *TypeValue;
+  UINT16                          OriginalDefaultId;
+  FORMSET_DEFAULTSTORE            *DefaultStore;
+  LIST_ENTRY                      *DefaultLink;
 
   Status   = EFI_NOT_FOUND;
   StrValue = NULL;
+  OriginalDefaultId  = DefaultId;
+  DefaultLink        = GetFirstNode (&FormSet->DefaultStoreListHead);
 
   //
   // Statement don't have storage, skip them
@@ -3814,7 +4244,15 @@ GetQuestionDefault (
   //  4, set flags of EFI_ONE_OF_OPTION (provide Standard and Manufacturing default)
   //  5, set flags of EFI_IFR_CHECKBOX (provide Standard and Manufacturing default) (lowest priority)
   //
+ReGetDefault:
   HiiValue = &Question->HiiValue;
+  TypeValue = &HiiValue->Value;
+  if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
+    //
+    // For orderedlist, need to pass the BufferValue to Callback function.
+    //
+    TypeValue = (EFI_IFR_TYPE_VALUE *) Question->BufferValue;
+  }
 
   //
   // Get Question defaut value from call back function.
@@ -3828,7 +4266,7 @@ GetQuestionDefault (
                              Action,
                              Question->QuestionId,
                              HiiValue->Type,
-                             &HiiValue->Value,
+                             TypeValue,
                              &ActionRequest
                              );
     if (!EFI_ERROR (Status)) {
@@ -3838,6 +4276,7 @@ GetQuestionDefault (
 
         ASSERT (StrLen (NewString) * sizeof (CHAR16) <= Question->StorageWidth);
         if (StrLen (NewString) * sizeof (CHAR16) <= Question->StorageWidth) {
+          ZeroMem (Question->BufferValue, Question->StorageWidth);
           CopyMem (Question->BufferValue, NewString, StrSize (NewString));
         } else {
           CopyMem (Question->BufferValue, NewString, Question->StorageWidth);
@@ -3908,6 +4347,7 @@ GetQuestionDefault (
             return EFI_NOT_FOUND;
           }
           if (Question->StorageWidth > StrSize (StrValue)) {
+            ZeroMem (Question->BufferValue, Question->StorageWidth);
             CopyMem (Question->BufferValue, StrValue, StrSize (StrValue));
           } else {
             CopyMem (Question->BufferValue, StrValue, Question->StorageWidth);
@@ -3962,8 +4402,6 @@ GetQuestionDefault (
           ((DefaultId == EFI_HII_DEFAULT_CLASS_MANUFACTURING) && ((Question->Flags & EFI_IFR_CHECKBOX_DEFAULT_MFG) != 0))
          ) {
         HiiValue->Value.b = TRUE;
-      } else {
-        HiiValue->Value.b = FALSE;
       }
 
       return EFI_SUCCESS;
@@ -3971,10 +4409,30 @@ GetQuestionDefault (
   }
 
   //
-  // For Questions without default
+  // For question without default value for current default Id, we try to re-get the default value form other default id in the DefaultStoreList.
+  // If get, will exit the function, if not, will choose next default id in the DefaultStoreList.
+  // The default id in DefaultStoreList are in ascending order to make sure choose the smallest default id every time.
+  //
+  while (!IsNull(&FormSet->DefaultStoreListHead, DefaultLink)) {
+    DefaultStore = FORMSET_DEFAULTSTORE_FROM_LINK(DefaultLink);
+    DefaultLink = GetNextNode (&FormSet->DefaultStoreListHead,DefaultLink);
+    DefaultId = DefaultStore->DefaultId;
+    if (DefaultId == OriginalDefaultId) {
+      continue;
+    }
+    goto ReGetDefault;
+  }
+
+  //
+  // For Questions without default value for all the default id in the DefaultStoreList.
   //
   Status = EFI_NOT_FOUND;
   switch (Question->Operand) {
+  case EFI_IFR_CHECKBOX_OP:
+    HiiValue->Value.b = FALSE;
+    Status = EFI_SUCCESS;
+    break;
+
   case EFI_IFR_NUMERIC_OP:
     //
     // Take minimum value as numeric default value
@@ -5392,7 +5850,7 @@ GetIfrBinaryData (
           //
           // Try to compare against formset GUID
           //
-          if (CompareGuid (FormSetGuid, &gZeroGuid) || 
+          if (IsZeroGuid (FormSetGuid) ||
               CompareGuid (ComparingGuid, (EFI_GUID *)(OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
             break;
           }
@@ -5541,8 +5999,9 @@ SaveBrowserContext (
   VOID
   )
 {
-  BROWSER_CONTEXT  *Context;
-  FORM_ENTRY_INFO     *MenuList;
+  BROWSER_CONTEXT      *Context;
+  FORM_ENTRY_INFO      *MenuList;
+  FORM_BROWSER_FORMSET *FormSet;
 
   gBrowserContextCount++;
   if (gBrowserContextCount == 1) {
@@ -5561,13 +6020,17 @@ SaveBrowserContext (
   // Save FormBrowser context
   //
   Context->Selection            = gCurrentSelection;
-  Context->ResetRequired        = gResetRequired;
+  Context->ResetRequired        = gResetRequiredFormLevel;
   Context->FlagReconnect        = gFlagReconnect;
   Context->CallbackReconnect    = gCallbackReconnect;
   Context->ExitRequired         = gExitRequired;
   Context->HiiHandle            = mCurrentHiiHandle;
   Context->FormId               = mCurrentFormId;
   CopyGuid (&Context->FormSetGuid, &mCurrentFormSetGuid);
+  Context->SystemLevelFormSet   = mSystemLevelFormSet;
+  Context->CurFakeQestId        = mCurFakeQestId;
+  Context->HiiPackageListUpdated = mHiiPackageListUpdated;
+  Context->FinishRetrieveCall   = mFinishRetrieveCall;
 
   //
   // Save the menu history data.
@@ -5578,6 +6041,17 @@ SaveBrowserContext (
     RemoveEntryList (&MenuList->Link);
 
     InsertTailList(&Context->FormHistoryList, &MenuList->Link);
+  }
+
+  //
+  // Save formset list.
+  //
+  InitializeListHead(&Context->FormSetList);
+  while (!IsListEmpty (&gBrowserFormSetList)) {
+    FormSet = FORM_BROWSER_FORMSET_FROM_LINK (gBrowserFormSetList.ForwardLink);
+    RemoveEntryList (&FormSet->Link);
+
+    InsertTailList(&Context->FormSetList, &FormSet->Link);
   }
 
   //
@@ -5598,7 +6072,8 @@ RestoreBrowserContext (
 {
   LIST_ENTRY       *Link;
   BROWSER_CONTEXT  *Context;
-  FORM_ENTRY_INFO     *MenuList;
+  FORM_ENTRY_INFO      *MenuList;
+  FORM_BROWSER_FORMSET *FormSet;
 
   ASSERT (gBrowserContextCount != 0);
   gBrowserContextCount--;
@@ -5618,13 +6093,17 @@ RestoreBrowserContext (
   // Restore FormBrowser context
   //
   gCurrentSelection     = Context->Selection;
-  gResetRequired        = Context->ResetRequired;
+  gResetRequiredFormLevel = Context->ResetRequired;
   gFlagReconnect        = Context->FlagReconnect;
   gCallbackReconnect    = Context->CallbackReconnect;
   gExitRequired         = Context->ExitRequired;
   mCurrentHiiHandle     = Context->HiiHandle;
   mCurrentFormId        = Context->FormId;
   CopyGuid (&mCurrentFormSetGuid, &Context->FormSetGuid);
+  mSystemLevelFormSet   = Context->SystemLevelFormSet;
+  mCurFakeQestId        = Context->CurFakeQestId;
+  mHiiPackageListUpdated = Context->HiiPackageListUpdated;
+  mFinishRetrieveCall   = Context->FinishRetrieveCall;
 
   //
   // Restore the menu history data.
@@ -5634,6 +6113,16 @@ RestoreBrowserContext (
     RemoveEntryList (&MenuList->Link);
 
     InsertTailList(&mPrivateData.FormBrowserEx2.FormViewHistoryHead, &MenuList->Link);
+  }
+
+  //
+  // Restore the Formset data.
+  //
+  while (!IsListEmpty (&Context->FormSetList)) {
+    FormSet = FORM_BROWSER_FORMSET_FROM_LINK (Context->FormSetList.ForwardLink);
+    RemoveEntryList (&FormSet->Link);
+
+    InsertTailList(&gBrowserFormSetList, &FormSet->Link);
   }
 
   //
@@ -5751,29 +6240,10 @@ PasswordCheck (
       return EFI_UNSUPPORTED;
     }
   } else {
-    if (PasswordString == NULL) {
-      return EFI_SUCCESS;
-    } 
-
     //
-    // Check whether has preexisted password.
+    // If a password doesn't have the CALLBACK flag, browser will not handle it.
     //
-    if (PasswordString[0] == 0) {
-      if (*((CHAR16 *) Question->BufferValue) == 0) {
-        return EFI_SUCCESS;
-      } else {
-        return EFI_NOT_READY;
-      }
-    }
-
-    //
-    // Check whether the input password is same as preexisted password.
-    //
-    if (StrnCmp (PasswordString, (CHAR16 *) Question->BufferValue, Question->StorageWidth/sizeof (CHAR16)) == 0) {
-      return EFI_SUCCESS;
-    } else {
-      return EFI_NOT_READY;
-    }
+    return EFI_UNSUPPORTED;
   }
     
   //
@@ -5890,6 +6360,7 @@ SetScope (
   @retval EFI_INVALID_PARAMETER  KeyData is NULL or HelpString is NULL on register.
   @retval EFI_NOT_FOUND          KeyData is not found to be unregistered.
   @retval EFI_UNSUPPORTED        Key represents a printable character. It is conflicted with Browser.
+  @retval EFI_ALREADY_STARTED    Key already been registered for one hot key.
 **/
 EFI_STATUS
 EFIAPI
@@ -5935,20 +6406,19 @@ RegisterHotKey (
       return EFI_NOT_FOUND;
     }
   }
-  
-  //
-  // Register HotKey into List.
-  //
-  if (HotKey == NULL) {
-    //
-    // Create new Key, and add it into List.
-    //
-    HotKey = AllocateZeroPool (sizeof (BROWSER_HOT_KEY));
-    ASSERT (HotKey != NULL);
-    HotKey->Signature = BROWSER_HOT_KEY_SIGNATURE;
-    HotKey->KeyData   = AllocateCopyPool (sizeof (EFI_INPUT_KEY), KeyData);
-    InsertTailList (&gBrowserHotKeyList, &HotKey->Link);
+
+  if (HotKey != NULL) {
+    return EFI_ALREADY_STARTED;
   }
+
+  //
+  // Create new Key, and add it into List.
+  //
+  HotKey = AllocateZeroPool (sizeof (BROWSER_HOT_KEY));
+  ASSERT (HotKey != NULL);
+  HotKey->Signature = BROWSER_HOT_KEY_SIGNATURE;
+  HotKey->KeyData   = AllocateCopyPool (sizeof (EFI_INPUT_KEY), KeyData);
+  InsertTailList (&gBrowserHotKeyList, &HotKey->Link);
 
   //
   // Fill HotKey information.
@@ -6098,7 +6568,8 @@ ExecuteAction (
   // Executet the reset action.
   //
   if ((Action & BROWSER_ACTION_RESET) != 0) {
-    gResetRequired = TRUE;
+    gResetRequiredFormLevel = TRUE;
+    gResetRequiredSystemLevel = TRUE;
   }
 
   //
@@ -6198,6 +6669,6 @@ IsResetRequired (
   VOID
   )
 {
-  return gResetRequired;
+  return gResetRequiredSystemLevel;
 }
 

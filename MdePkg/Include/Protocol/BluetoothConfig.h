@@ -1,8 +1,8 @@
 /** @file
-  EFI Bluetooth Configuration Protocol as defined in UEFI 2.5.
+  EFI Bluetooth Configuration Protocol as defined in UEFI 2.7.
   This protocol abstracts user interface configuration for Bluetooth device.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under 
   the terms and conditions of the BSD License that accompanies this distribution.  
   The full text of the license may be found at
@@ -12,7 +12,7 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:          
-  This Protocol is introduced in UEFI Specification 2.5
+  This Protocol is introduced in UEFI Specification 2.7
 
 **/
 
@@ -69,7 +69,7 @@ typedef enum {
   ///
   /// Remote Bluetooth device state. Data structure is EFI_BLUETOOTH_CONFIG_REMOTE_DEVICE_STATE_TYPE.
   ///
-  EfiBluetoothConfigDataTypeRemoteDeviceState,
+  EfiBluetoothConfigDataTypeRemoteDeviceState, /* Relevant for LE*/
   ///
   /// Local/Remote Bluetooth device SDP information. Data structure is UINT8[].
   ///
@@ -77,11 +77,11 @@ typedef enum {
   ///
   /// Local Bluetooth device address. Data structure is BLUETOOTH_ADDRESS.
   ///
-  EfiBluetoothConfigDataTypeBDADDR,
+  EfiBluetoothConfigDataTypeBDADDR, /* Relevant for LE*/
   ///
   /// Local Bluetooth discoverable state. Data structure is UINT8. (Page scan and/or Inquiry scan)
   ///
-  EfiBluetoothConfigDataTypeDiscoverable,
+  EfiBluetoothConfigDataTypeDiscoverable, /* Relevant for LE*/
   ///
   /// Local Bluetooth controller stored paired device list. Data structure is BLUETOOTH_ADDRESS[].
   ///
@@ -90,6 +90,21 @@ typedef enum {
   /// Local available device list. Data structure is BLUETOOTH_ADDRESS[].
   ///
   EfiBluetoothConfigDataTypeAvailableDeviceList,
+  EfiBluetoothConfigDataTypeRandomAddress, /* Relevant for LE*/
+  EfiBluetoothConfigDataTypeRSSI, /* Relevant for LE*/
+  ///
+  /// Advertisement report. Data structure is UNIT8[].
+  ///
+  EfiBluetoothConfigDataTypeAdvertisementData, /* Relevant for LE*/
+  EfiBluetoothConfigDataTypeIoCapability, /* Relevant for LE*/
+  EfiBluetoothConfigDataTypeOOBDataFlag, /* Relevant for LE*/
+  ///
+  /// KeyType of Authentication Requirements flag of local
+  /// device as UINT8, indicating requested security properties.
+  /// See Bluetooth specification 3.H.3.5.1. BIT0: MITM, BIT1:SC.
+  ///
+  EfiBluetoothConfigDataTypeKeyType, /* Relevant for LE*/
+  EfiBluetoothConfigDataTypeEncKeySize, /* Relevant for LE*/
   EfiBluetoothConfigDataTypeMax,
 } EFI_BLUETOOTH_CONFIG_DATA_TYPE;
 
@@ -258,11 +273,11 @@ EFI_STATUS
   @retval EFI_SUCCESS           The Bluetooth configuration data is returned successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
                                 - DataSize is NULL.
-                                - *DataSize is 0.
-                                - Data is NULL.
+                                - *DataSize is not 0 and Data is NULL.
   @retval EFI_UNSUPPORTED       The DataType is unsupported.
   @retval EFI_NOT_FOUND         The DataType is not found.
   @retval EFI_BUFFER_TOO_SMALL  The buffer is too small to hold the buffer.
+                                *DataSize has been updated with the size needed to complete the request.
 
 **/
 typedef 
@@ -312,11 +327,11 @@ EFI_STATUS
   @retval EFI_SUCCESS           The remote Bluetooth device configuration data is returned successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following conditions is TRUE:
                                 - DataSize is NULL.
-                                - *DataSize is 0.
-                                - Data is NULL.
+                                - *DataSize is not 0 and Data is NULL.
   @retval EFI_UNSUPPORTED       The DataType is unsupported.
   @retval EFI_NOT_FOUND         The DataType is not found.
   @retval EFI_BUFFER_TOO_SMALL  The buffer is too small to hold the buffer.
+                                *DataSize has been updated with the size needed to complete the request.
 
 **/
 typedef 
@@ -324,7 +339,7 @@ EFI_STATUS
 (EFIAPI *EFI_BLUETOOTH_CONFIG_GET_REMOTE_DATA)(
   IN EFI_BLUETOOTH_CONFIG_PROTOCOL                  *This,
   IN EFI_BLUETOOTH_CONFIG_DATA_TYPE                 DataType,
-  IN BLUETOOTH_ADDRESS                              BDAddr,
+  IN BLUETOOTH_ADDRESS                              *BDAddr,
   IN OUT UINTN                                      *DataSize,
   IN OUT VOID                                       *Data
   );

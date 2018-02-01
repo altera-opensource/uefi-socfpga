@@ -24,6 +24,7 @@ import GlobalData
 from BuildToolError import *
 from CommonDataClass.Exceptions import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.MultipleWorkspace import MultipleWorkspace as mws
 
 gHexVerPatt = re.compile('0x[a-f0-9]{4}[a-f0-9]{4}$', re.IGNORECASE)
 gHumanReadableVerPatt = re.compile(r'([1-9][0-9]*|0)\.[0-9]{1,2}$')
@@ -45,12 +46,13 @@ def GetSplitValueList(String, SplitTag=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
     Last = 0
     Escaped = False
     InString = False
+    InParenthesis = 0
     for Index in range(0, len(String)):
         Char = String[Index]
 
         if not Escaped:
             # Found a splitter not in a string, split it
-            if not InString and Char == SplitTag:
+            if not InString and InParenthesis == 0 and Char == SplitTag:
                 ValueList.append(String[Last:Index].strip())
                 Last = Index + 1
                 if MaxSplit > 0 and len(ValueList) >= MaxSplit:
@@ -63,6 +65,10 @@ def GetSplitValueList(String, SplitTag=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
                     InString = True
                 else:
                     InString = False
+            elif Char == '(':
+                InParenthesis = InParenthesis + 1
+            elif Char == ')':
+                InParenthesis = InParenthesis - 1
         else:
             Escaped = False
 
@@ -305,6 +311,11 @@ def NormPath(Path, Defines={}):
         # To local path format
         #
         Path = os.path.normpath(Path)
+        if Path.startswith(GlobalData.gWorkspace) and not Path.startswith(GlobalData.gBuildDirectory) and not os.path.exists(Path):
+            Path = Path[len (GlobalData.gWorkspace):]
+            if Path[0] == os.path.sep:
+                Path = Path[1:]
+            Path = mws.join(GlobalData.gWorkspace, Path)
 
     if IsRelativePath and Path[0] != '.':
         Path = os.path.join('.', Path)
@@ -702,7 +713,7 @@ def RaiseParserError(Line, Section, File, Format='', LineNo= -1):
 # @retval string A full path
 #
 def WorkspaceFile(WorkspaceDir, Filename):
-    return os.path.join(NormPath(WorkspaceDir), NormPath(Filename))
+    return mws.join(NormPath(WorkspaceDir), NormPath(Filename))
 
 ## Split string
 #

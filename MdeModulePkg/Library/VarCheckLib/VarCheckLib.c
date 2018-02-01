@@ -1,7 +1,7 @@
 /** @file
   Implementation functions and structures for var check services.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -80,6 +80,13 @@ VARIABLE_ENTRY_PROPERTY mVarCheckVariableWithWildcardName[] = {
     },
   },
   {
+    &gEfiGlobalVariableGuid,
+    L"PlatformRecovery####",
+    {
+      0
+    },
+  },
+  {
     &gEfiHardwareErrorVariableGuid,
     L"HwErrRec####",
     {
@@ -89,17 +96,17 @@ VARIABLE_ENTRY_PROPERTY mVarCheckVariableWithWildcardName[] = {
 };
 
 /**
-  Check if a Unicode character is a hexadecimal character.
+  Check if a Unicode character is an upper case hexadecimal character.
 
-  This function checks if a Unicode character is a
-  hexadecimal character.  The valid hexadecimal character is
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
+  This function checks if a Unicode character is an upper case
+  hexadecimal character.  The valid upper case hexadecimal character is
+  L'0' to L'9', or L'A' to L'F'.
 
 
   @param[in] Char       The character to check against.
 
-  @retval TRUE          If the Char is a hexadecmial character.
-  @retval FALSE         If the Char is not a hexadecmial character.
+  @retval TRUE          If the Char is an upper case hexadecmial character.
+  @retval FALSE         If the Char is not an upper case hexadecmial character.
 
 **/
 BOOLEAN
@@ -108,7 +115,7 @@ VarCheckInternalIsHexaDecimalDigitCharacter (
   IN CHAR16             Char
   )
 {
-  return (BOOLEAN) ((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F') || (Char >= L'a' && Char <= L'f'));
+  return (BOOLEAN) ((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F'));
 }
 
 /**
@@ -504,6 +511,9 @@ VarCheckLibVariablePropertySet (
 
   Status = EFI_SUCCESS;
 
+  //
+  // Get the pointer of property data for set.
+  //
   Property = VariablePropertyGetFunction (Name, Guid, FALSE);
   if (Property != NULL) {
     CopyMem (Property, VariableProperty, sizeof (*VariableProperty));
@@ -563,7 +573,12 @@ VarCheckLibVariablePropertyGet (
   }
 
   Property = VariablePropertyGetFunction (Name, Guid, TRUE);
-  if (Property != NULL) {
+  //
+  // Also check the property revision before using the property data.
+  // There is no property set to this variable(wildcard name)
+  // if the revision is not VAR_CHECK_VARIABLE_PROPERTY_REVISION.
+  //
+  if ((Property != NULL) && (Property->Revision == VAR_CHECK_VARIABLE_PROPERTY_REVISION)) {
     CopyMem (VariableProperty, Property, sizeof (*VariableProperty));
     return EFI_SUCCESS;
   }
@@ -611,7 +626,12 @@ VarCheckLibSetVariableCheck (
   }
 
   Property = VariablePropertyGetFunction (VariableName, VendorGuid, TRUE);
-  if (Property != NULL) {
+  //
+  // Also check the property revision before using the property data.
+  // There is no property set to this variable(wildcard name)
+  // if the revision is not VAR_CHECK_VARIABLE_PROPERTY_REVISION.
+  //
+  if ((Property != NULL) && (Property->Revision == VAR_CHECK_VARIABLE_PROPERTY_REVISION)) {
     if ((RequestSource != VarCheckFromTrusted) && ((Property->Property & VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY) != 0)) {
       DEBUG ((EFI_D_INFO, "Variable Check ReadOnly variable fail %r - %g:%s\n", EFI_WRITE_PROTECTED, VendorGuid, VariableName));
       return EFI_WRITE_PROTECTED;

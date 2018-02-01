@@ -4,7 +4,7 @@
 #
 # Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -248,7 +248,7 @@ class UniFileClassObject(object):
                 EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=File);
             LineNo = GetLineNo(FileIn, Line, False)
             EdkLogger.error("Unicode File Parser", PARSER_ERROR, "Wrong language definition",
-                            ExtraData="""%s\n\t*Correct format is like '#langdef en-US "English"'""" % Line, File = File, Line = LineNo)
+                            ExtraData="""%s\n\t*Correct format is like '#langdef en-US "English"'""" % Line, File=File, Line=LineNo)
         else:
             LangName = GetLanguageCode(Lang[1], self.IsCompatibleMode, self.File)
             LangPrintName = Lang[2]
@@ -348,11 +348,11 @@ class UniFileClassObject(object):
         Value = ''
 
         Name = Item.split()[1]
-        # Check the string name is the upper character
+        # Check the string name
         if Name != '':
-            MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
+            MatchString = re.match('^[a-zA-Z][a-zA-Z0-9_]*$', Name, re.UNICODE)
             if MatchString == None or MatchString.end(0) != len(Name):
-                EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid lower case character.' %(Name, self.File))
+                EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid character.' % (Name, self.File))
         LanguageList = Item.split(u'#language ')
         for IndexI in range(len(LanguageList)):
             if IndexI == 0:
@@ -432,9 +432,19 @@ class UniFileClassObject(object):
             Line = Line.replace(u"\\'", u"'") 
             Line = Line.replace(BACK_SLASH_PLACEHOLDER, u'\\')
 
-#           if Line.find(u'\\x'):
-#               hex = Line[Line.find(u'\\x') + 2 : Line.find(u'\\x') + 6]
-#               hex = "u'\\u" + hex + "'"
+            StartPos = Line.find(u'\\x')
+            while (StartPos != -1):
+                EndPos = Line.find(u'\\', StartPos + 1, StartPos + 7)
+                if EndPos != -1 and EndPos - StartPos == 6 :
+                    if re.match('[a-fA-F0-9]{4}', Line[StartPos + 2 : EndPos], re.UNICODE):
+                        EndStr = Line[EndPos: ]
+                        UniStr = ('\u' + (Line[StartPos + 2 : EndPos])).decode('unicode_escape')
+                        if EndStr.startswith(u'\\x') and len(EndStr) >= 7:
+                            if EndStr[6] == u'\\' and re.match('[a-fA-F0-9]{4}', EndStr[2 : 6], re.UNICODE):
+                                Line = Line[0 : StartPos] + UniStr + EndStr
+                        else:
+                            Line = Line[0 : StartPos] + UniStr + EndStr[1:]
+                StartPos = Line.find(u'\\x', StartPos + 1)
 
             IncList = gIncludePattern.findall(Line)
             if len(IncList) == 1:
@@ -508,11 +518,11 @@ class UniFileClassObject(object):
                         break
                 # Value = Value.replace(u'\r\n', u'')
                 Language = GetLanguageCode(Language, self.IsCompatibleMode, self.File)
-                # Check the string name is the upper character
+                # Check the string name
                 if not self.IsCompatibleMode and Name != '':
-                    MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
+                    MatchString = re.match('^[a-zA-Z][a-zA-Z0-9_]*$', Name, re.UNICODE)
                     if MatchString == None or MatchString.end(0) != len(Name):
-                        EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid lower case character.' %(Name, self.File))
+                        EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid character.' % (Name, self.File))
                 self.AddStringToList(Name, Language, Value)
                 continue
 
@@ -571,7 +581,7 @@ class UniFileClassObject(object):
                 ItemIndexInList = self.OrderedStringDict[Language][Name]
                 Item = self.OrderedStringList[Language][ItemIndexInList]
                 Item.UpdateValue(Value)
-                Item.UseOtherLangDef = ''   
+                Item.UseOtherLangDef = ''
 
         if IsAdded:
             Token = len(self.OrderedStringList[Language])

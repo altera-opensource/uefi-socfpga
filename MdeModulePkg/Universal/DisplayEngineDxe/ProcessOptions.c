@@ -2,7 +2,7 @@
 Implementation for handling the User Interface option processing.
 
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -568,7 +568,6 @@ PrintFormattedNumber (
 
   default:
     return EFI_UNSUPPORTED;
-    break;
   }
 
   UnicodeSPrint (FormattedNumber, BufferSize, Format, Value);
@@ -815,6 +814,11 @@ PasswordProcess (
     //
     // Password can't be set now. 
     //
+    if (Status == EFI_UNSUPPORTED) {
+      do {
+        CreateDialog (&Key, gEmptyString, gPasswordUnsupported, gPressEnter, gEmptyString, NULL);
+      } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+    }
     FreePool (StringPtr);
     return EFI_SUCCESS;
   }
@@ -886,18 +890,8 @@ PasswordProcess (
     gUserInput->InputValue.BufferLen = Question->CurrentValue.BufferLen;
     gUserInput->InputValue.Type = Question->CurrentValue.Type;
     gUserInput->InputValue.Value.string = HiiSetString(gFormData->HiiHandle, gUserInput->InputValue.Value.string, StringPtr, NULL);
-    FreePool (StringPtr); 
 
     Status = EFI_SUCCESS;
-
-    if (EFI_ERROR (Status)) {
-      //
-      // Reset state machine for password
-      //
-      Question->PasswordCheck (gFormData, Question, NULL);
-    }
-
-    return Status;
   } else {
     //
     // Reset state machine for password
@@ -913,7 +907,8 @@ PasswordProcess (
 
     Status = EFI_INVALID_PARAMETER;
   }
-  
+  ZeroMem (TempString, (Maximum + 1) * sizeof (CHAR16));
+  ZeroMem (StringPtr, (Maximum + 1) * sizeof (CHAR16));
   FreePool (TempString);
   FreePool (StringPtr);
 

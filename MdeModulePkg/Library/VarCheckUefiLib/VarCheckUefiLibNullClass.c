@@ -1,7 +1,7 @@
 /** @file
   Implementation functions and structures for var check uefi library.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -604,6 +604,17 @@ UEFI_DEFINED_VARIABLE_ENTRY mGlobalVariableList2[] = {
     },
     InternalVarCheckKeyOption
   },
+  {
+    L"PlatformRecovery####",
+    {
+      VAR_CHECK_VARIABLE_PROPERTY_REVISION,
+      0,
+      VARIABLE_ATTRIBUTE_BS_RT,
+      sizeof (UINT32) + sizeof (UINT16),
+      MAX_UINTN
+    },
+    InternalVarCheckLoadOption
+  },
 };
 
 //
@@ -667,17 +678,17 @@ EFI_GUID *mUefiDefinedGuid[] = {
 };
 
 /**
-  Check if a Unicode character is a hexadecimal character.
+  Check if a Unicode character is an upper case hexadecimal character.
 
-  This function checks if a Unicode character is a
-  hexadecimal character.  The valid hexadecimal character is
-  L'0' to L'9', L'a' to L'f', or L'A' to L'F'.
+  This function checks if a Unicode character is an upper case
+  hexadecimal character.  The valid upper case hexadecimal character is
+  L'0' to L'9', or L'A' to L'F'.
 
 
   @param[in] Char       The character to check against.
 
-  @retval TRUE          If the Char is a hexadecmial character.
-  @retval FALSE         If the Char is not a hexadecmial character.
+  @retval TRUE          If the Char is an upper case hexadecmial character.
+  @retval FALSE         If the Char is not an upper case hexadecmial character.
 
 **/
 BOOLEAN
@@ -686,7 +697,7 @@ VarCheckUefiIsHexaDecimalDigitCharacter (
   IN CHAR16             Char
   )
 {
-  return (BOOLEAN) ((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F') || (Char >= L'a' && Char <= L'f'));
+  return (BOOLEAN) ((Char >= L'0' && Char <= L'9') || (Char >= L'A' && Char <= L'F'));
 }
 
 /**

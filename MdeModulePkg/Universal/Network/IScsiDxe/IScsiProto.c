@@ -289,16 +289,16 @@ IScsiSessionLogin (
   ISCSI_SESSION     *Session;
   ISCSI_CONNECTION  *Conn;
   EFI_TCP4_PROTOCOL *Tcp4;
-  BOOLEAN           MediaPresent;
+  EFI_STATUS        MediaStatus;
 
   Session = &Private->Session;
 
   //
   // Check media status before session login
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Private->Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Private->Controller, ISCSI_CHECK_MEDIA_LOGIN_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
     return EFI_NO_MEDIA;
   }
 
@@ -1815,7 +1815,7 @@ IScsiNewDataSegment (
 
   @param[in]  Packet The EXT SCSI PASS THRU request packet containing the SCSI command.
   @param[in]  Lun    The LUN.
-  @param[in]  Tcb    The tcb assocated with this SCSI command.
+  @param[in]  Tcb    The tcb associated with this SCSI command.
 
   @return The  created iSCSI SCSI command PDU.
   @retval NULL Other errors as indicated.

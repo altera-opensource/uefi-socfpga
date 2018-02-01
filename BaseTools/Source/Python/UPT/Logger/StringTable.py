@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define strings used in the UPT tool
 #
-# Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -39,13 +39,13 @@ MSG_USAGE_STRING = _("\n"
 ##
 # Version and Copyright
 #
-MSG_VERSION_NUMBER = _("1.0")
+MSG_VERSION_NUMBER = _("1.1")
 MSG_VERSION = _("UEFI Packaging Tool (UEFIPT) - Revision " + \
                 MSG_VERSION_NUMBER)
-MSG_COPYRIGHT = _("Copyright (c) 2011 - 2015 Intel Corporation All Rights Reserved.")
+MSG_COPYRIGHT = _("Copyright (c) 2011 - 2016 Intel Corporation All Rights Reserved.")
 MSG_VERSION_COPYRIGHT = _("\n  %s\n  %s" % (MSG_VERSION, MSG_COPYRIGHT))
 MSG_USAGE = _("%s [options]\n%s" % ("UPT", MSG_VERSION_COPYRIGHT))
-MSG_DESCRIPTION = _("The UEFIUPT is used to create, " + \
+MSG_DESCRIPTION = _("The UEFIPT is used to create, " + \
                     "install or remove a UEFI Distribution Package. " + \
                     "If WORKSPACE environment variable is present, " + \
                     "then UPT will install packages to the location specified by WORKSPACE, " + \
@@ -323,7 +323,7 @@ MSG_NEW_FILE_NAME_FOR_DIST      = _(
 MSG_UPDATE_PACKAGE_DATABASE    = _("Update Distribution Package Database ...")
 MSG_PYTHON_ON                  = _("(Python %s on %s) ")
 MSG_SEARCH_FOR_HELP            = _(
-    "\n(Please send email to edk2-devel@lists.sourceforge.net for\n"
+    "\n(Please send email to edk2-devel@lists.01.org for\n"
     " help, attach the following call stack trace.)\n")
 MSG_REMOVE_TEMP_FILE_STARTED   = _("Removing temp files started ... ")
 MSG_REMOVE_TEMP_FILE_DONE   = _("Removing temp files ... Done.")
@@ -656,7 +656,7 @@ _("Wrong define section format, must be KEY = Value.")
 ERR_DECPARSE_DEFINE_UNKNOWKEY       = \
 _("Unknown key [%s] in define section.")
 ERR_DECPARSE_DEFINE_SPEC            = \
-_("Specification value must be HEX numbers.")
+_("Specification value must be HEX numbers or decimal numbers.")
 ERR_DECPARSE_DEFINE_PKGNAME         = \
 _("Package name must be AlphaNumeric characters.")
 ERR_DECPARSE_DEFINE_PKGGUID         = \
@@ -785,7 +785,7 @@ WRN_MODULE_EXISTED        = _("This module already exists: %s")
 WRN_FILE_EXISTED          = _("This file already exists: %s")
 WRN_FILE_NOT_OVERWRITTEN  = \
 _("This file already exist and cannot be overwritten: %s")
-WRN_DIST_PKG_INSTALLED = _("This distribution package has previously been installed.")
+WRN_DIST_PKG_INSTALLED = _("This distribution package %s has previously been installed.")
 WRN_DIST_NOT_FOUND         = _(
     "Distribution is not found at location %s")
 WRN_MULTI_PCD_RANGES      = _(
@@ -858,3 +858,8 @@ HLP_SPECIFY_PACKAGE_NAME_TO_BE_REPLACED = _(
     "Specify the UEFI Distribution Package file name to be replaced")
 HLP_USE_GUIDED_PATHS = _(
     "Install packages to the following directory path by default: <PackageName>_<PACKAGE_GUID>_<PACKAGE_VERSION>")
+HLP_TEST_INSTALL = _(
+    "Specify the UEFI Distribution Package filenames to install")
+
+MSG_TEST_INSTALL_PASS = _("All distribution package file are satisfied for dependence check.")
+MSG_TEST_INSTALL_FAIL = _("NOT all distribution package file are satisfied for dependence check.")

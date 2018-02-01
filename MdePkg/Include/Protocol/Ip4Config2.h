@@ -2,7 +2,7 @@
   This file provides a definition of the EFI IPv4 Configuration II
   Protocol.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -51,7 +51,9 @@ typedef enum {
   /// The station addresses set manually for the EFI IPv4 network 
   /// stack. It is only configurable when the policy is 
   /// Ip4Config2PolicyStatic. The corresponding Data is of 
-  /// type EFI_IP4_CONFIG2_MANUAL_ADDRESS.
+  /// type EFI_IP4_CONFIG2_MANUAL_ADDRESS. When DataSize 
+  /// is 0 and Data is NULL, the existing configuration is cleared 
+  /// from the EFI IPv4 Configuration II Protocol instance.
   ///
   Ip4Config2DataTypeManualAddress,
   ///
@@ -61,6 +63,8 @@ typedef enum {
   /// the policy is Ip4Config2PolicyDhcp. The gateway 
   /// addresses must be unicast IPv4 addresses. The corresponding 
   /// Data is a pointer to an array of EFI_IPv4_ADDRESS instances.
+  /// When DataSize is 0 and Data is NULL, the existing configuration 
+  /// is cleared from the EFI IPv4 Configuration II Protocol instance.
   ///
   Ip4Config2DataTypeGateway,
   ///
@@ -69,11 +73,18 @@ typedef enum {
   /// Protocol manages. It is not configurable when the policy is 
   /// Ip4Config2PolicyDhcp. The DNS server addresses must be 
   /// unicast IPv4 addresses. The corresponding Data is a pointer to 
-  /// an array of EFI_IPv4_ADDRESS instances.
+  /// an array of EFI_IPv4_ADDRESS instances. When DataSize 
+  /// is 0 and Data is NULL, the existing configuration is cleared 
+  /// from the EFI IPv4 Configuration II Protocol instance.
   ///
   Ip4Config2DataTypeDnsServer,
   Ip4Config2DataTypeMaximum
 } EFI_IP4_CONFIG2_DATA_TYPE;
+
+///
+/// EFI_IP4_CONFIG2_INTERFACE_INFO related definitions
+///
+#define EFI_IP4_CONFIG2_INTERFACE_INFO_NAME_SIZE 32
 
 ///
 /// EFI_IP4_CONFIG2_INTERFACE_INFO
@@ -82,7 +93,7 @@ typedef struct {
   ///
   /// The name of the interface. It is a NULL-terminated Unicode string.
   ///
-  CHAR16                Name[32];
+  CHAR16                Name[EFI_IP4_CONFIG2_INTERFACE_INFO_NAME_SIZE];
   ///
   /// The interface type of the network interface. See RFC 1700, 
   /// section "Number Hardware Type".
@@ -181,9 +192,8 @@ typedef struct {
                                   successfully.
   @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
                                   This is NULL.
-                                  Data is NULL.
-                                  One or more fields in Data do not match the requirement of the data type 
-                                  indicated by DataType.
+                                  One or more fields in Data and DataSize do not match the 
+                                  requirement of the data type indicated by DataType.
   @retval EFI_WRITE_PROTECTED     The specified configuration data is read-only or the specified configuration 
                                   data can not be set under the current policy.
   @retval EFI_ACCESS_DENIED       Another set operation on the specified configuration data is already in process.

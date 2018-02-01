@@ -2,6 +2,7 @@
   Library functions which contain all the code to connect console device.
 
 Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -250,7 +251,7 @@ EfiBootManagerConnectVideoController (
   }
 
   //
-  // Try to connect the PCI device path, so that GOP dirver could start on this 
+  // Try to connect the PCI device path, so that GOP driver could start on this
   // device and create child handles with GraphicsOutput Protocol installed
   // on them, then we get device paths of these child handles and select 
   // them as possible console device.
@@ -301,6 +302,7 @@ BmUpdateSystemTableConsole (
   EFI_DEVICE_PATH_PROTOCOL        *FullDevicePath;
   EFI_DEVICE_PATH_PROTOCOL        *VarConsole;
   EFI_DEVICE_PATH_PROTOCOL        *Instance;
+  EFI_DEVICE_PATH_PROTOCOL        *FullInstance;
   VOID                            *Interface;
   EFI_HANDLE                      NewHandle;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *TextOut;
@@ -354,11 +356,13 @@ BmUpdateSystemTableConsole (
     //
     // Find console device handle by device path instance
     //
+    FullInstance = Instance;
     Status = gBS->LocateDevicePath (
                     ConsoleGuid,
                     &Instance,
                     &NewHandle
                     );
+    FreePool (FullInstance);
     if (!EFI_ERROR (Status)) {
       //
       // Get the console protocol on this console device handle
@@ -383,6 +387,7 @@ BmUpdateSystemTableConsole (
             TextOut->SetMode (TextOut, 0);
           }
         }
+        FreePool (FullDevicePath);
         return TRUE;
       }
     }
@@ -392,6 +397,7 @@ BmUpdateSystemTableConsole (
   //
   // No any available console devcie found.
   //
+  FreePool (FullDevicePath);
   return FALSE;
 }
 
@@ -424,7 +430,7 @@ EfiBootManagerUpdateConsoleVariable (
   EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *TempNewDevicePath;
 
-  if (ConsoleType >= sizeof (mConVarName) / sizeof (mConVarName[0])) {
+  if (ConsoleType >= ARRAY_SIZE (mConVarName)) {
     return EFI_INVALID_PARAMETER;
   }
 

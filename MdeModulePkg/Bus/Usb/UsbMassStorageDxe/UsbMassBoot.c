@@ -2,7 +2,7 @@
   Implementation of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @param  UsbMass                The device whose sense data is requested.
 
-  @retval EFI_SUCCESS            The command is excuted successfully.
+  @retval EFI_SUCCESS            The command is executed successfully.
   @retval EFI_DEVICE_ERROR       Failed to request sense.
   @retval EFI_NO_RESPONSE        The device media doesn't response this request.
   @retval EFI_INVALID_PARAMETER  The command has some invalid parameters.
@@ -80,7 +80,14 @@ UsbBootRequestSense (
   switch (USB_BOOT_SENSE_KEY (SenseData.SenseKey)) {
 
   case USB_BOOT_SENSE_NO_SENSE:
-    Status = EFI_NO_RESPONSE;
+    if (SenseData.Asc == USB_BOOT_ASC_NO_ADDITIONAL_SENSE_INFORMATION) {
+      //
+      // It is not an error if a device does not have additional sense information
+      //
+      Status = EFI_SUCCESS;
+    } else {
+      Status = EFI_NO_RESPONSE;
+    }
     break;
 
   case USB_BOOT_SENSE_RECOVERED:
@@ -113,6 +120,10 @@ UsbBootRequestSense (
       Status = EFI_MEDIA_CHANGED;
       Media->ReadOnly = FALSE;
       Media->MediaId++;
+    } else if (SenseData.Asc == USB_BOOT_ASC_NOT_READY) {
+      Status = EFI_NOT_READY;
+    } else if (SenseData.Asc == USB_BOOT_ASC_NO_MEDIA) {
+      Status = EFI_NOT_READY;
     }
     break;
 
@@ -152,7 +163,7 @@ UsbBootRequestSense (
   @param  DataLen                The length of expected data
   @param  Timeout                The timeout used to transfer
 
-  @retval EFI_SUCCESS            Command is excuted successfully
+  @retval EFI_SUCCESS            Command is executed successfully
   @retval Others                 Command execution failed.
 
 **/

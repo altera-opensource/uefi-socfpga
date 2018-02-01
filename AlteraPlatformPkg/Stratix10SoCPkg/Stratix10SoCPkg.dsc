@@ -530,6 +530,7 @@
   SerialPortLib|AlteraPlatformPkg/Library/Mmio16550SerialPortLib/Mmio16550SerialPortLib.inf
   SerialPortPrintLib|AlteraPlatformPkg/Library/SerialPortPrintLib/SerialPortPrintLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
+  UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
 
   # replace hps timer by arm timer
   #TimerLib|AlteraPlatformPkg/Library/AlteraHpsTimerLib/AlteraHpsTimerLib.inf

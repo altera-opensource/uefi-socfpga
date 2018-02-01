@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,7 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 
 #include <Guid/SmBios.h>
 #include <IndustryStandard/SmBios.h>
+#include <IndustryStandard/Dhcp.h>
 #include <Protocol/Dhcp4.h>
 #include <Protocol/PxeBaseCode.h>
 #include <Protocol/Mtftp4.h>
@@ -56,6 +57,7 @@ typedef struct _PXEBC_PRIVATE_DATA  PXEBC_PRIVATE_DATA;
 #define PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE   4
 #define PXEBC_DEFAULT_PACKET_SIZE          1480
 #define PXEBC_DEFAULT_LIFETIME             50000  // 50ms, unit is microsecond
+#define PXEBC_CHECK_MEDIA_WAITING_TIME     EFI_TIMER_PERIOD_SECONDS(20)
 
 struct _PXEBC_PRIVATE_DATA {
   UINT32                                    Signature;

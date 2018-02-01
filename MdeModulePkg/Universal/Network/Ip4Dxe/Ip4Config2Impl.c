@@ -1,7 +1,8 @@
 /** @file
   The implementation of EFI IPv4 Configuration II Protocol.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -141,7 +142,7 @@ Ip4Config2OnPolicyChanged (
   IpSb->DefaultRouteTable = RouteTable;
   Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
 
-  if (IpSb->State == IP4_SERVICE_CONFIGED) {
+  if (IpSb->State == IP4_SERVICE_CONFIGED || IpSb->State == IP4_SERVICE_STARTED) {
     IpSb->State = IP4_SERVICE_UNSTARTED;
   }
 
@@ -149,7 +150,6 @@ Ip4Config2OnPolicyChanged (
   // Start the dhcp configuration.
   //
   if (NewPolicy == Ip4Config2PolicyDhcp) {
-    IpSb->Reconfig = TRUE;
     Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
   }
 
@@ -415,7 +415,7 @@ Ip4Config2BuildDefaultRouteTable (
   //
   Count = 0;
 
-  for (Index = IP4_MASK_NUM - 1; Index >= 0; Index--) {
+  for (Index = IP4_MASK_MAX; Index >= 0; Index--) {
 
     NET_LIST_FOR_EACH (Entry, &(IpSb->DefaultRouteTable->RouteArea[Index])) {
       RtEntry = NET_LIST_USER_STRUCT (Entry, IP4_ROUTE_ENTRY, Link);
@@ -609,6 +609,13 @@ Ip4Config2SetDefaultIf (
 
   IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
 
+  //
+  // Check whether the StationAddress/SubnetMask pair is valid.
+  //
+  if (!Ip4StationAddressValid (StationAddress, SubnetMask)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Status = Ip4Config2SetDefaultAddr (IpSb, StationAddress, SubnetMask);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -677,6 +684,119 @@ Ip4Config2CleanDhcp4 (
   }
 }
 
+/**
+  This worker function sets the DNS server list for the EFI IPv4 network
+  stack running on the communication device that this EFI_IP4_CONFIG2_PROTOCOL
+  manages. The DNS server addresses must be unicast IPv4 addresses. 
+
+  @param[in]     Instance        The pointer to the IP4 config2 instance data.
+  @param[in]     DataSize        The size of the buffer pointed to by Data in bytes.
+  @param[in]     Data            The data buffer to set, points to an array of
+                                 EFI_IPv4_ADDRESS instances.
+
+  @retval EFI_BAD_BUFFER_SIZE    The DataSize does not match the size of the type.
+  @retval EFI_INVALID_PARAMETER  One or more fields in Data is invalid.
+  @retval EFI_OUT_OF_RESOURCES   Failed to allocate resources to complete the operation.
+  @retval EFI_ABORTED            The DNS server addresses to be set equal the current
+                                 configuration.
+  @retval EFI_SUCCESS            The specified configuration data for the EFI IPv4
+                                 network stack was set.
+
+**/
+EFI_STATUS
+Ip4Config2SetDnsServerWorker (
+  IN IP4_CONFIG2_INSTANCE    *Instance,
+  IN UINTN                   DataSize,
+  IN VOID                    *Data
+  )
+{
+  UINTN                 OldIndex;
+  UINTN                 NewIndex;
+  EFI_IPv4_ADDRESS      *OldDns;
+  EFI_IPv4_ADDRESS      *NewDns;
+  UINTN                 OldDnsCount;
+  UINTN                 NewDnsCount;
+  IP4_CONFIG2_DATA_ITEM *Item;
+  BOOLEAN               OneAdded;
+  VOID                  *Tmp;
+  IP4_ADDR              DnsAddress;
+
+  if ((DataSize % sizeof (EFI_IPv4_ADDRESS) != 0) || (DataSize == 0)) {
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  Item        = &Instance->DataItem[Ip4Config2DataTypeDnsServer];
+  NewDns      = (EFI_IPv4_ADDRESS *) Data;
+  OldDns      = Item->Data.DnsServers;
+  NewDnsCount = DataSize / sizeof (EFI_IPv4_ADDRESS);  
+  OldDnsCount = Item->DataSize / sizeof (EFI_IPv4_ADDRESS);
+  OneAdded    = FALSE;
+
+  if (NewDnsCount != OldDnsCount) {
+    Tmp = AllocatePool (DataSize);
+    if (Tmp == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+  } else {
+    Tmp = NULL;
+  }
+
+  for (NewIndex = 0; NewIndex < NewDnsCount; NewIndex++) {
+    CopyMem (&DnsAddress, NewDns + NewIndex, sizeof (IP4_ADDR));
+    if (IP4_IS_UNSPECIFIED (NTOHL (DnsAddress)) || IP4_IS_LOCAL_BROADCAST (NTOHL (DnsAddress))) {
+      //
+      // The dns server address must be unicast.
+      //
+      if (Tmp != NULL) {
+        FreePool (Tmp);
+      }
+      return EFI_INVALID_PARAMETER;
+    }
+
+    if (OneAdded) {
+      //
+      // If any address in the new setting is not in the old settings, skip the
+      // comparision below.
+      //
+      continue;
+    }
+
+    for (OldIndex = 0; OldIndex < OldDnsCount; OldIndex++) {
+      if (EFI_IP4_EQUAL (NewDns + NewIndex, OldDns + OldIndex)) {
+        //
+        // If found break out.
+        //
+        break;
+      }
+    }
+
+    if (OldIndex == OldDnsCount) {
+      OneAdded = TRUE;
+    }
+  }
+
+  if (!OneAdded && (DataSize == Item->DataSize)) {
+    //
+    // No new item is added and the size is the same.
+    //
+    Item->Status = EFI_SUCCESS;
+    return EFI_ABORTED;
+  } else {
+    if (Tmp != NULL) {
+      if (Item->Data.Ptr != NULL) {
+        FreePool (Item->Data.Ptr);
+      }      
+      Item->Data.Ptr = Tmp;
+    }
+
+    CopyMem (Item->Data.Ptr, Data, DataSize);
+    Item->DataSize = DataSize;
+    Item->Status   = EFI_SUCCESS;
+    return EFI_SUCCESS;
+  }
+}
+
+
 
 /**
   Callback function when DHCP process finished. It will save the
@@ -701,6 +821,9 @@ Ip4Config2OnDhcp4Complete (
   IP4_ADDR                  StationAddress;
   IP4_ADDR                  SubnetMask;
   IP4_ADDR                  GatewayAddress;
+  UINT32                    Index;
+  UINT32                    OptionCount;
+  EFI_DHCP4_PACKET_OPTION   **OptionList;
 
   Instance = (IP4_CONFIG2_INSTANCE *) Context;
   ASSERT (Instance->Dhcp4 != NULL);
@@ -724,6 +847,44 @@ Ip4Config2OnDhcp4Complete (
       goto Exit;
     }
   
+    //
+    // Parse the ACK to get required DNS server information.
+    //
+    OptionCount = 0;
+    OptionList  = NULL;
+
+    Status      = Instance->Dhcp4->Parse (Instance->Dhcp4, Dhcp4Mode.ReplyPacket, &OptionCount, OptionList);
+    if (Status != EFI_BUFFER_TOO_SMALL) {
+      goto Exit;
+    }
+
+    OptionList = AllocateZeroPool (OptionCount * sizeof (EFI_DHCP4_PACKET_OPTION *));
+    if (OptionList == NULL) {
+      goto Exit;
+    }
+
+    Status = Instance->Dhcp4->Parse (Instance->Dhcp4, Dhcp4Mode.ReplyPacket, &OptionCount, OptionList);
+    if (EFI_ERROR (Status)) {
+      FreePool (OptionList);
+      goto Exit;
+    }
+
+    for (Index = 0; Index < OptionCount; Index++) {
+      //
+      // Look for DNS Server opcode (6).
+      //
+      if (OptionList[Index]->OpCode == DHCP4_TAG_DNS_SERVER) {
+        if (((OptionList[Index]->Length & 0x3) != 0) || (OptionList[Index]->Length == 0)) {
+          break;
+        }
+
+        Ip4Config2SetDnsServerWorker (Instance, OptionList[Index]->Length, &OptionList[Index]->Data[0]);
+        break;
+      }
+    }
+
+    FreePool (OptionList);
+
     Instance->DhcpSuccess = TRUE;
   }
 
@@ -740,7 +901,7 @@ Exit:
 
   @param[in]  Instance           The IP4 config2 instance to configure
 
-  @retval EFI_SUCCESS            The auto configuration is successfull started
+  @retval EFI_SUCCESS            The auto configuration is successfully started
   @retval Others                 Failed to start auto configuration.
 
 **/
@@ -756,7 +917,6 @@ Ip4StartAutoConfig (
   IP4_CONFIG2_DHCP4_OPTION       ParaList;
   EFI_STATUS                     Status;
  
-
   IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
 
   if (IpSb->State > IP4_SERVICE_UNSTARTED) {
@@ -809,8 +969,18 @@ Ip4StartAutoConfig (
                   IpSb->Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    NetLibDestroyServiceChild (
+      IpSb->Controller,
+      IpSb->Image,
+      &gEfiDhcp4ServiceBindingProtocolGuid,
+      Instance->Dhcp4Handle
+      );
 
+    Instance->Dhcp4Handle = NULL;
+    
+    return Status;
+  }
 
   //
   // Check the current DHCP status, if the DHCP process has
@@ -818,11 +988,10 @@ Ip4StartAutoConfig (
   //
   Dhcp4  = Instance->Dhcp4;
   Status = Dhcp4->GetModeData (Dhcp4, &Dhcp4Mode);
-
   if (Dhcp4Mode.State == Dhcp4Bound) {
     Ip4Config2OnDhcp4Complete (NULL, Instance);
+    
     return EFI_SUCCESS;
-
   }
 
   //
@@ -830,17 +999,35 @@ Ip4StartAutoConfig (
   // DHCP configuration to avoid problems if some DHCP client
   // yields the control of this DHCP service to us.
   //
-  ParaList.Head.OpCode             = DHCP_TAG_PARA_LIST;
-  ParaList.Head.Length             = 2;
-  ParaList.Head.Data[0]            = DHCP_TAG_NETMASK;
-  ParaList.Route                   = DHCP_TAG_ROUTER;
+  ParaList.Head.OpCode             = DHCP4_TAG_PARA_LIST;
+  ParaList.Head.Length             = 3;
+  ParaList.Head.Data[0]            = DHCP4_TAG_NETMASK;
+  ParaList.Route                   = DHCP4_TAG_ROUTER;
+  ParaList.Dns                     = DHCP4_TAG_DNS_SERVER;
   OptionList[0]                    = &ParaList.Head;
   Dhcp4Mode.ConfigData.OptionCount = 1;
   Dhcp4Mode.ConfigData.OptionList  = OptionList;
 
   Status = Dhcp4->Configure (Dhcp4, &Dhcp4Mode.ConfigData);
-
   if (EFI_ERROR (Status)) {
+    gBS->CloseProtocol (
+           Instance->Dhcp4Handle,
+           &gEfiDhcp4ProtocolGuid,
+           IpSb->Image,
+           IpSb->Controller
+           );
+
+    NetLibDestroyServiceChild (
+      IpSb->Controller,
+      IpSb->Image,
+      &gEfiDhcp4ServiceBindingProtocolGuid,
+      Instance->Dhcp4Handle
+      );
+    
+    Instance->Dhcp4 = NULL;
+    
+    Instance->Dhcp4Handle = NULL;
+    
     return Status;
   }
   
@@ -854,21 +1041,24 @@ Ip4StartAutoConfig (
                   Instance,
                   &Instance->Dhcp4Event
                   );
-
   if (EFI_ERROR (Status)) {
+    Ip4Config2DestroyDhcp4 (Instance);
     return Status;
   }
 
   Status = Dhcp4->Start (Dhcp4, Instance->Dhcp4Event);
-
   if (EFI_ERROR (Status)) {
+    Ip4Config2DestroyDhcp4 (Instance);
+    gBS->CloseEvent (Instance->Dhcp4Event);
+    Instance->Dhcp4Event = NULL;
+    
     return Status;
   }
  
-  IpSb->State     = IP4_SERVICE_STARTED;
+  IpSb->State = IP4_SERVICE_STARTED;
   DispatchDpc ();
+  
   return EFI_SUCCESS;
-
 }
 
 
@@ -897,7 +1087,6 @@ Ip4Config2GetIfInfo (
   IN VOID                 *Data      OPTIONAL
   )
 {
-
   IP4_SERVICE                    *IpSb;
   UINTN                          Length;
   IP4_CONFIG2_DATA_ITEM          *Item;
@@ -981,40 +1170,43 @@ Ip4Config2SetPolicy (
   }
 
   if (NewPolicy == Instance->Policy) {
-     return EFI_ABORTED;
+    if (NewPolicy != Ip4Config2PolicyDhcp || Instance->DhcpSuccess) {
+      return EFI_ABORTED;
+    }
   } else {
+    //
+    // The policy is changed. Clean the ManualAddress, Gateway and DnsServers, 
+    // shrink the variable data size, and fire up all the related events.
+    //
+    DataItem           = &Instance->DataItem[Ip4Config2DataTypeManualAddress];
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+    NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
+
+    DataItem           = &Instance->DataItem[Ip4Config2DataTypeGateway];
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+    NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
+
+    DataItem           = &Instance->DataItem[Ip4Config2DataTypeDnsServer];
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+    NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
+    
     if (NewPolicy == Ip4Config2PolicyDhcp) {
-      //
-      // The policy is changed from static to dhcp:
-      // Clean the ManualAddress, Gateway and DnsServers, shrink the variable
-      // data size, and fire up all the related events.
-      //
-      DataItem           = &Instance->DataItem[Ip4Config2DataTypeManualAddress];
-      if (DataItem->Data.Ptr != NULL) {
-        FreePool (DataItem->Data.Ptr);
-      }
-      DataItem->Data.Ptr = NULL;
-      DataItem->DataSize = 0;
-      DataItem->Status   = EFI_NOT_FOUND;
-      NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
-
-      DataItem           = &Instance->DataItem[Ip4Config2DataTypeGateway];
-      if (DataItem->Data.Ptr != NULL) {
-        FreePool (DataItem->Data.Ptr);
-      }
-      DataItem->Data.Ptr = NULL;
-      DataItem->DataSize = 0;
-      DataItem->Status   = EFI_NOT_FOUND;
-      NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
-
-      DataItem           = &Instance->DataItem[Ip4Config2DataTypeDnsServer];
-      if (DataItem->Data.Ptr != NULL) {
-        FreePool (DataItem->Data.Ptr);
-      }
-      DataItem->Data.Ptr = NULL;
-      DataItem->DataSize = 0;
-      DataItem->Status   = EFI_NOT_FOUND;
-      NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
+      SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_VOLATILE);
     } else {
       //
       // The policy is changed from dhcp to static. Stop the DHCPv4 process
@@ -1029,6 +1221,7 @@ Ip4Config2SetPolicy (
       //
       if (Instance->Dhcp4Event != NULL) {
         gBS->CloseEvent (Instance->Dhcp4Event);
+        Instance->Dhcp4Event = NULL;
       }
     }
   }
@@ -1063,7 +1256,7 @@ Ip4Config2SetPolicy (
 
 **/
 EFI_STATUS
-Ip4Config2SetMaunualAddress (
+Ip4Config2SetManualAddress (
   IN IP4_CONFIG2_INSTANCE *Instance,
   IN UINTN                DataSize,
   IN VOID                 *Data
@@ -1076,12 +1269,20 @@ Ip4Config2SetMaunualAddress (
   IP4_ADDR                       SubnetMask;
   VOID                           *Ptr;
   IP4_SERVICE                    *IpSb;
+  IP4_INTERFACE                  *IpIf;
+  IP4_ROUTE_TABLE                *RouteTable;
+
+  DataItem   = NULL;
+  Status     = EFI_SUCCESS;
+  Ptr        = NULL;
+  IpIf       = NULL;
+  RouteTable = NULL;
 
   IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
 
   ASSERT (Instance->DataItem[Ip4Config2DataTypeManualAddress].Status != EFI_NOT_READY);
 
-  if (((DataSize % sizeof (EFI_IP4_CONFIG2_MANUAL_ADDRESS)) != 0) || (DataSize == 0)) {
+  if ((DataSize != 0) && ((DataSize % sizeof (EFI_IP4_CONFIG2_MANUAL_ADDRESS)) != 0)) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
@@ -1089,46 +1290,105 @@ Ip4Config2SetMaunualAddress (
     return EFI_WRITE_PROTECTED;
   }
 
-  NewAddress = *((EFI_IP4_CONFIG2_MANUAL_ADDRESS *) Data);
-
-  //
-  // Store the new data, and init the DataItem status to EFI_NOT_READY because
-  // we may have an asynchronous configuration process.
-  //
-  Ptr = AllocateCopyPool (DataSize, Data);
-  if (Ptr == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
   DataItem = &Instance->DataItem[Ip4Config2DataTypeManualAddress];
-  if (DataItem->Data.Ptr != NULL) {
-    FreePool (DataItem->Data.Ptr);
-  }
-  
-  DataItem->Data.Ptr = Ptr;
-  DataItem->DataSize = DataSize;
-  DataItem->Status   = EFI_NOT_READY;
 
-  StationAddress = EFI_NTOHL (NewAddress.Address);
-  SubnetMask = EFI_NTOHL (NewAddress.SubnetMask);
+  if (Data != NULL && DataSize != 0) {
+    NewAddress = *((EFI_IP4_CONFIG2_MANUAL_ADDRESS *) Data);
 
-  IpSb->Reconfig = TRUE;
-  Status = Ip4Config2SetDefaultAddr (IpSb, StationAddress, SubnetMask);
-  if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
-  }  
+    StationAddress = EFI_NTOHL (NewAddress.Address);
+    SubnetMask = EFI_NTOHL (NewAddress.SubnetMask);
 
-  DataItem->Status = EFI_SUCCESS;   
-
-ON_EXIT:
-  if (EFI_ERROR (DataItem->Status)) {
-    if (Ptr != NULL) {
-      FreePool (Ptr);
+    //
+    // Check whether the StationAddress/SubnetMask pair is valid.
+    //
+    if (!Ip4StationAddressValid (StationAddress, SubnetMask)) {
+      return EFI_INVALID_PARAMETER;
     }
-    DataItem->Data.Ptr = NULL; 
+
+    //
+    // Store the new data, and init the DataItem status to EFI_NOT_READY because
+    // we may have an asynchronous configuration process.
+    //
+    Ptr = AllocateCopyPool (DataSize, Data);
+    if (Ptr == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    
+    DataItem->Data.Ptr = Ptr;
+    DataItem->DataSize = DataSize;
+    DataItem->Status   = EFI_NOT_READY;
+
+    IpSb->Reconfig = TRUE;
+    Status = Ip4Config2SetDefaultAddr (IpSb, StationAddress, SubnetMask);
+
+    DataItem->Status = Status;
+
+    if (EFI_ERROR (DataItem->Status) && DataItem->Status != EFI_NOT_READY) {
+      if (Ptr != NULL) {
+        FreePool (Ptr);
+      }
+      DataItem->Data.Ptr = NULL; 
+    }
+  } else {
+    //
+    // DataSize is 0 and Data is NULL, clean up the manual address.
+    //
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
+
+    //
+    // Free the default router table and Interface, clean up the assemble table.
+    //
+    if (IpSb->DefaultInterface != NULL) {
+      if (IpSb->DefaultRouteTable != NULL) {
+        Ip4FreeRouteTable (IpSb->DefaultRouteTable);
+        IpSb->DefaultRouteTable = NULL;    
+      }
+
+      Ip4CancelReceive (IpSb->DefaultInterface);
+
+      Ip4FreeInterface (IpSb->DefaultInterface, NULL);
+      IpSb->DefaultInterface = NULL;
+    }
+
+    Ip4CleanAssembleTable (&IpSb->Assemble);
+
+    //
+    // Create new default interface and route table.
+    //    
+    IpIf = Ip4CreateInterface (IpSb->Mnp, IpSb->Controller, IpSb->Image);
+    if (IpIf == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    RouteTable = Ip4CreateRouteTable ();
+    if (RouteTable == NULL) {
+      Ip4FreeInterface (IpIf, NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+    
+    IpSb->DefaultInterface  = IpIf;
+    InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
+    IpSb->DefaultRouteTable = RouteTable;
+    Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
+
+    //
+    // Reset the State to unstarted. 
+    //
+    if (IpSb->State == IP4_SERVICE_CONFIGED || IpSb->State == IP4_SERVICE_STARTED) {
+      IpSb->State = IP4_SERVICE_UNSTARTED;
+    }
   }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -1174,7 +1434,13 @@ Ip4Config2SetGateway (
   BOOLEAN               OneAdded;
   VOID                  *Tmp;
 
-  if ((DataSize % sizeof (EFI_IPv4_ADDRESS) != 0) || (DataSize == 0)) {
+  OldGateway      = NULL;
+  NewGateway      = NULL;
+  OneRemoved      = FALSE;
+  OneAdded        = FALSE;
+  Tmp             = NULL;
+
+  if ((DataSize != 0) && (DataSize % sizeof (EFI_IPv4_ADDRESS) != 0)) {
     return EFI_BAD_BUFFER_SIZE;
   }
 
@@ -1182,43 +1448,15 @@ Ip4Config2SetGateway (
     return EFI_WRITE_PROTECTED;
   }
 
-
-  NewGateway      = (EFI_IPv4_ADDRESS *) Data;
-  NewGatewayCount = DataSize / sizeof (EFI_IPv4_ADDRESS);
-  for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
-    CopyMem (&Gateway, NewGateway + Index1, sizeof (IP4_ADDR));
-    
-    if (!NetIp4IsUnicast (NTOHL (Gateway), 0)) {
-
-      return EFI_INVALID_PARAMETER;
-    }
-
-    for (Index2 = Index1 + 1; Index2 < NewGatewayCount; Index2++) {
-      if (EFI_IP4_EQUAL (NewGateway + Index1, NewGateway + Index2)) {
-        return EFI_INVALID_PARAMETER;
-      }
-    }
-  }
- 
   IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
-  DataItem = &Instance->DataItem[Ip4Config2DataTypeGateway];
+
+  DataItem        = &Instance->DataItem[Ip4Config2DataTypeGateway];
   OldGateway      = DataItem->Data.Gateway;
   OldGatewayCount = DataItem->DataSize / sizeof (EFI_IPv4_ADDRESS);
-  OneRemoved      = FALSE;
-  OneAdded        = FALSE;
-
-  if (NewGatewayCount != OldGatewayCount) {
-    Tmp = AllocatePool (DataSize);
-    if (Tmp == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-  } else {
-    Tmp = NULL;
-  }
 
   for (Index1 = 0; Index1 < OldGatewayCount; Index1++) {
     //
-    // Remove this route entry.
+    // Remove the old route entry.
     //
     CopyMem (&Gateway, OldGateway + Index1, sizeof (IP4_ADDR));
     Ip4DelRoute (
@@ -1228,40 +1466,78 @@ Ip4Config2SetGateway (
       NTOHL (Gateway)
       );
     OneRemoved = TRUE;
-
   }
 
-  for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
-    CopyMem (&Gateway, NewGateway + Index1, sizeof (IP4_ADDR));
-    Ip4AddRoute (
-      IpSb->DefaultRouteTable,
-      IP4_ALLZERO_ADDRESS,
-      IP4_ALLZERO_ADDRESS,
-      NTOHL (Gateway)
-      );    
+  if (Data != NULL && DataSize != 0) {
+    NewGateway      = (EFI_IPv4_ADDRESS *) Data;
+    NewGatewayCount = DataSize / sizeof (EFI_IPv4_ADDRESS);
+    for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
+      CopyMem (&Gateway, NewGateway + Index1, sizeof (IP4_ADDR));
 
-    OneAdded = TRUE;
-  }
-
-
-  if (!OneRemoved && !OneAdded) {
-    DataItem->Status = EFI_SUCCESS;
-    return EFI_ABORTED;
-  } else {
-
-    if (Tmp != NULL) {
-      if (DataItem->Data.Ptr != NULL) {
-        FreePool (DataItem->Data.Ptr);
+      if ((IpSb->DefaultInterface->SubnetMask != 0) && 
+          !NetIp4IsUnicast (NTOHL (Gateway), IpSb->DefaultInterface->SubnetMask)) {
+        return EFI_INVALID_PARAMETER;
       }
-      DataItem->Data.Ptr = Tmp;
+
+      for (Index2 = Index1 + 1; Index2 < NewGatewayCount; Index2++) {
+        if (EFI_IP4_EQUAL (NewGateway + Index1, NewGateway + Index2)) {
+          return EFI_INVALID_PARAMETER;
+        }
+      }
     }
 
-    CopyMem (DataItem->Data.Ptr, Data, DataSize);
-    DataItem->DataSize = DataSize;
-    DataItem->Status   = EFI_SUCCESS;
-    return EFI_SUCCESS;
+    if (NewGatewayCount != OldGatewayCount) {
+      Tmp = AllocatePool (DataSize);
+      if (Tmp == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+    } else {
+      Tmp = NULL;
+    }
+
+    for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
+      //
+      // Add the new route entry.
+      //
+      CopyMem (&Gateway, NewGateway + Index1, sizeof (IP4_ADDR));
+      Ip4AddRoute (
+        IpSb->DefaultRouteTable,
+        IP4_ALLZERO_ADDRESS,
+        IP4_ALLZERO_ADDRESS,
+        NTOHL (Gateway)
+        );    
+
+      OneAdded = TRUE;
+    }
+
+    if (!OneRemoved && !OneAdded) {
+      DataItem->Status = EFI_SUCCESS;
+      return EFI_ABORTED;
+    } else {
+      if (Tmp != NULL) {
+        if (DataItem->Data.Ptr != NULL) {
+          FreePool (DataItem->Data.Ptr);
+        }
+        DataItem->Data.Ptr = Tmp;
+      }
+
+      CopyMem (DataItem->Data.Ptr, Data, DataSize);
+      DataItem->DataSize = DataSize;
+      DataItem->Status   = EFI_SUCCESS;
+    }
+  } else {
+    //
+    // DataSize is 0 and Data is NULL, clean up the Gateway address.
+    //
+    if (DataItem->Data.Ptr != NULL) {
+      FreePool (DataItem->Data.Ptr);
+    }
+    DataItem->Data.Ptr = NULL;
+    DataItem->DataSize = 0;
+    DataItem->Status   = EFI_NOT_FOUND;
   }
 
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1293,102 +1569,37 @@ Ip4Config2SetDnsServer (
   IN VOID                 *Data
   )
 {
-  UINTN                 OldIndex;
-  UINTN                 NewIndex;
-  UINTN                 Index1;
-  EFI_IPv4_ADDRESS      *OldDns;
-  EFI_IPv4_ADDRESS      *NewDns;
-  UINTN                 OldDnsCount;
-  UINTN                 NewDnsCount;
-  IP4_CONFIG2_DATA_ITEM *Item;
-  BOOLEAN               OneAdded;
-  VOID                  *Tmp;
-  IP4_ADDR              DnsAddress;
+  EFI_STATUS                     Status;
+  IP4_CONFIG2_DATA_ITEM          *Item;
 
-  if ((DataSize % sizeof (EFI_IPv4_ADDRESS) != 0) || (DataSize == 0)) {
-    return EFI_BAD_BUFFER_SIZE;
-  }
+  Status = EFI_SUCCESS;
+  Item   = NULL;
 
   if (Instance->Policy != Ip4Config2PolicyStatic) {
     return EFI_WRITE_PROTECTED;
   }
 
-  Item        = &Instance->DataItem[Ip4Config2DataTypeDnsServer];
-  NewDns      = (EFI_IPv4_ADDRESS *) Data;
-  OldDns      = Item->Data.DnsServers;
-  NewDnsCount = DataSize / sizeof (EFI_IPv4_ADDRESS);
-  OldDnsCount = Item->DataSize / sizeof (EFI_IPv4_ADDRESS);
-  OneAdded    = FALSE;
+  Item = &Instance->DataItem[Ip4Config2DataTypeDnsServer];
 
-  if (NewDnsCount != OldDnsCount) {
-    Tmp = AllocatePool (DataSize);
-    if (Tmp == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
+  if (DATA_ATTRIB_SET (Item->Attribute, DATA_ATTRIB_VOLATILE)) {
+    REMOVE_DATA_ATTRIB (Item->Attribute, DATA_ATTRIB_VOLATILE);
+  }
+
+  if (Data != NULL && DataSize != 0) {
+    Status = Ip4Config2SetDnsServerWorker (Instance, DataSize, Data);
   } else {
-    Tmp = NULL;
-  }
-
-  for (NewIndex = 0; NewIndex < NewDnsCount; NewIndex++) {
-    CopyMem (&DnsAddress, NewDns + NewIndex, sizeof (IP4_ADDR));
-
-    if (!NetIp4IsUnicast (NTOHL (DnsAddress), 0)) {
-      //
-      // The dns server address must be unicast.
-      //
-      FreePool (Tmp);
-      return EFI_INVALID_PARAMETER;
-    }
-
-    for (Index1 = NewIndex + 1; Index1 < NewDnsCount; Index1++) {
-      if (EFI_IP4_EQUAL (NewDns + NewIndex, NewDns + Index1)) {
-        FreePool (Tmp);
-        return EFI_INVALID_PARAMETER;
-      }
-    }
-
-    if (OneAdded) {
-      //
-      // If any address in the new setting is not in the old settings, skip the
-      // comparision below.
-      //
-      continue;
-    }
-
-    for (OldIndex = 0; OldIndex < OldDnsCount; OldIndex++) {
-      if (EFI_IP4_EQUAL (NewDns + NewIndex, OldDns + OldIndex)) {
-        //
-        // If found break out.
-        //
-        break;
-      }
-    }
-
-    if (OldIndex == OldDnsCount) {
-      OneAdded = TRUE;
-    }
-  }
-
-  if (!OneAdded && (DataSize == Item->DataSize)) {
     //
-    // No new item is added and the size is the same.
+    // DataSize is 0 and Data is NULL, clean up the DnsServer address. 
     //
-    Item->Status = EFI_SUCCESS;
-    return EFI_ABORTED;
-  } else {
-    if (Tmp != NULL) {
-      if (Item->Data.Ptr != NULL) {
-        FreePool (Item->Data.Ptr);
-      }      
-      Item->Data.Ptr = Tmp;
+    if (Item->Data.Ptr != NULL) {
+      FreePool (Item->Data.Ptr);
     }
-
-    CopyMem (Item->Data.Ptr, Data, DataSize);
-    Item->DataSize = DataSize;
-    Item->Status   = EFI_SUCCESS;
-    return EFI_SUCCESS;
+    Item->Data.Ptr = NULL;
+    Item->DataSize = 0;
+    Item->Status   = EFI_NOT_FOUND;
   }
-
+  
+  return Status;
 }
 
 /**
@@ -1405,11 +1616,12 @@ Ip4Config2InitIfInfo (
   OUT EFI_IP4_CONFIG2_INTERFACE_INFO *IfInfo
   )
 {
-  IfInfo->Name[0] = L'e';
-  IfInfo->Name[1] = L't';
-  IfInfo->Name[2] = L'h';
-  IfInfo->Name[3] = (CHAR16) (L'0' + IpSb->Ip4Config2Instance.IfIndex);
-  IfInfo->Name[4] = 0;
+  UnicodeSPrint (
+    IfInfo->Name,
+    EFI_IP4_CONFIG2_INTERFACE_INFO_NAME_SIZE,
+    L"eth%d",
+    IpSb->Ip4Config2Instance.IfIndex
+  );
 
   IfInfo->IfType        = IpSb->SnpMode.IfType;
   IfInfo->HwAddressSize = IpSb->SnpMode.HwAddressSize;
@@ -1466,9 +1678,8 @@ Ip4Config2OnDhcp4Event (
                                 network stack was set successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following are TRUE:
                                 - This is NULL.
-                                - Data is NULL.
-                                - One or more fields in Data do not match the requirement of the
-                                  data type indicated by DataType.
+                                - One or more fields in Data and DataSize do not match the 
+                                  requirement of the data type indicated by DataType.
   @retval EFI_WRITE_PROTECTED   The specified configuration data is read-only or the specified
                                 configuration data cannot be set under the current policy.
   @retval EFI_ACCESS_DENIED     Another set operation on the specified configuration
@@ -1496,7 +1707,7 @@ EfiIp4Config2SetData (
   IP4_CONFIG2_INSTANCE *Instance;
   IP4_SERVICE          *IpSb;
 
-  if ((This == NULL) || (Data == NULL)) {
+  if ((This == NULL) || (Data == NULL && DataSize != 0) || (Data != NULL && DataSize == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1836,11 +2047,11 @@ Ip4Config2InitInstance (
   DataItem->SetData  = Ip4Config2SetPolicy;
   DataItem->Data.Ptr = &Instance->Policy;
   DataItem->DataSize = sizeof (Instance->Policy);
-  Instance->Policy   = Ip4Config2PolicyDhcp;
+  Instance->Policy   = Ip4Config2PolicyStatic;
   SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_SIZE_FIXED);
 
   DataItem           = &Instance->DataItem[Ip4Config2DataTypeManualAddress];
-  DataItem->SetData  = Ip4Config2SetMaunualAddress;
+  DataItem->SetData  = Ip4Config2SetManualAddress;
   DataItem->Status   = EFI_NOT_FOUND;
 
   DataItem           = &Instance->DataItem[Ip4Config2DataTypeGateway];
@@ -1851,22 +2062,12 @@ Ip4Config2InitInstance (
   DataItem->SetData  = Ip4Config2SetDnsServer;
   DataItem->Status   = EFI_NOT_FOUND;
 
-  //
-  // Create the event used for DHCP.
-  //
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  Ip4Config2OnDhcp4Event,
-                  Instance,
-                  &Instance->Dhcp4Event
-                  );
-  ASSERT_EFI_ERROR (Status);
-
   Instance->Configured  = TRUE;
 
   //
   // Try to read the config data from NV variable.
+  // If not found, write initialized config data into NV variable 
+  // as a default config data.
   //
   Status = Ip4Config2ReadConfigData (IpSb->MacString, Instance);
   if (Status == EFI_NOT_FOUND) {
@@ -1876,21 +2077,7 @@ Ip4Config2InitInstance (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  //
-  // Try to set the configured parameter.
-  //
-  for (Index = Ip4Config2DataTypePolicy; Index < Ip4Config2DataTypeMaximum; Index++) {
-    DataItem = &IpSb->Ip4Config2Instance.DataItem[Index];
-    if (DataItem->Data.Ptr != NULL) {
-      DataItem->SetData (
-                  &IpSb->Ip4Config2Instance,
-                  DataItem->DataSize,
-                  DataItem->Data.Ptr
-                  );
-    }
-  }
-
+  
   Instance->Ip4Config2.SetData              = EfiIp4Config2SetData;
   Instance->Ip4Config2.GetData              = EfiIp4Config2GetData;
   Instance->Ip4Config2.RegisterDataNotify   = EfiIp4Config2RegisterDataNotify;
@@ -1935,6 +2122,7 @@ Ip4Config2CleanInstance (
   //
   if (Instance->Dhcp4Event != NULL) {
     gBS->CloseEvent (Instance->Dhcp4Event);
+    Instance->Dhcp4Event = NULL;
   }
 
   for (Index = 0; Index < Ip4Config2DataTypeMaximum; Index++) {
@@ -1955,5 +2143,55 @@ Ip4Config2CleanInstance (
   Ip4Config2FormUnload (Instance);
 
   RemoveEntryList (&Instance->Link);
+}
+
+/**
+  The event handle for IP4 auto reconfiguration. The original default
+  interface and route table will be removed as the default.
+
+  @param[in]  Context                The IP4 service binding instance.
+
+**/
+VOID
+EFIAPI
+Ip4AutoReconfigCallBackDpc (
+  IN VOID                   *Context
+  )
+{
+  IP4_SERVICE               *IpSb;
+
+  IpSb      = (IP4_SERVICE *) Context;
+  NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
+
+  if (IpSb->State > IP4_SERVICE_UNSTARTED) {
+    IpSb->State = IP4_SERVICE_UNSTARTED;
+  }
+  
+  IpSb->Reconfig = TRUE;
+
+  Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);
+
+  return ;
+}
+
+
+/**
+  Request Ip4AutoReconfigCallBackDpc as a DPC at TPL_CALLBACK.
+
+  @param Event     The event that is signalled.
+  @param Context   The IP4 service binding instance.
+
+**/
+VOID
+EFIAPI
+Ip4AutoReconfigCallBack (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  )
+{
+  //
+  // Request Ip4AutoReconfigCallBackDpc as a DPC at TPL_CALLBACK
+  //
+  QueueDpc (TPL_CALLBACK, Ip4AutoReconfigCallBackDpc, Context);
 }
 

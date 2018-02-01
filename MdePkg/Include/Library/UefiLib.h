@@ -12,7 +12,7 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -221,6 +221,40 @@ EFI_STATUS
 EFIAPI
 EfiNamedEventSignal (
   IN CONST EFI_GUID  *Name
+  );
+
+/**
+  Signals an event group by placing a new event in the group temporarily and
+  signaling it.
+
+  @param[in] EventGroup          Supplies the unique identifier of the event
+                                 group to signal.
+
+  @retval EFI_SUCCESS            The event group was signaled successfully.
+  @retval EFI_INVALID_PARAMETER  EventGroup is NULL.
+  @return                        Error codes that report problems about event
+                                 creation or signaling.
+**/
+EFI_STATUS
+EFIAPI
+EfiEventGroupSignal (
+  IN CONST EFI_GUID *EventGroup
+  );
+
+/**
+  An empty function that can be used as NotifyFunction parameter of
+  CreateEvent() or CreateEventEx().
+
+  @param Event              Event whose notification function is being invoked.
+  @param Context            The pointer to the notification function's context,
+                            which is implementation-dependent.
+
+**/
+VOID
+EFIAPI
+EfiEventEmptyFunction (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
   );
 
 /** 

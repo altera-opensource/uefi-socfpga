@@ -85,13 +85,13 @@ typedef struct _USB2_HC_DEV  USB2_HC_DEV;
 #define  EHC_TPL                     TPL_NOTIFY
 
 //
-//Iterate through the doule linked list. NOT delete safe
+//Iterate through the double linked list. NOT delete safe
 //
 #define EFI_LIST_FOR_EACH(Entry, ListHead)    \
   for(Entry = (ListHead)->ForwardLink; Entry != (ListHead); Entry = Entry->ForwardLink)
 
 //
-//Iterate through the doule linked list. This is delete-safe.
+//Iterate through the double linked list. This is delete-safe.
 //Don't touch NextEntry
 //
 #define EFI_LIST_FOR_EACH_SAFE(Entry, NextEntry, ListHead)            \
@@ -146,7 +146,7 @@ struct _USB2_HC_DEV {
   EHC_QH                   *ReclaimHead;
 
   //
-  // Peroidic (interrupt) transfer schedule data:
+  // Periodic (interrupt) transfer schedule data:
   //
   VOID                      *PeriodFrame;     // the buffer pointed by this pointer is used to store pci bus address of the QH descriptor.
   VOID                      *PeriodFrameHost; // the buffer pointed by this pointer is used to store host memory address of the QH descriptor.
@@ -173,6 +173,8 @@ struct _USB2_HC_DEV {
   UINT16                    DebugPortOffset; // The offset of debug port mmio register
   UINT8                     DebugPortBarNum; // The bar number of debug port mmio register
   UINT8                     DebugPortNum;    // The port number of usb debug port
+
+  BOOLEAN                   Support64BitDma; // Whether 64 bit DMA may be used with this device
 };
 
 
@@ -223,7 +225,7 @@ EhcDriverBindingStart (
   );
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Stop this driver on ControllerHandle. Support stopping any child handles
   created by this driver.
 
   @param  This                 Protocol instance pointer.

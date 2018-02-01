@@ -1,11 +1,11 @@
 /** @file
   Include file that supports UEFI.
 
-  This include file must contain things defined in the UEFI 2.5 specification.
-  If a code construct is defined in the UEFI 2.5 specification it must be included
+  This include file must contain things defined in the UEFI 2.7 specification.
+  If a code construct is defined in the UEFI 2.7 specification it must be included
   by this include file.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -103,21 +103,28 @@ typedef enum {
 ///
 typedef struct {
   ///
-  /// Type of the memory region.  See EFI_MEMORY_TYPE.
+  /// Type of the memory region.
+  /// Type EFI_MEMORY_TYPE is defined in the
+  /// AllocatePages() function description.
   ///
   UINT32                Type;
   ///
-  /// Physical address of the first byte of the memory region.  Must aligned 
-  /// on a 4 KB boundary.
+  /// Physical address of the first byte in the memory region. PhysicalStart must be
+  /// aligned on a 4 KiB boundary, and must not be above 0xfffffffffffff000. Type
+  /// EFI_PHYSICAL_ADDRESS is defined in the AllocatePages() function description
   ///
   EFI_PHYSICAL_ADDRESS  PhysicalStart;
   ///
-  /// Virtual address of the first byte of the memory region.  Must aligned 
-  /// on a 4 KB boundary.
+  /// Virtual address of the first byte in the memory region.
+  /// VirtualStart must be aligned on a 4 KiB boundary,
+  /// and must not be above 0xfffffffffffff000.
   ///
   EFI_VIRTUAL_ADDRESS   VirtualStart;
   ///
-  /// Number of 4KB pages in the memory region.
+  /// NumberOfPagesNumber of 4 KiB pages in the memory region.
+  /// NumberOfPages must not be 0, and must not be any value
+  /// that would represent a memory page with a start address,
+  /// either physical or virtual, above 0xfffffffffffff000.
   ///
   UINT64                NumberOfPages;
   ///
@@ -136,8 +143,7 @@ typedef struct {
                                 MemoryType values in the range 0x70000000..0x7FFFFFFF
                                 are reserved for OEM use. MemoryType values in the range
                                 0x80000000..0xFFFFFFFF are reserved for use by UEFI OS loaders
-                                that are provided by operating system vendors. The only illegal
-                                memory type values are those in the range EfiMaxMemoryType..0x6FFFFFFF.
+                                that are provided by operating system vendors.
   @param[in]       Pages        The number of contiguous 4 KB pages to allocate.
   @param[in, out]  Memory       The pointer to a physical address. On input, the way in which the address is
                                 used depends on the value of Type.
@@ -148,7 +154,7 @@ typedef struct {
                                 2) MemoryType is in the range
                                 EfiMaxMemoryType..0x6FFFFFFF.
                                 3) Memory is NULL.
-                                4) MemoryType was EfiPersistentMemory.
+                                4) MemoryType is EfiPersistentMemory.
   @retval EFI_OUT_OF_RESOURCES  The pages could not be allocated.
   @retval EFI_NOT_FOUND         The requested pages could not be found.
 
@@ -223,16 +229,16 @@ EFI_STATUS
                                 MemoryType values in the range 0x70000000..0x7FFFFFFF
                                 are reserved for OEM use. MemoryType values in the range
                                 0x80000000..0xFFFFFFFF are reserved for use by UEFI OS loaders
-                                that are provided by operating system vendors. The only illegal
-                                memory type values are those in the range EfiMaxMemoryType..0x6FFFFFFF.
+                                that are provided by operating system vendors.
   @param[in]   Size             The number of bytes to allocate from the pool.
   @param[out]  Buffer           A pointer to a pointer to the allocated buffer if the call succeeds;
                                 undefined otherwise.
 
   @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
-  @retval EFI_INVALID_PARAMETER PoolType was invalid or Buffer is NULL.
-                                PoolType was EfiPersistentMemory.
+  @retval EFI_INVALID_PARAMETER Buffer is NULL.
+                                PoolType is in the range EfiMaxMemoryType..0x6FFFFFFF.
+                                PoolType is EfiPersistentMemory.
 
 **/
 typedef
@@ -628,7 +634,8 @@ VOID
                                  attributes bitmask for the variable.
   @param[in, out]  DataSize      On input, the size in bytes of the return Data buffer.
                                  On output the size of data returned in Data.
-  @param[out]      Data          The buffer to return the contents of the variable.
+  @param[out]      Data          The buffer to return the contents of the variable. May be NULL
+                                 with a zero DataSize in order to determine the size buffer needed.
 
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_NOT_FOUND          The variable was not found.
@@ -648,13 +655,14 @@ EFI_STATUS
   IN     EFI_GUID                    *VendorGuid,
   OUT    UINT32                      *Attributes,    OPTIONAL
   IN OUT UINTN                       *DataSize,
-  OUT    VOID                        *Data
+  OUT    VOID                        *Data           OPTIONAL
   );
 
 /**
   Enumerates the current variable names.
 
-  @param[in, out]  VariableNameSize The size of the VariableName buffer.
+  @param[in, out]  VariableNameSize The size of the VariableName buffer. The size must be large
+                                    enough to fit input string supplied in VariableName buffer.
   @param[in, out]  VariableName     On input, supplies the last VariableName that was returned
                                     by GetNextVariableName(). On output, returns the Nullterminated
                                     string of the current variable.
@@ -665,9 +673,14 @@ EFI_STATUS
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The next variable was not found.
   @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the result.
+                                VariableNameSize has been updated with the size needed to complete the request.
   @retval EFI_INVALID_PARAMETER VariableNameSize is NULL.
   @retval EFI_INVALID_PARAMETER VariableName is NULL.
   @retval EFI_INVALID_PARAMETER VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER The input values of VariableName and VendorGuid are not a name and
+                                GUID of an existing variable.
+  @retval EFI_INVALID_PARAMETER Null-terminator is not found in the first VariableNameSize bytes of
+                                the input VariableName buffer.
   @retval EFI_DEVICE_ERROR      The variable could not be retrieved due to a hardware error.
 
 **/
@@ -688,8 +701,7 @@ EFI_STATUS
                                  then EFI_INVALID_PARAMETER is returned.
   @param[in]  VendorGuid         A unique identifier for the vendor.
   @param[in]  Attributes         Attributes bitmask to set for the variable.
-  @param[in]  DataSize           The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
-                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or 
+  @param[in]  DataSize           The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE or
                                  EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero 
                                  causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
                                  set, then a SetVariable() call with a DataSize of zero will not cause any change to 
@@ -708,9 +720,8 @@ EFI_STATUS
   @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
   @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
   @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
-  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS 
-                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo 
-                                 does NOT pass the validation check carried out by the firmware.
+  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set,
+                                 but the AuthInfo does NOT pass the validation check carried out by the firmware.
   
   @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
 
@@ -1004,11 +1015,18 @@ EFI_STATUS
 
   @param[in]  ResetType         The type of reset to perform.
   @param[in]  ResetStatus       The status code for the reset.
-  @param[in]  DataSize          The size, in bytes, of WatchdogData.
+  @param[in]  DataSize          The size, in bytes, of ResetData.
   @param[in]  ResetData         For a ResetType of EfiResetCold, EfiResetWarm, or
                                 EfiResetShutdown the data buffer starts with a Null-terminated
                                 string, optionally followed by additional binary data.
-
+                                The string is a description that the caller may use to further
+                                indicate the reason for the system reset. ResetData is only
+                                valid if ResetStatus is something other than EFI_SUCCESS
+                                unless the ResetType is EfiResetPlatformSpecific
+                                where a minimum amount of ResetData is always required.
+                                For a ResetType of EfiResetPlatformSpecific the data buffer
+                                also starts with a Null-terminated string that is followed
+                                by an EFI_GUID that describes the specific type of reset to perform.
 **/
 typedef
 VOID
@@ -1561,6 +1579,7 @@ EFI_STATUS
   @retval EFI_NOT_FOUND         No protocol instances were found that match Protocol and
                                 Registration.
   @retval EFI_INVALID_PARAMETER Interface is NULL.
+                                Protocol is NULL.
 
 **/
 typedef
@@ -1750,11 +1769,14 @@ EFI_STATUS
 #define EFI_OS_INDICATIONS_FILE_CAPSULE_DELIVERY_SUPPORTED  0x0000000000000004
 #define EFI_OS_INDICATIONS_FMP_CAPSULE_SUPPORTED            0x0000000000000008
 #define EFI_OS_INDICATIONS_CAPSULE_RESULT_VAR_SUPPORTED     0x0000000000000010
+#define EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY          0x0000000000000040
 
 //
 // EFI Runtime Services Table
 //
 #define EFI_SYSTEM_TABLE_SIGNATURE      SIGNATURE_64 ('I','B','I',' ','S','Y','S','T')
+#define EFI_2_70_SYSTEM_TABLE_REVISION  ((2 << 16) | (70))
+#define EFI_2_60_SYSTEM_TABLE_REVISION  ((2 << 16) | (60))
 #define EFI_2_50_SYSTEM_TABLE_REVISION  ((2 << 16) | (50))
 #define EFI_2_40_SYSTEM_TABLE_REVISION  ((2 << 16) | (40))
 #define EFI_2_31_SYSTEM_TABLE_REVISION  ((2 << 16) | (31))
@@ -1764,7 +1786,7 @@ EFI_STATUS
 #define EFI_2_00_SYSTEM_TABLE_REVISION  ((2 << 16) | (00))
 #define EFI_1_10_SYSTEM_TABLE_REVISION  ((1 << 16) | (10))
 #define EFI_1_02_SYSTEM_TABLE_REVISION  ((1 << 16) | (02))
-#define EFI_SYSTEM_TABLE_REVISION       EFI_2_50_SYSTEM_TABLE_REVISION
+#define EFI_SYSTEM_TABLE_REVISION       EFI_2_70_SYSTEM_TABLE_REVISION
 #define EFI_SPECIFICATION_VERSION       EFI_SYSTEM_TABLE_REVISION
 
 #define EFI_RUNTIME_SERVICES_SIGNATURE  SIGNATURE_64 ('R','U','N','T','S','E','R','V')

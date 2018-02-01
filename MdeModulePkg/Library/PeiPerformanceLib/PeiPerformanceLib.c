@@ -4,9 +4,11 @@
   This file implements all APIs in Performance Library class in MdePkg. It creates
   performance logging GUIDed HOB on the first performance logging and then logs the
   performance data to the GUIDed HOB. Due to the limitation of temporary RAM, the maximum
-  number of performance logging entry is specified by PcdMaxPeiPerformanceLogEntries.  
+  number of performance logging entry is specified by PcdMaxPeiPerformanceLogEntries or 
+  PcdMaxPeiPerformanceLogEntries16.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -50,10 +52,14 @@ InternalGetPerformanceHobLog (
 {
   EFI_HOB_GUID_TYPE           *GuidHob;
   UINTN                       PeiPerformanceSize;
+  UINT16                      PeiPerformanceLogEntries;
 
   ASSERT (PeiPerformanceLog != NULL);
   ASSERT (PeiPerformanceIdArray != NULL);
 
+  PeiPerformanceLogEntries = (UINT16) (PcdGet16 (PcdMaxPeiPerformanceLogEntries16) != 0 ?
+                                       PcdGet16 (PcdMaxPeiPerformanceLogEntries16) :
+                                       PcdGet8 (PcdMaxPeiPerformanceLogEntries));
   GuidHob = GetFirstGuidHob (&gPerformanceProtocolGuid);
 
   if (GuidHob != NULL) {
@@ -70,11 +76,11 @@ InternalGetPerformanceHobLog (
     // PEI Performance HOB was not found, then build one.
     //
     PeiPerformanceSize     = sizeof (PEI_PERFORMANCE_LOG_HEADER) +
-                             sizeof (PEI_PERFORMANCE_LOG_ENTRY) * PcdGet8 (PcdMaxPeiPerformanceLogEntries);
+                             sizeof (PEI_PERFORMANCE_LOG_ENTRY) * PeiPerformanceLogEntries;
     *PeiPerformanceLog     = BuildGuidHob (&gPerformanceProtocolGuid, PeiPerformanceSize);
     *PeiPerformanceLog     = ZeroMem (*PeiPerformanceLog, PeiPerformanceSize);
 
-    PeiPerformanceSize     = sizeof (UINT32) * PcdGet8 (PcdMaxPeiPerformanceLogEntries);
+    PeiPerformanceSize     = sizeof (UINT32) * PeiPerformanceLogEntries;
     *PeiPerformanceIdArray = BuildGuidHob (&gPerformanceExProtocolGuid, PeiPerformanceSize);
     *PeiPerformanceIdArray = ZeroMem (*PeiPerformanceIdArray, PeiPerformanceSize);
   }
@@ -134,8 +140,7 @@ InternalSearchForLogEntry (
     if (LogEntryArray[Index2].EndTimeStamp == 0 &&
         (LogEntryArray[Index2].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
         AsciiStrnCmp (LogEntryArray[Index2].Token, Token, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
-        AsciiStrnCmp (LogEntryArray[Index2].Module, Module, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
-        (PeiPerformanceIdArray[Index2] == Identifier)) {
+        AsciiStrnCmp (LogEntryArray[Index2].Module, Module, PEI_PERFORMANCE_STRING_LENGTH) == 0) {
       Index = Index2;
       break;
     }
@@ -179,10 +184,16 @@ StartPerformanceMeasurementEx (
   UINT32                      *PeiPerformanceIdArray;
   PEI_PERFORMANCE_LOG_ENTRY   *LogEntryArray;
   UINT32                      Index;
+  UINT16                      PeiPerformanceLogEntries;
+
+  PeiPerformanceLogEntries = (UINT16) (PcdGet16 (PcdMaxPeiPerformanceLogEntries16) != 0 ?
+                                       PcdGet16 (PcdMaxPeiPerformanceLogEntries16) :
+                                       PcdGet8 (PcdMaxPeiPerformanceLogEntries));
 
   InternalGetPerformanceHobLog (&PeiPerformanceLog, &PeiPerformanceIdArray);
 
-  if (PeiPerformanceLog->NumberOfEntries >= PcdGet8 (PcdMaxPeiPerformanceLogEntries)) {
+  if (PeiPerformanceLog->NumberOfEntries >= PeiPerformanceLogEntries) {
+    DEBUG ((DEBUG_ERROR, "PEI performance log array out of resources\n"));
     return RETURN_OUT_OF_RESOURCES;
   }
   Index                       = PeiPerformanceLog->NumberOfEntries++;
@@ -210,7 +221,7 @@ StartPerformanceMeasurementEx (
 /**
   Fills in the end time of a performance measurement.
 
-  Looks up the record that matches Handle, Token, Module and Identifier.
+  Looks up the record that matches Handle, Token and Module.
   If the record can not be found then return RETURN_NOT_FOUND.
   If the record is found and TimeStamp is not zero,
   then TimeStamp is added to the record as the end time.

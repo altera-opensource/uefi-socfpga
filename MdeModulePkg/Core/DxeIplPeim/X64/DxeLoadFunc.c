@@ -42,6 +42,10 @@ HandOffToDxeCore (
   EFI_VECTOR_HANDOFF_INFO         *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI *VectorHandoffInfoPpi;
 
+  if (IsNullDetectionEnabled ()) {
+    ClearFirst4KPage (HobList.Raw);
+  }
+
   //
   // Get Vector Hand-off Info PPI and build Guided HOB
   //
@@ -91,6 +95,7 @@ HandOffToDxeCore (
     // for the DxeIpl and the DxeCore are both X64.
     //
     ASSERT (PcdGetBool (PcdSetNxForStack) == FALSE);
+    ASSERT (PcdGetBool (PcdCpuStackGuard) == FALSE);
   }
   
   //

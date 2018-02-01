@@ -3,7 +3,7 @@
   NVM Express specification.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -317,6 +317,100 @@ EXIT:
 
 
 /**
+  Aborts the asynchronous PassThru requests.
+
+  @param[in] Private        The pointer to the NVME_CONTROLLER_PRIVATE_DATA
+                            data structure.
+
+  @retval EFI_SUCCESS       The asynchronous PassThru requests have been aborted.
+  @return EFI_DEVICE_ERROR  Fail to abort all the asynchronous PassThru requests.
+
+**/
+EFI_STATUS
+AbortAsyncPassThruTasks (
+  IN NVME_CONTROLLER_PRIVATE_DATA    *Private
+  )
+{
+  EFI_PCI_IO_PROTOCOL                *PciIo;
+  LIST_ENTRY                         *Link;
+  LIST_ENTRY                         *NextLink;
+  NVME_BLKIO2_SUBTASK                *Subtask;
+  NVME_BLKIO2_REQUEST                *BlkIo2Request;
+  NVME_PASS_THRU_ASYNC_REQ           *AsyncRequest;
+  EFI_BLOCK_IO2_TOKEN                *Token;
+  EFI_TPL                            OldTpl;
+  EFI_STATUS                         Status;
+
+  PciIo  = Private->PciIo;
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+
+  //
+  // Cancel the unsubmitted subtasks.
+  //
+  for (Link = GetFirstNode (&Private->UnsubmittedSubtasks);
+       !IsNull (&Private->UnsubmittedSubtasks, Link);
+       Link = NextLink) {
+    NextLink      = GetNextNode (&Private->UnsubmittedSubtasks, Link);
+    Subtask       = NVME_BLKIO2_SUBTASK_FROM_LINK (Link);
+    BlkIo2Request = Subtask->BlockIo2Request;
+    Token         = BlkIo2Request->Token;
+
+    BlkIo2Request->UnsubmittedSubtaskNum--;
+    if (Subtask->IsLast) {
+      BlkIo2Request->LastSubtaskSubmitted = TRUE;
+    }
+    Token->TransactionStatus = EFI_ABORTED;
+
+    RemoveEntryList (Link);
+    InsertTailList (&BlkIo2Request->SubtasksQueue, Link);
+    gBS->SignalEvent (Subtask->Event);
+  }
+
+  //
+  // Cleanup the resources for the asynchronous PassThru requests.
+  //
+  for (Link = GetFirstNode (&Private->AsyncPassThruQueue);
+       !IsNull (&Private->AsyncPassThruQueue, Link);
+       Link = NextLink) {
+    NextLink = GetNextNode (&Private->AsyncPassThruQueue, Link);
+    AsyncRequest = NVME_PASS_THRU_ASYNC_REQ_FROM_THIS (Link);
+
+    if (AsyncRequest->MapData != NULL) {
+      PciIo->Unmap (PciIo, AsyncRequest->MapData);
+    }
+    if (AsyncRequest->MapMeta != NULL) {
+      PciIo->Unmap (PciIo, AsyncRequest->MapMeta);
+    }
+    if (AsyncRequest->MapPrpList != NULL) {
+      PciIo->Unmap (PciIo, AsyncRequest->MapPrpList);
+    }
+    if (AsyncRequest->PrpListHost != NULL) {
+      PciIo->FreeBuffer (
+               PciIo,
+               AsyncRequest->PrpListNo,
+               AsyncRequest->PrpListHost
+               );
+    }
+
+    RemoveEntryList (Link);
+    gBS->SignalEvent (AsyncRequest->CallerEvent);
+    FreePool (AsyncRequest);
+  }
+
+  if (IsListEmpty (&Private->AsyncPassThruQueue) &&
+      IsListEmpty (&Private->UnsubmittedSubtasks)) {
+    Status = EFI_SUCCESS;
+  } else {
+    Status = EFI_DEVICE_ERROR;
+  }
+
+  gBS->RestoreTPL (OldTpl);
+
+  return Status;
+}
+
+
+/**
   Sends an NVM Express Command Packet to an NVM Express controller or namespace. This function supports
   both blocking I/O and non-blocking I/O. The blocking I/O functionality is required, and the non-blocking
   I/O functionality is optional.
@@ -357,25 +451,31 @@ NvmExpressPassThru (
   IN     EFI_EVENT                                   Event OPTIONAL
   )
 {
-  NVME_CONTROLLER_PRIVATE_DATA  *Private;
-  EFI_STATUS                    Status;
-  EFI_PCI_IO_PROTOCOL           *PciIo;
-  NVME_SQ                       *Sq;
-  NVME_CQ                       *Cq;
-  UINT8                         QueueType;
-  UINT32                        Bytes;
-  UINT16                        Offset;
-  EFI_EVENT                     TimerEvent;
-  EFI_PCI_IO_PROTOCOL_OPERATION Flag;
-  EFI_PHYSICAL_ADDRESS          PhyAddr;
-  VOID                          *MapData;
-  VOID                          *MapMeta;
-  VOID                          *MapPrpList;
-  UINTN                         MapLength;
-  UINT64                        *Prp;
-  VOID                          *PrpListHost;
-  UINTN                         PrpListNo;
-  UINT32                        Data;
+  NVME_CONTROLLER_PRIVATE_DATA   *Private;
+  EFI_STATUS                     Status;
+  EFI_STATUS                     PreviousStatus;
+  EFI_PCI_IO_PROTOCOL            *PciIo;
+  NVME_SQ                        *Sq;
+  NVME_CQ                        *Cq;
+  UINT16                         QueueId;
+  UINT32                         Bytes;
+  UINT16                         Offset;
+  EFI_EVENT                      TimerEvent;
+  EFI_PCI_IO_PROTOCOL_OPERATION  Flag;
+  EFI_PHYSICAL_ADDRESS           PhyAddr;
+  VOID                           *MapData;
+  VOID                           *MapMeta;
+  VOID                           *MapPrpList;
+  UINTN                          MapLength;
+  UINT64                         *Prp;
+  VOID                           *PrpListHost;
+  UINTN                          PrpListNo;
+  UINT32                         Attributes;
+  UINT32                         IoAlign;
+  UINT32                         MaxTransLen;
+  UINT32                         Data;
+  NVME_PASS_THRU_ASYNC_REQ       *AsyncRequest;
+  EFI_TPL                        OldTpl;
 
   //
   // check the data fields in Packet parameter.
@@ -392,7 +492,51 @@ NvmExpressPassThru (
     return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // 'Attributes' with neither EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_LOGICAL nor
+  // EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_PHYSICAL set is an illegal
+  // configuration.
+  //
+  Attributes  = This->Mode->Attributes;
+  if ((Attributes & (EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_PHYSICAL |
+    EFI_NVM_EXPRESS_PASS_THRU_ATTRIBUTES_LOGICAL)) == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Buffer alignment check for TransferBuffer & MetadataBuffer.
+  //
+  IoAlign     = This->Mode->IoAlign;
+  if (IoAlign > 0 && (((UINTN) Packet->TransferBuffer & (IoAlign - 1)) != 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (IoAlign > 0 && (((UINTN) Packet->MetadataBuffer & (IoAlign - 1)) != 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   Private     = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (This);
+
+  //
+  // Check NamespaceId is valid or not.
+  //
+  if ((NamespaceId > Private->ControllerData->Nn) &&
+      (NamespaceId != (UINT32) -1)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Check whether TransferLength exceeds the maximum data transfer size.
+  //
+  if (Private->ControllerData->Mdts != 0) {
+    MaxTransLen = (1 << (Private->ControllerData->Mdts)) *
+                  (1 << (Private->Cap.Mpsmin + 12));
+    if (Packet->TransferLength > MaxTransLen) {
+      Packet->TransferLength = MaxTransLen;
+      return EFI_BAD_BUFFER_SIZE;
+    }
+  }
+
   PciIo       = Private->PciIo;
   MapData     = NULL;
   MapMeta     = NULL;
@@ -403,9 +547,25 @@ NvmExpressPassThru (
   TimerEvent  = NULL;
   Status      = EFI_SUCCESS;
 
-  QueueType = Packet->QueueType;
-  Sq  = Private->SqBuffer[QueueType] + Private->SqTdbl[QueueType].Sqt;
-  Cq  = Private->CqBuffer[QueueType] + Private->CqHdbl[QueueType].Cqh;
+  if (Packet->QueueType == NVME_ADMIN_QUEUE) {
+    QueueId = 0;
+  } else {
+    if (Event == NULL) {
+      QueueId = 1;
+    } else {
+      QueueId = 2;
+
+      //
+      // Submission queue full check.
+      //
+      if ((Private->SqTdbl[QueueId].Sqt + 1) % (NVME_ASYNC_CSQ_SIZE + 1) ==
+          Private->AsyncSqHead) {
+        return EFI_NOT_READY;
+      }
+    }
+  }
+  Sq  = Private->SqBuffer[QueueId] + Private->SqTdbl[QueueId].Sqt;
+  Cq  = Private->CqBuffer[QueueId] + Private->CqHdbl[QueueId].Cqh;
 
   if (Packet->NvmeCmd->Nsid != NamespaceId) {
     return EFI_INVALID_PARAMETER;
@@ -414,7 +574,7 @@ NvmExpressPassThru (
   ZeroMem (Sq, sizeof (NVME_SQ));
   Sq->Opc  = (UINT8)Packet->NvmeCmd->Cdw0.Opcode;
   Sq->Fuse = (UINT8)Packet->NvmeCmd->Cdw0.FusedOperation;
-  Sq->Cid  = Private->Cid[QueueType]++;
+  Sq->Cid  = Private->Cid[QueueId]++;
   Sq->Nsid = Packet->NvmeCmd->Nsid;
 
   //
@@ -434,6 +594,10 @@ NvmExpressPassThru (
   // processor and a PCI Bus Master. It's caller's responsbility to ensure this.
   //
   if (((Sq->Opc & (BIT0 | BIT1)) != 0) && (Sq->Opc != NVME_ADMIN_CRIOCQ_CMD) && (Sq->Opc != NVME_ADMIN_CRIOSQ_CMD)) {
+    if ((Packet->TransferLength == 0) || (Packet->TransferBuffer == NULL)) {
+      return EFI_INVALID_PARAMETER;
+    }
+
     if ((Sq->Opc & BIT0) != 0) {
       Flag = EfiPciIoOperationBusMasterRead;
     } else {
@@ -456,8 +620,7 @@ NvmExpressPassThru (
     Sq->Prp[0] = PhyAddr;
     Sq->Prp[1] = 0;
 
-    MapLength = Packet->MetadataLength;
-    if(Packet->MetadataBuffer != NULL) {
+    if((Packet->MetadataLength != 0) && (Packet->MetadataBuffer != NULL)) {
       MapLength = Packet->MetadataLength;
       Status = PciIo->Map (
                         PciIo,
@@ -528,16 +691,53 @@ NvmExpressPassThru (
   //
   // Ring the submission queue doorbell.
   //
-  Private->SqTdbl[QueueType].Sqt ^= 1;
-  Data = ReadUnaligned32 ((UINT32*)&Private->SqTdbl[QueueType]);
-  PciIo->Mem.Write (
+  if ((Event != NULL) && (QueueId != 0)) {
+    Private->SqTdbl[QueueId].Sqt =
+      (Private->SqTdbl[QueueId].Sqt + 1) % (NVME_ASYNC_CSQ_SIZE + 1);
+  } else {
+    Private->SqTdbl[QueueId].Sqt ^= 1;
+  }
+  Data = ReadUnaligned32 ((UINT32*)&Private->SqTdbl[QueueId]);
+  Status = PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
-               NVME_SQTDBL_OFFSET(QueueType, Private->Cap.Dstrd),
+               NVME_SQTDBL_OFFSET(QueueId, Private->Cap.Dstrd),
                1,
                &Data
                );
+
+  if (EFI_ERROR (Status)) {
+    goto EXIT;
+  }
+
+  //
+  // For non-blocking requests, return directly if the command is placed
+  // in the submission queue.
+  //
+  if ((Event != NULL) && (QueueId != 0)) {
+    AsyncRequest = AllocateZeroPool (sizeof (NVME_PASS_THRU_ASYNC_REQ));
+    if (AsyncRequest == NULL) {
+      Status = EFI_DEVICE_ERROR;
+      goto EXIT;
+    }
+
+    AsyncRequest->Signature     = NVME_PASS_THRU_ASYNC_REQ_SIG;
+    AsyncRequest->Packet        = Packet;
+    AsyncRequest->CommandId     = Sq->Cid;
+    AsyncRequest->CallerEvent   = Event;
+    AsyncRequest->MapData       = MapData;
+    AsyncRequest->MapMeta       = MapMeta;
+    AsyncRequest->MapPrpList    = MapPrpList;
+    AsyncRequest->PrpListNo     = PrpListNo;
+    AsyncRequest->PrpListHost   = PrpListHost;
+
+    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
+    InsertTailList (&Private->AsyncPassThruQueue, &AsyncRequest->Link);
+    gBS->RestoreTPL (OldTpl);
+
+    return EFI_SUCCESS;
+  }
 
   Status = gBS->CreateEvent (
                   EVT_TIMER,
@@ -561,7 +761,7 @@ NvmExpressPassThru (
   //
   Status = EFI_TIMEOUT;
   while (EFI_ERROR (gBS->CheckEvent (TimerEvent))) {
-    if (Cq->Pt != Private->Pt[QueueType]) {
+    if (Cq->Pt != Private->Pt[QueueId]) {
       Status = EFI_SUCCESS;
       break;
     }
@@ -587,21 +787,72 @@ NvmExpressPassThru (
         NvmeDumpStatus(Cq);
       DEBUG_CODE_END();
     }
+  } else {
+    //
+    // Timeout occurs for an NVMe command. Reset the controller to abort the
+    // outstanding commands.
+    //
+    DEBUG ((DEBUG_ERROR, "NvmExpressPassThru: Timeout occurs for an NVMe command.\n"));
+
+    //
+    // Disable the timer to trigger the process of async transfers temporarily.
+    //
+    Status = gBS->SetTimer (Private->TimerEvent, TimerCancel, 0);
+    if (EFI_ERROR (Status)) {
+      goto EXIT;
+    }
+
+    //
+    // Reset the NVMe controller.
+    //
+    Status = NvmeControllerInit (Private);
+    if (!EFI_ERROR (Status)) {
+      Status = AbortAsyncPassThruTasks (Private);
+      if (!EFI_ERROR (Status)) {
+        //
+        // Re-enable the timer to trigger the process of async transfers.
+        //
+        Status = gBS->SetTimer (Private->TimerEvent, TimerPeriodic, NVME_HC_ASYNC_TIMER);
+        if (!EFI_ERROR (Status)) {
+          //
+          // Return EFI_TIMEOUT to indicate a timeout occurs for NVMe PassThru command.
+          //
+          Status = EFI_TIMEOUT;
+        }
+      }
+    } else {
+      Status = EFI_DEVICE_ERROR;
+    }
+
+    goto EXIT;
   }
 
-  if ((Private->CqHdbl[QueueType].Cqh ^= 1) == 0) {
-    Private->Pt[QueueType] ^= 1;
+  if ((Private->CqHdbl[QueueId].Cqh ^= 1) == 0) {
+    Private->Pt[QueueId] ^= 1;
   }
 
-  Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueType]);
-  PciIo->Mem.Write (
+  Data = ReadUnaligned32 ((UINT32*)&Private->CqHdbl[QueueId]);
+  PreviousStatus = Status;
+  Status = PciIo->Mem.Write (
                PciIo,
                EfiPciIoWidthUint32,
                NVME_BAR,
-               NVME_CQHDBL_OFFSET(QueueType, Private->Cap.Dstrd),
+               NVME_CQHDBL_OFFSET(QueueId, Private->Cap.Dstrd),
                1,
                &Data
                );
+  // The return status of PciIo->Mem.Write should not override
+  // previous status if previous status contains error.
+  Status = EFI_ERROR (PreviousStatus) ? PreviousStatus : Status;
+
+  //
+  // For now, the code does not support the non-blocking feature for admin queue.
+  // If Event is not NULL for admin queue, signal the caller's event here.
+  //
+  if (Event != NULL) {
+    ASSERT (QueueId == 0);
+    gBS->SignalEvent (Event);
+  }
 
 EXIT:
   if (MapData != NULL) {
@@ -712,11 +963,15 @@ NvmExpressGetNextNamespace (
 
     *NamespaceId = NextNamespaceId;
   } else {
-    if (*NamespaceId >= Private->ControllerData->Nn) {
+    if (*NamespaceId > Private->ControllerData->Nn) {
       return EFI_INVALID_PARAMETER;
     }
 
     NextNamespaceId = *NamespaceId + 1;
+    if (NextNamespaceId > Private->ControllerData->Nn) {
+      return EFI_NOT_FOUND;
+    }
+
     //
     // Allocate buffer for Identify Namespace data.
     //
@@ -774,6 +1029,7 @@ NvmExpressGetNamespace (
   )
 {
   NVME_NAMESPACE_DEVICE_PATH       *Node;
+  NVME_CONTROLLER_PRIVATE_DATA     *Private;
 
   if ((This == NULL) || (DevicePath == NULL) || (NamespaceId == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -783,10 +1039,19 @@ NvmExpressGetNamespace (
     return EFI_UNSUPPORTED;
   }
 
-  Node = (NVME_NAMESPACE_DEVICE_PATH *)DevicePath;
+  Node    = (NVME_NAMESPACE_DEVICE_PATH *)DevicePath;
+  Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (This);
 
   if (DevicePath->SubType == MSG_NVME_NAMESPACE_DP) {
     if (DevicePathNodeLength(DevicePath) != sizeof(NVME_NAMESPACE_DEVICE_PATH)) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
+    // Check NamespaceId in the device path node is valid or not.
+    //
+    if ((Node->NamespaceId == 0) ||
+      (Node->NamespaceId > Private->ControllerData->Nn)) {
       return EFI_NOT_FOUND;
     }
 
@@ -849,12 +1114,16 @@ NvmExpressBuildDevicePath (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (NamespaceId == 0) {
-    return EFI_NOT_FOUND;
-  }
-
   Status  = EFI_SUCCESS;
   Private = NVME_CONTROLLER_PRIVATE_DATA_FROM_PASS_THRU (This);
+
+  //
+  // Check NamespaceId is valid or not.
+  //
+  if ((NamespaceId == 0) ||
+    (NamespaceId > Private->ControllerData->Nn)) {
+    return EFI_NOT_FOUND;
+  }
 
   Node = (NVME_NAMESPACE_DEVICE_PATH *)AllocateZeroPool (sizeof (NVME_NAMESPACE_DEVICE_PATH));
   if (Node == NULL) {

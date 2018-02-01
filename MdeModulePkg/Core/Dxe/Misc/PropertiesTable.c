@@ -1,7 +1,7 @@
 /** @file
   UEFI PropertiesTable support
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -36,26 +36,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
 
-#define IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE SIGNATURE_32 ('I','P','R','C')
-
-typedef struct {
-  UINT32                 Signature;
-  LIST_ENTRY             Link;
-  EFI_PHYSICAL_ADDRESS   CodeSegmentBase;
-  UINT64                 CodeSegmentSize;
-} IMAGE_PROPERTIES_RECORD_CODE_SECTION;
-
-#define IMAGE_PROPERTIES_RECORD_SIGNATURE SIGNATURE_32 ('I','P','R','D')
-
-typedef struct {
-  UINT32                 Signature;
-  LIST_ENTRY             Link;
-  EFI_PHYSICAL_ADDRESS   ImageBase;
-  UINT64                 ImageSize;
-  UINTN                  CodeSegmentCount;
-  LIST_ENTRY             CodeSegmentList;
-} IMAGE_PROPERTIES_RECORD;
-
 #define IMAGE_PROPERTIES_PRIVATE_DATA_SIGNATURE SIGNATURE_32 ('I','P','P','D')
 
 typedef struct {
@@ -79,6 +59,8 @@ EFI_PROPERTIES_TABLE  mPropertiesTable = {
 };
 
 EFI_LOCK           mPropertiesTableLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
+
+BOOLEAN            mPropertiesTableEnable;
 
 //
 // Below functions are for MemoryMap
@@ -200,7 +182,6 @@ SortMemoryMap (
                                  it is the size of new memory map after merge.
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
-STATIC
 VOID
 MergeMemoryMap (
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
@@ -221,14 +202,24 @@ MergeMemoryMap (
     CopyMem (NewMemoryMapEntry, MemoryMapEntry, sizeof(EFI_MEMORY_DESCRIPTOR));
     NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
 
-    MemoryBlockLength = (UINT64) (EfiPagesToSize (MemoryMapEntry->NumberOfPages));
-    if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
-        (MemoryMapEntry->Type == NextMemoryMapEntry->Type) &&
-        (MemoryMapEntry->Attribute == NextMemoryMapEntry->Attribute) &&
-        ((MemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart)) {
-      NewMemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
-      MemoryMapEntry = NextMemoryMapEntry;
-    }
+    do {
+      MemoryBlockLength = (UINT64) (EfiPagesToSize (MemoryMapEntry->NumberOfPages));
+      if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
+          (MemoryMapEntry->Type == NextMemoryMapEntry->Type) &&
+          (MemoryMapEntry->Attribute == NextMemoryMapEntry->Attribute) &&
+          ((MemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart)) {
+        MemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
+        if (NewMemoryMapEntry != MemoryMapEntry) {
+          NewMemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
+        }
+
+        NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+        continue;
+      } else {
+        MemoryMapEntry = PREVIOUS_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
+        break;
+      }
+    } while (TRUE);
 
     MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
     NewMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NewMemoryMapEntry, DescriptorSize);
@@ -374,7 +365,11 @@ SetNewRecord (
       //
       // DATA
       //
-      NewRecord->Type = EfiRuntimeServicesData;
+      if (!mPropertiesTableEnable) {
+        NewRecord->Type = TempRecord.Type;
+      } else {
+        NewRecord->Type = EfiRuntimeServicesData;
+      }
       NewRecord->PhysicalStart = TempRecord.PhysicalStart;
       NewRecord->VirtualStart  = 0;
       NewRecord->NumberOfPages = EfiSizeToPages(ImageRecordCodeSection->CodeSegmentBase - NewRecord->PhysicalStart);
@@ -387,7 +382,11 @@ SetNewRecord (
       //
       // CODE
       //
-      NewRecord->Type = EfiRuntimeServicesCode;
+      if (!mPropertiesTableEnable) {
+        NewRecord->Type = TempRecord.Type;
+      } else {
+        NewRecord->Type = EfiRuntimeServicesCode;
+      }
       NewRecord->PhysicalStart = ImageRecordCodeSection->CodeSegmentBase;
       NewRecord->VirtualStart  = 0;
       NewRecord->NumberOfPages = EfiSizeToPages(ImageRecordCodeSection->CodeSegmentSize);
@@ -411,7 +410,11 @@ SetNewRecord (
   // Final DATA
   //
   if (TempRecord.PhysicalStart < ImageEnd) {
-    NewRecord->Type = EfiRuntimeServicesData;
+    if (!mPropertiesTableEnable) {
+      NewRecord->Type = TempRecord.Type;
+    } else {
+      NewRecord->Type = EfiRuntimeServicesData;
+    }
     NewRecord->PhysicalStart = TempRecord.PhysicalStart;
     NewRecord->VirtualStart  = 0;
     NewRecord->NumberOfPages = EfiSizeToPages (ImageEnd - TempRecord.PhysicalStart);
@@ -493,6 +496,7 @@ SplitRecord (
   UINT64                  PhysicalEnd;
   UINTN                   NewRecordCount;
   UINTN                   TotalNewRecordCount;
+  BOOLEAN                 IsLastRecordData;
 
   if (MaxSplitRecordCount == 0) {
     CopyMem (NewRecord, OldRecord, DescriptorSize);
@@ -520,7 +524,17 @@ SplitRecord (
         // If this is still address in this record, need record.
         //
         NewRecord = PREVIOUS_MEMORY_DESCRIPTOR (NewRecord, DescriptorSize);
-        if (NewRecord->Type == EfiRuntimeServicesData) {
+        IsLastRecordData = FALSE;
+        if (!mPropertiesTableEnable) {
+          if ((NewRecord->Attribute & EFI_MEMORY_XP) != 0) {
+            IsLastRecordData = TRUE;
+          }
+        } else {
+          if (NewRecord->Type == EfiRuntimeServicesData) {
+            IsLastRecordData = TRUE;
+          }
+        }
+        if (IsLastRecordData) {
           //
           // Last record is DATA, just merge it.
           //
@@ -530,7 +544,11 @@ SplitRecord (
           // Last record is CODE, create a new DATA entry.
           //
           NewRecord = NEXT_MEMORY_DESCRIPTOR (NewRecord, DescriptorSize);
-          NewRecord->Type = EfiRuntimeServicesData;
+          if (!mPropertiesTableEnable) {
+            NewRecord->Type = TempRecord.Type;
+          } else {
+            NewRecord->Type = EfiRuntimeServicesData;
+          }
           NewRecord->PhysicalStart = TempRecord.PhysicalStart;
           NewRecord->VirtualStart  = 0;
           NewRecord->NumberOfPages = TempRecord.NumberOfPages;
@@ -557,6 +575,11 @@ SplitRecord (
     TempRecord.NumberOfPages = EfiSizeToPages (PhysicalEnd - PhysicalStart);
   } while ((ImageRecord != NULL) && (PhysicalStart < PhysicalEnd));
 
+  //
+  // The logic in function SplitTable() ensures that TotalNewRecordCount will not be zero if the
+  // code reaches here.
+  //
+  ASSERT (TotalNewRecordCount != 0);
   return TotalNewRecordCount - 1;
 }
 
@@ -686,7 +709,7 @@ SplitTable (
 }
 
 /**
-  This function for GetMemoryMap() with properties table.
+  This function for GetMemoryMap() with properties table capability.
 
   It calls original GetMemoryMap() to get the original memory map information. Then
   plus the additional memory map entries for PE Code/Data seperation.
@@ -717,10 +740,9 @@ SplitTable (
   @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
 
 **/
-STATIC
 EFI_STATUS
 EFIAPI
-CoreGetMemoryMapPropertiesTable (
+CoreGetMemoryMapWithSeparatedImageSection (
   IN OUT UINTN                  *MemoryMapSize,
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
   OUT UINTN                     *MapKey,
@@ -752,6 +774,7 @@ CoreGetMemoryMapPropertiesTable (
   if (Status == EFI_BUFFER_TOO_SMALL) {
     *MemoryMapSize = *MemoryMapSize + (*DescriptorSize) * AdditionalRecordCount;
   } else if (Status == EFI_SUCCESS) {
+    ASSERT (MemoryMap != NULL);
     if (OldMemoryMapSize - *MemoryMapSize < (*DescriptorSize) * AdditionalRecordCount) {
       *MemoryMapSize = *MemoryMapSize + (*DescriptorSize) * AdditionalRecordCount;
       //
@@ -775,7 +798,7 @@ CoreGetMemoryMapPropertiesTable (
 //
 
 /**
-  Set PropertiesTable accroding to PE/COFF image section alignment.
+  Set PropertiesTable according to PE/COFF image section alignment.
 
   @param  SectionAlignment    PE/COFF section alignment
 **/
@@ -785,7 +808,7 @@ SetPropertiesTableSectionAlignment (
   IN UINT32  SectionAlignment
   )
 {
-  if (((SectionAlignment & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) != 0) &&
+  if (((SectionAlignment & (RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1)) != 0) &&
       ((mPropertiesTable.MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) != 0)) {
     DEBUG ((EFI_D_VERBOSE, "SetPropertiesTableSectionAlignment - Clear\n"));
     mPropertiesTable.MemoryProtectionAttribute &= ~((UINT64)EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA);
@@ -825,7 +848,6 @@ SwapImageRecordCodeSection (
 
   @param  ImageRecord    image record to be sorted
 **/
-STATIC
 VOID
 SortImageRecordCodeSection (
   IN IMAGE_PROPERTIES_RECORD              *ImageRecord
@@ -876,7 +898,6 @@ SortImageRecordCodeSection (
   @retval TRUE  image record is valid
   @retval FALSE image record is invalid
 **/
-STATIC
 BOOLEAN
 IsImageRecordCodeSectionValid (
   IN IMAGE_PROPERTIES_RECORD              *ImageRecord
@@ -1119,12 +1140,12 @@ InsertImageRecord (
   }
 
   SetPropertiesTableSectionAlignment (SectionAlignment);
-  if ((SectionAlignment & (EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT - 1)) != 0) {
-    DEBUG ((EFI_D_ERROR, "!!!!!!!!  InsertImageRecord - Section Alignment(0x%x) is not %dK  !!!!!!!!\n",
-      SectionAlignment, EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT >> 10));
+  if ((SectionAlignment & (RUNTIME_PAGE_ALLOCATION_GRANULARITY - 1)) != 0) {
+    DEBUG ((EFI_D_WARN, "!!!!!!!!  InsertImageRecord - Section Alignment(0x%x) is not %dK  !!!!!!!!\n",
+      SectionAlignment, RUNTIME_PAGE_ALLOCATION_GRANULARITY >> 10));
     PdbPointer = PeCoffLoaderGetPdbPointer ((VOID*) (UINTN) ImageAddress);
     if (PdbPointer != NULL) {
-      DEBUG ((EFI_D_ERROR, "!!!!!!!!  Image - %a  !!!!!!!!\n", PdbPointer));
+      DEBUG ((EFI_D_WARN, "!!!!!!!!  Image - %a  !!!!!!!!\n", PdbPointer));
     }
     goto Finish;
   }
@@ -1208,18 +1229,18 @@ InsertImageRecord (
   InsertTailList (&mImagePropertiesPrivateData.ImageRecordList, &ImageRecord->Link);
   mImagePropertiesPrivateData.ImageRecordCount++;
 
-  SortImageRecord ();
-
   if (mImagePropertiesPrivateData.CodeSegmentCountMax < ImageRecord->CodeSegmentCount) {
     mImagePropertiesPrivateData.CodeSegmentCountMax = ImageRecord->CodeSegmentCount;
   }
+
+  SortImageRecord ();
 
 Finish:
   return ;
 }
 
 /**
-  Find image record accroding to image base and size.
+  Find image record according to image base and size.
 
   @param  ImageBase    Base of PE image
   @param  ImageSize    Size of PE image
@@ -1320,16 +1341,20 @@ InstallPropertiesTable (
 
     DEBUG ((EFI_D_INFO, "MemoryProtectionAttribute - 0x%016lx\n", mPropertiesTable.MemoryProtectionAttribute));
     if ((mPropertiesTable.MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) == 0) {
+      DEBUG ((EFI_D_ERROR, "MemoryProtectionAttribute NON_EXECUTABLE_PE_DATA is not set, "));
+      DEBUG ((EFI_D_ERROR, "because Runtime Driver Section Alignment is not %dK.\n", RUNTIME_PAGE_ALLOCATION_GRANULARITY >> 10));
       return ;
     }
 
-    gBS->GetMemoryMap = CoreGetMemoryMapPropertiesTable;
+    gBS->GetMemoryMap = CoreGetMemoryMapWithSeparatedImageSection;
     gBS->Hdr.CRC32 = 0;
     gBS->CalculateCrc32 ((UINT8 *)gBS, gBS->Hdr.HeaderSize, &gBS->Hdr.CRC32);
 
     DEBUG ((EFI_D_VERBOSE, "Total Image Count - 0x%x\n", mImagePropertiesPrivateData.ImageRecordCount));
     DEBUG ((EFI_D_VERBOSE, "Dump ImageRecord:\n"));
     DumpImageRecord ();
+
+    mPropertiesTableEnable = TRUE;
   }
 }
 

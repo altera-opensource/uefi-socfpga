@@ -1,7 +1,7 @@
 /** @file
   The application to show the Boot Manager Menu.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -57,7 +57,7 @@ PrintStringAt (
 }
 
 /**
-  Prints a chracter to the default console, at
+  Prints a character to the default console, at
   the supplied cursor position, using L"%c" format.
 
   @param  Column     The cursor position to print the string at.
@@ -79,7 +79,7 @@ PrintCharAt (
 }
 
 /**
-  Count the storage space of a Unicode string which uses current lanaguag to get 
+  Count the storage space of a Unicode string which uses current language to get
   from input string ID.
 
   @param StringId          The input string to be counted.
@@ -147,7 +147,7 @@ GetLineWidth (
 /**
   This function uses calculate the boot menu location, size and scroll bar information.
 
-  @param  BootMenuData            The boot menu data to be proccessed.
+  @param  BootMenuData            The boot menu data to be processed.
 
   @return EFI_SUCCESS             calculate boot menu information successful.
   @retval EFI_INVALID_PARAMETER   Input parameter is invalid   
@@ -219,7 +219,7 @@ InitializeBootMenuScreen (
   return EFI_SUCCESS;
 }
 /**
-  This funciton uses check boot option is wheher setup application or no
+  This function uses check boot option is wheher setup application or no
 
   @param   BootOption   Pointer to EFI_BOOT_MANAGER_LOAD_OPTION array.
   
@@ -242,10 +242,51 @@ IsBootManagerMenu (
 
   return (BOOLEAN) (!EFI_ERROR (Status) && (BootOption->OptionNumber == BootManagerMenu.OptionNumber));
 }
- 
 
 /**
-  This funciton uses to initialize boot menu data
+  Return whether to ignore the boot option.
+
+  @param BootOption  Pointer to EFI_BOOT_MANAGER_LOAD_OPTION to check.
+
+  @retval TRUE  Ignore the boot option.
+  @retval FALSE Do not ignore the boot option.
+**/
+BOOLEAN
+IgnoreBootOption (
+  IN   EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_DEVICE_PATH_PROTOCOL      *ImageDevicePath;
+
+  //
+  // Ignore myself.
+  //
+  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageDevicePathProtocolGuid, (VOID **) &ImageDevicePath);
+  ASSERT_EFI_ERROR (Status);
+  if (CompareMem (BootOption->FilePath, ImageDevicePath, GetDevicePathSize (ImageDevicePath)) == 0) {
+    return TRUE;
+  }
+
+  //
+  // Do not ignore Boot Manager Menu.
+  //
+  if (IsBootManagerMenu (BootOption)) {
+    return FALSE;
+  }
+
+  //
+  // Ignore the hidden/inactive boot option.
+  //
+  if (((BootOption->Attributes & LOAD_OPTION_HIDDEN) != 0) || ((BootOption->Attributes & LOAD_OPTION_ACTIVE) == 0)) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+  This function uses to initialize boot menu data
 
   @param   BootOption             Pointer to EFI_BOOT_MANAGER_LOAD_OPTION array.
   @param   BootOptionCount        Number of boot option.
@@ -267,8 +308,8 @@ InitializeBootMenuData (
       
   if (BootOption == NULL || BootMenuData == NULL) {
     return EFI_INVALID_PARAMETER;
-  } 
-  
+  }
+
   BootMenuData->TitleToken[0] = STRING_TOKEN (STR_BOOT_POPUP_MENU_TITLE_STRING);
   BootMenuData->PtrTokens     = AllocateZeroPool (BootOptionCount * sizeof (EFI_STRING_ID));
   ASSERT (BootMenuData->PtrTokens != NULL);
@@ -277,13 +318,10 @@ InitializeBootMenuData (
   // Skip boot option which created by BootNext Variable
   //
   for (StrIndex = 0, Index = 0; Index < BootOptionCount; Index++) {
-    //
-    // Don't display the hidden/inactive boot option except setup application.
-    //
-    if ((((BootOption[Index].Attributes & LOAD_OPTION_HIDDEN) != 0) || ((BootOption[Index].Attributes & LOAD_OPTION_ACTIVE) == 0)) &&
-        !IsBootManagerMenu (&BootOption[Index])) {      
+    if (IgnoreBootOption (&BootOption[Index])) {
       continue;
     }
+
     ASSERT (BootOption[Index].Description != NULL);
     BootMenuData->PtrTokens[StrIndex++] = HiiSetString (
                                             gStringPackHandle, 
@@ -307,7 +345,7 @@ InitializeBootMenuData (
   and set current selected item in BootMenuData
 
   @param  WantSelectItem          The user wants to select item.
-  @param  BootMenuData            The boot menu data to be proccessed
+  @param  BootMenuData            The boot menu data to be processed
 
   @return EFI_SUCCESS             Highlight selected item and update current selected 
                                   item successful 
@@ -336,6 +374,7 @@ BootMenuSelectItem (
   if (BootMenuData == NULL || WantSelectItem >= BootMenuData->ItemCount) {
     return EFI_INVALID_PARAMETER;
   }
+  ASSERT (BootMenuData->ItemCount != 0);
   SavedAttribute = gST->ConOut->Mode->Attribute;
   RePaintItems = FALSE;
   StartCol = BootMenuData->MenuScreen.StartCol;
@@ -447,7 +486,7 @@ BootMenuSelectItem (
 }
 
 /**
-  This funciton uses to draw boot popup menu
+  This function uses to draw boot popup menu
 
   @param   BootMenuData           The Input BootMenuData to be processed.
   
@@ -462,7 +501,6 @@ DrawBootPopupMenu (
   EFI_STRING            String;
   UINTN                 Index;
   UINTN                 Width;  
-  UINTN                 Height;
   UINTN                 StartCol;
   UINTN                 StartRow;
   UINTN                 PrintRow;
@@ -476,7 +514,6 @@ DrawBootPopupMenu (
   SavedAttribute = gST->ConOut->Mode->Attribute;
   gST->ConOut->SetAttribute (gST->ConOut, EFI_WHITE | EFI_BACKGROUND_BLUE);
   Width    = BootMenuData->MenuScreen.Width;
-  Height   = BootMenuData->MenuScreen.Height;
   StartCol = BootMenuData->MenuScreen.StartCol;
   StartRow = BootMenuData->MenuScreen.StartRow;
   ItemCountPerScreen = BootMenuData->ScrollBarControl.ItemCountPerScreen;
@@ -608,7 +645,7 @@ DrawBootPopupMenu (
 }
 
 /**
-  This funciton uses to boot from selected item 
+  This function uses to boot from selected item 
 
   @param   BootOptions            Pointer to EFI_BOOT_MANAGER_LOAD_OPTION array.
   @param   BootOptionCount        Number of boot option.
@@ -627,13 +664,10 @@ BootFromSelectOption (
   ASSERT (BootOptions != NULL);
 
   for (ItemNum = 0, Index = 0; Index < BootOptionCount; Index++) {
-    //
-    // Don't display the hidden/inactive boot option except setup application.
-    //
-    if ((((BootOptions[Index].Attributes & LOAD_OPTION_HIDDEN) != 0) || ((BootOptions[Index].Attributes & LOAD_OPTION_ACTIVE) == 0)) &&
-        !IsBootManagerMenu (&BootOptions[Index])) {      
+    if (IgnoreBootOption (&BootOptions[Index])) {
       continue;
     }
+
     if (ItemNum++ == SelectItem) {
       EfiBootManagerBoot (&BootOptions[Index]);
       break;
@@ -705,7 +739,7 @@ BdsSetConsoleMode (
 
   if (IsSetupMode) {
     //
-    // The requried resolution and text mode is setup mode.
+    // The required resolution and text mode is setup mode.
     //
     NewHorizontalResolution = mSetupHorizontalResolution;
     NewVerticalResolution   = mSetupVerticalResolution;
@@ -761,7 +795,7 @@ BdsSetConsoleMode (
             return EFI_SUCCESS;
           } else {
             //
-            // If current text mode is different from requried text mode.  Set new video mode
+            // If current text mode is different from required text mode.  Set new video mode
             //
             for (Index = 0; Index < MaxTextMode; Index++) {
               Status = SimpleTextOut->QueryMode (SimpleTextOut, Index, &CurrentColumn, &CurrentRow);
@@ -775,8 +809,10 @@ BdsSetConsoleMode (
                   //
                   // Update text mode PCD.
                   //
-                  PcdSet32 (PcdConOutColumn, mSetupTextModeColumn);
-                  PcdSet32 (PcdConOutRow, mSetupTextModeRow);
+                  Status = PcdSet32S (PcdConOutColumn, mSetupTextModeColumn);
+                  ASSERT_EFI_ERROR (Status);
+                  Status = PcdSet32S (PcdConOutRow, mSetupTextModeRow);
+                  ASSERT_EFI_ERROR (Status);
                   FreePool (Info);
                   return EFI_SUCCESS;
                 }
@@ -784,7 +820,7 @@ BdsSetConsoleMode (
             }
             if (Index == MaxTextMode) {
               //
-              // If requried text mode is not supported, return error.
+              // If required text mode is not supported, return error.
               //
               FreePool (Info);
               return EFI_UNSUPPORTED;
@@ -817,11 +853,14 @@ BdsSetConsoleMode (
   // Set PCD to Inform GraphicsConsole to change video resolution.
   // Set PCD to Inform Consplitter to change text mode.
   //
-  PcdSet32 (PcdVideoHorizontalResolution, NewHorizontalResolution);
-  PcdSet32 (PcdVideoVerticalResolution, NewVerticalResolution);
-  PcdSet32 (PcdConOutColumn, NewColumns);
-  PcdSet32 (PcdConOutRow, NewRows);
-  
+  Status = PcdSet32S (PcdVideoHorizontalResolution, NewHorizontalResolution);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdVideoVerticalResolution, NewVerticalResolution);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdConOutColumn, NewColumns);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdConOutRow, NewRows);
+  ASSERT_EFI_ERROR (Status);
   
   //
   // Video mode is changed, so restart graphics console driver and higher level driver.

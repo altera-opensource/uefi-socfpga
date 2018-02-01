@@ -2,7 +2,7 @@
   This library is only intended to be used by UEFI network stack modules.
   It provides the combined IpIo layer on the EFI IP4 Protocol and EFI IP6 protocol.
 
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -261,6 +261,8 @@ typedef struct _IP_IO {
   PKT_RCVD_NOTIFY               PktRcvdNotify;   ///< See IP_IO_OPEN_DATA::PktRcvdNotify.
   PKT_SENT_NOTIFY               PktSentNotify;   ///< See IP_IO_OPEN_DATA::PktSentNotify.
   UINT8                         IpVersion;
+  IP4_ADDR                      StationIp;
+  IP4_ADDR                      SubnetMask;
 } IP_IO;
 
 ///
@@ -357,8 +359,9 @@ IpIoDestroy (
 
   @param[in, out]  IpIo            The pointer to the IP_IO instance that needs to stop.
 
-  @retval          EFI_SUCCESS     The IP_IO instance stopped successfully.
-  @retval          Others          Anrror condition occurred.
+  @retval          EFI_SUCCESS            The IP_IO instance stopped successfully.
+  @retval          EFI_INVALID_PARAMETER  Invalid input parameter.
+  @retval          Others                 Anrror condition occurred.
 
 **/
 EFI_STATUS
@@ -379,11 +382,13 @@ IpIoStop (
   @param[in]       OpenData           The configuration data and callbacks for
                                       the IP_IO instance.
 
-  @retval          EFI_SUCCESS        The IP_IO instance opened with OpenData
-                                      successfully.
-  @retval          EFI_ACCESS_DENIED  The IP_IO instance is configured; avoid  
-                                      reopening it.
-  @retval          Others             An error condition occurred.
+  @retval          EFI_SUCCESS            The IP_IO instance opened with OpenData
+                                          successfully.
+  @retval          EFI_ACCESS_DENIED      The IP_IO instance is configured, avoid to 
+                                          reopen it.
+  @retval          EFI_UNSUPPORTED        IPv4 RawData mode is no supported.
+  @retval          EFI_INVALID_PARAMETER  Invalid input parameter.
+  @retval          Others                 Error condition occurred.
 
 **/
 EFI_STATUS
@@ -397,23 +402,26 @@ IpIoOpen (
   Send out an IP packet.
   
   This function is called after IpIoOpen(). The data to be sent are wrapped in
-  Pkt. The IP instance wrapped in IpIo is used for sending by default, but can be
-  overriden by Sender. Other sending configurations, such as source address and gateway
-  address, are specified in OverrideData.
+  Pkt. The IP instance wrapped in IpIo is used for sending by default but can be
+  overriden by Sender. Other sending configs, like source address and gateway
+  address etc., are specified in OverrideData.
 
-  @param[in, out]  IpIo                  The pointer to an IP_IO instance used for sending IP
+  @param[in, out]  IpIo                  Pointer to an IP_IO instance used for sending IP
                                          packet.
-  @param[in, out]  Pkt                   The pointer to the IP packet to be sent.
-  @param[in]       Sender                Optional. The IP protocol instance used for sending.
-  @param[in]       Context               The optional context data.
-  @param[in]       NotifyData            The optional notify data.
+  @param[in, out]  Pkt                   Pointer to the IP packet to be sent.
+  @param[in]       Sender                The IP protocol instance used for sending.
+  @param[in]       Context               Optional context data.
+  @param[in]       NotifyData            Optional notify data.
   @param[in]       Dest                  The destination IP address to send this packet to.
+                                         This parameter is optional when using IPv6.
   @param[in]       OverrideData          The data to override some configuration of the IP
                                          instance used for sending.
 
-  @retval          EFI_SUCCESS           The operation completed successfully.
+  @retval          EFI_SUCCESS           The operation is completed successfully.
+  @retval          EFI_INVALID_PARAMETER The input parameter is not correct.
   @retval          EFI_NOT_STARTED       The IpIo is not configured.
-  @retval          EFI_OUT_OF_RESOURCES  Failed due to resource limitations.
+  @retval          EFI_OUT_OF_RESOURCES  Failed due to resource limit.
+  @retval          Others                Error condition occurred.
 
 **/
 EFI_STATUS
@@ -424,7 +432,7 @@ IpIoSend (
   IN     IP_IO_IP_INFO  *Sender        OPTIONAL,
   IN     VOID           *Context       OPTIONAL,
   IN     VOID           *NotifyData    OPTIONAL,
-  IN     EFI_IP_ADDRESS *Dest,
+  IN     EFI_IP_ADDRESS *Dest          OPTIONAL,
   IN     IP_IO_OVERRIDE *OverrideData  OPTIONAL
   );
 
@@ -516,7 +524,7 @@ IpIoRemoveIp (
   @param[in]       Src               The local IP address.
 
   @return The pointer to the IP protocol can be used for sending purpose and its local
-          address is the same with Src.
+          address is the same with Src. NULL if failed.
 
 **/
 IP_IO_IP_INFO *
@@ -539,6 +547,7 @@ IpIoFindSender (
   @param[out]  IsHard                If TRUE, indicates that it is a hard error.
   @param[out]  Notify                If TRUE, SockError needs to be notified.
 
+  @retval EFI_UNSUPPORTED            Unrecognizable ICMP error code
   @return The ICMP Error Status, such as EFI_NETWORK_UNREACHABLE.
 
 **/
@@ -572,6 +581,7 @@ IpIoGetIcmpErrStatus (
   @retval      EFI_INVALID_PARAMETER The Neighbor Address is invalid.
   @retval      EFI_NOT_FOUND         The neighbor cache entry is not in the 
                                      neighbor table.  
+  @retval      EFI_UNSUPPORTED       IP version is IPv4, which doesn't support neighbor cache refresh.
   @retval      EFI_OUT_OF_RESOURCES  Failed due to resource limitations.
 
 **/

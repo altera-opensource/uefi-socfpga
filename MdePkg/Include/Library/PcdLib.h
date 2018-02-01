@@ -14,7 +14,7 @@
   There are no restrictions on the use of FeaturePcd(), FixedPcdGetXX(),
   PatchPcdGetXX(), and PatchPcdSetXX().
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,15 +28,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __PCD_LIB_H__
 #define __PCD_LIB_H__
 
-#define PCD_MAX_SKU_ID           0x100
-
 
 /**
   Retrieves a token number based on a token name.
 
- Returns the token number associated with the PCD token specified by TokenName.
+  Returns the token number associated with the PCD token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve the token number for.
 
@@ -51,7 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the Boolean value for the PCD feature flag specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a feature flag PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -66,7 +63,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the 8-bit value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a fixed at build PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -81,7 +78,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the 16-bit value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a fixed at build PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -96,7 +93,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the 32-bit value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a fixed at build PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -111,7 +108,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the 64-bit value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a fixed at build PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -126,7 +123,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the Boolean value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a fixed at build PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -141,7 +138,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns a pointer to the buffer for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a fixed at build PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -156,7 +153,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the 8-bit value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -170,7 +167,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the 16-bit value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -185,7 +182,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the 32-bit value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -200,7 +197,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the 64-bit value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -215,7 +212,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns the Boolean value for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -230,7 +227,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Returns a pointer to the buffer for the token specified by TokenName.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the PCD token to retrieve a current value for.
 
@@ -245,7 +242,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Sets the 8-bit value for the token specified by TokenName. Value is returned.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The 8-bit value to set.
@@ -261,7 +258,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Sets the 16-bit value for the token specified by TokenName. Value is returned.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The 16-bit value to set.
@@ -277,7 +274,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Sets the 32-bit value for the token specified by TokenName. Value is returned.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The 32-bit value to set.
@@ -293,7 +290,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Sets the 64-bit value for the token specified by TokenName. Value is returned.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The 64-bit value to set.
@@ -309,7 +306,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Sets the Boolean value for the token specified by TokenName. Value is returned.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
 
   @param   TokenName  The name of the binary patchable PCD token to set the current value for.
   @param   Value      The boolean value to set.
@@ -329,7 +326,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   was not actually performed.  If SizeOfBuffer is set to MAX_ADDRESS, then SizeOfBuffer must be 
   set to the maximum size supported by TokenName and NULL must be returned.
   If TokenName is not a valid token in the token space, then the module will not build.
-  If TokenName is not a feature flag, then the module will not build.
+  If TokenName is not a patchable in module PCD, then the module will not build.
   
   If SizeOfBuffer is NULL, then ASSERT().
   If SizeOfBuffer > 0 and Buffer is NULL, then ASSERT().
@@ -690,6 +687,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Retrieves a token number based on a GUID and a token name.
 
   Returns the token number for the token specified by Guid and TokenName.
+  If TokenName is not a valid token in the token space, then the module will not build.
 
   @param   Guid        Pointer to a 128-bit unique value that designates 
                        which namespace to retrieve a value from.
@@ -1074,7 +1072,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   This function provides a means by which SKU support can be established in the PCD infrastructure.
 
   Sets the current SKU in the PCD database to the value specified by SkuId.  SkuId is returned.
-  If SkuId >= PCD_MAX_SKU_ID, then ASSERT(). 
 
   @param  SkuId   The SKU value that will be used when the PCD service retrieves and sets values
                   associated with a PCD token.
@@ -2249,8 +2246,6 @@ LibPcdGetInfoEx (
 
 /**
   Retrieve the currently set SKU Id.
-
-  If the sku id got >= PCD_MAX_SKU_ID, then ASSERT().
 
   @return   The currently set SKU Id. If the platform has not set at a SKU Id, then the
             default SKU Id value of 0 is returned. If the platform has set a SKU Id, then the currently set SKU

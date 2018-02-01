@@ -3,7 +3,8 @@
   and volatile storage space and install variable architecture protocol.
 
 Copyright (C) 2013, Red Hat, Inc.
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,18 +17,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Variable.h"
 
-extern VARIABLE_STORE_HEADER   *mNvVariableCache;
-extern VARIABLE_INFO_ENTRY     *gVariableInfo;
-EFI_HANDLE                     mHandle                    = NULL;
-EFI_EVENT                      mVirtualAddressChangeEvent = NULL;
-EFI_EVENT                      mFtwRegistration           = NULL;
-extern BOOLEAN                 mEndOfDxe;
-VOID                           ***mVarCheckAddressPointer = NULL;
-UINTN                          mVarCheckAddressPointerCount = 0;
-EDKII_VARIABLE_LOCK_PROTOCOL   mVariableLock              = { VariableLockRequestToLock };
-EDKII_VAR_CHECK_PROTOCOL       mVarCheck                  = { VarCheckRegisterSetVariableCheckHandler,
-                                                              VarCheckVariablePropertySet,
-                                                              VarCheckVariablePropertyGet };
+extern VARIABLE_STORE_HEADER        *mNvVariableCache;
+extern EFI_FIRMWARE_VOLUME_HEADER   *mNvFvHeaderCache;
+extern VARIABLE_INFO_ENTRY          *gVariableInfo;
+EFI_HANDLE                          mHandle                    = NULL;
+EFI_EVENT                           mVirtualAddressChangeEvent = NULL;
+EFI_EVENT                           mFtwRegistration           = NULL;
+extern BOOLEAN                      mEndOfDxe;
+VOID                                ***mVarCheckAddressPointer = NULL;
+UINTN                               mVarCheckAddressPointerCount = 0;
+EDKII_VARIABLE_LOCK_PROTOCOL        mVariableLock              = { VariableLockRequestToLock };
+EDKII_VAR_CHECK_PROTOCOL            mVarCheck                  = { VarCheckRegisterSetVariableCheckHandler,
+                                                                    VarCheckVariablePropertySet,
+                                                                    VarCheckVariablePropertyGet };
+
+/**
+  Some Secure Boot Policy Variable may update following other variable changes(SecureBoot follows PK change, etc).
+  Record their initial State when variable write service is ready.
+
+**/
+VOID
+EFIAPI
+RecordSecureBootPolicyVarData(
+  VOID
+  );
 
 /**
   Return TRUE if ExitBootServices () has been called.
@@ -115,7 +128,7 @@ ReleaseLockOnlyAtBootTime (
 }
 
 /**
-  Retrive the Fault Tolerent Write protocol interface.
+  Retrieve the Fault Tolerent Write protocol interface.
 
   @param[out] FtwProtocol       The interface of Ftw protocol
 
@@ -143,7 +156,7 @@ GetFtwProtocol (
 }
 
 /**
-  Retrive the FVB protocol interface by HANDLE.
+  Retrieve the FVB protocol interface by HANDLE.
 
   @param[in]  FvBlockHandle     The handle of FVB protocol that provides services for
                                 reading, writing, and erasing the target block.
@@ -243,6 +256,7 @@ VariableClassAddressChangeEvent (
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->VariableGlobal.HobVariableBase);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal);
   EfiConvertPointer (0x0, (VOID **) &mNvVariableCache);
+  EfiConvertPointer (0x0, (VOID **) &mNvFvHeaderCache);
 
   if (mAuthContextOut.AddressPointer != NULL) {
     for (Index = 0; Index < mAuthContextOut.AddressPointerCount; Index++) {
@@ -277,6 +291,7 @@ OnReadyToBoot (
   )
 {
   if (!mEndOfDxe) {
+    MorLockInitAtEndOfDxe ();
     //
     // Set the End Of DXE bit in case the EFI_END_OF_DXE_EVENT_GROUP_GUID event is not signaled.
     //
@@ -316,6 +331,7 @@ OnEndOfDxe (
   )
 {
   DEBUG ((EFI_D_INFO, "[Variable]END_OF_DXE is signaled\n"));
+  MorLockInitAtEndOfDxe ();
   mEndOfDxe = TRUE;
   mVarCheckAddressPointer = VarCheckLibInitializeAtEndOfDxe (&mVarCheckAddressPointerCount);
   //
@@ -410,6 +426,12 @@ FtwNotificationEvent (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Variable write service initialization failed. Status = %r\n", Status));
   }
+
+  //
+  // Some Secure Boot Policy Var (SecureBoot, etc) updates following other
+  // Secure Boot Policy Variable change. Record their initial value.
+  //
+  RecordSecureBootPolicyVarData();
 
   //
   // Install the Variable Write Architectural protocol.

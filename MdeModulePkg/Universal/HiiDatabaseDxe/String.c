@@ -2,7 +2,8 @@
 Implementation for EFI_HII_STRING_PROTOCOL.
 
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -105,7 +106,7 @@ ReferFontInfoLocally (
   @param  StringSrc              Points to current null-terminated string.
   @param  BufferSize             Length of the buffer.
 
-  @retval EFI_SUCCESS            The string text was outputed successfully.
+  @retval EFI_SUCCESS            The string text was outputted successfully.
   @retval EFI_BUFFER_TOO_SMALL   Buffer is insufficient to store the found string
                                  text. BufferSize is updated to the required buffer
                                  size.
@@ -149,7 +150,7 @@ ConvertToUnicodeText (
   @param  StringSrc              Points to current null-terminated string.
   @param  BufferSize             Length of the buffer.
 
-  @retval EFI_SUCCESS            The string text was outputed successfully.
+  @retval EFI_SUCCESS            The string text was outputted successfully.
   @retval EFI_BUFFER_TOO_SMALL   Buffer is insufficient to store the found string
                                  text. BufferSize is updated to the required buffer
                                  size.
@@ -198,7 +199,7 @@ GetUnicodeStringTextOrSize (
   @param  StringFontInfo         Buffer to record the output font info. It's
                                  caller's responsibility to free this buffer.
 
-  @retval EFI_SUCCESS            The string font is outputed successfully.
+  @retval EFI_SUCCESS            The string font is outputted successfully.
   @retval EFI_NOT_FOUND          The specified font id does not exist.
 
 **/
@@ -295,6 +296,7 @@ FindStringBlock (
   ASSERT (StringPackage->Signature == HII_STRING_PACKAGE_SIGNATURE);
 
   CurrentStringId = 1;
+  StringSize = 0;
 
   if (StringId != (EFI_STRING_ID) (-1) && StringId != 0) {
     ASSERT (BlockType != NULL && StringBlockAddr != NULL && StringTextOffset != NULL);
@@ -317,8 +319,6 @@ FindStringBlock (
   BlockHdr  = StringPackage->StringBlock;
   BlockSize = 0;
   Offset    = 0;
-  StringSize = 0;
-
   while (*BlockHdr != EFI_HII_SIBT_END) {
     switch (*BlockHdr) {
     case EFI_HII_SIBT_STRING_SCSU:
@@ -719,7 +719,7 @@ GetStringWorker (
   @param  StringBlockAddr         Output the block address of found string block.  
   @param  FontBlock               whether this string block has font info.
 
-  @retval EFI_SUCCESS            The string font is outputed successfully.
+  @retval EFI_SUCCESS            The string font is outputted successfully.
   @retval EFI_OUT_OF_RESOURCES   NO resource for the memory to save the new string block.
 
 **/
@@ -1560,6 +1560,18 @@ Done:
     FreePool (StringPackage->StringPkgHdr);
     FreePool (StringPackage);
   }
+  //
+  // The contents of HiiDataBase may updated,need to check.
+  //
+  //
+  // Check whether need to get the contents of HiiDataBase.
+  // Only after ReadyToBoot to do the export.
+  //
+  if (gExportAfterReadyToBoot) {
+    if (!EFI_ERROR (Status)) {
+      HiiGetDatabaseInfo(&Private->HiiDatabase);
+    }
+  }
 
   return Status;
 }
@@ -1755,6 +1767,13 @@ HiiSetString (
           return Status;
         }
         PackageListNode->PackageListHdr.PackageLength += StringPackage->StringPkgHdr->Header.Length - OldPackageLen;
+        //
+        // Check whether need to get the contents of HiiDataBase.
+        // Only after ReadyToBoot to do the export.
+        //
+        if (gExportAfterReadyToBoot) {
+          HiiGetDatabaseInfo(&Private->HiiDatabase);
+        }
         return EFI_SUCCESS;
       }
     }

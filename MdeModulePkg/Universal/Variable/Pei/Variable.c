@@ -2,7 +2,7 @@
   Implement ReadOnly Variable Services required by PEIM and install
   PEI ReadOnly Varaiable2 PPI. These services operates the non volatile storage space.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -947,9 +947,10 @@ FindVariable (
   @param  DataSize              On entry, points to the size in bytes of the Data buffer.
                                 On return, points to the size of the data returned in Data.
   @param  Data                  Points to the buffer which will hold the returned variable value.
+                                May be NULL with a zero DataSize in order to determine the size of the buffer needed.
 
   @retval EFI_SUCCESS           The variable was read successfully.
-  @retval EFI_NOT_FOUND         The variable could not be found.
+  @retval EFI_NOT_FOUND         The variable was be found.
   @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data.
                                 DataSize is updated with the size required for
                                 the specified variable.
@@ -965,7 +966,7 @@ PeiGetVariable (
   IN CONST  EFI_GUID                        *VariableGuid,
   OUT       UINT32                          *Attributes,
   IN OUT    UINTN                           *DataSize,
-  OUT       VOID                            *Data
+  OUT       VOID                            *Data OPTIONAL
   )
 {
   VARIABLE_POINTER_TRACK  Variable;
@@ -976,6 +977,10 @@ PeiGetVariable (
 
   if (VariableName == NULL || VariableGuid == NULL || DataSize == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (VariableName[0] == 0) {
+    return EFI_NOT_FOUND;
   }
 
   VariableHeader = NULL;

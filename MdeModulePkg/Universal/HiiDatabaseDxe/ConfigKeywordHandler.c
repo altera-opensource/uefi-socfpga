@@ -1,7 +1,7 @@
 /** @file
 Implementation of interfaces function for EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,7 +28,7 @@ extern HII_DATABASE_PRIVATE_DATA mPrivate;
   @param  NextString             string follow the possible PathHdr string.
 
   @retval EFI_INVALID_PARAMETER  The device path is not valid or the incoming parameter is invalid.
-  @retval EFI_OUT_OF_RESOURCES   Lake of resources to store neccesary structures.
+  @retval EFI_OUT_OF_RESOURCES   Lake of resources to store necessary structures.
   @retval EFI_SUCCESS            The device path is retrieved and translated to binary format.
                                  The Input string not include PathHdr section.
 
@@ -178,6 +178,7 @@ ExtractNameSpace (
   )
 {
   CHAR16    *TmpPtr;
+  UINTN     NameSpaceSize;
 
   ASSERT (NameSpace != NULL);
 
@@ -218,11 +219,12 @@ ExtractNameSpace (
   // Input NameSpace is unicode string. The language in String package is ascii string.
   // Here will convert the unicode string to ascii and save it.
   //
-  *NameSpace = AllocatePool (StrLen (String) + 1);
+  NameSpaceSize = StrLen (String) + 1;
+  *NameSpace = AllocatePool (NameSpaceSize);
   if (*NameSpace == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  UnicodeStrToAsciiStr (String, *NameSpace);
+  UnicodeStrToAsciiStrS (String, *NameSpace, NameSpaceSize);
 
   if (TmpPtr != NULL) {
     *TmpPtr = L'&'; 
@@ -238,10 +240,10 @@ ExtractNameSpace (
 
   @param  String                 KeywordRequestformat string.
   @param  Keyword                return the extract keyword string.
-  @param  NextString             return the next string follow this keyword sectin.
+  @param  NextString             return the next string follow this keyword section.
 
   @retval EFI_SUCCESS            Success to get the keyword string.
-  @retval EFI_INVALID_PARAMETER  Parsr the input string return error.
+  @retval EFI_INVALID_PARAMETER  Parse the input string return error.
 
 **/
 EFI_STATUS
@@ -304,10 +306,10 @@ ExtractKeyword (
 
   @param  String                 KeywordRequestformat string.
   @param  Value                  return the extract value string.
-  @param  NextString             return the next string follow this keyword sectin.
+  @param  NextString             return the next string follow this keyword section.
 
   @retval EFI_SUCCESS            Success to get the keyword string.
-  @retval EFI_INVALID_PARAMETER  Parsr the input string return error.
+  @retval EFI_INVALID_PARAMETER  Parse the input string return error.
 
 **/
 EFI_STATUS
@@ -359,10 +361,10 @@ ExtractValue (
 
   @param  String                 KeywordRequestformat string.
   @param  FilterFlags            return the filter condition.
-  @param  NextString             return the next string follow this keyword sectin.
+  @param  NextString             return the next string follow this keyword section.
 
   @retval EFI_SUCCESS            Success to get the keyword string.
-  @retval EFI_INVALID_PARAMETER  Parsr the input string return error.
+  @retval EFI_INVALID_PARAMETER  Parse the input string return error.
 
 **/
 BOOLEAN
@@ -475,7 +477,7 @@ ExtractFilter (
         String = KeywordPtr;
       } else {
         //
-        // Only has paltform defined filter section, just skip it.
+        // Only has platform defined filter section, just skip it.
         //
         String += StrLen (String);
       }
@@ -518,9 +520,9 @@ ExtractReadOnlyFromOpCode (
 
   This is a internal function.
 
-  @param  OpCodeData             The questin binary ifr data.
+  @param  OpCodeData             The question binary ifr data.
   @param  KeywordRequest         KeywordRequestformat string.
-  @param  NextString             return the next string follow this keyword sectin.
+  @param  NextString             return the next string follow this keyword section.
   @param  ReadOnly               Return whether this question is read only.
 
   @retval KEYWORD_HANDLER_NO_ERROR                     Success validate.
@@ -709,7 +711,7 @@ GetRecordFromDevicePath (
   @param  BufferSize             Length of the buffer.
   @param  StringDest             Buffer to store the string text. 
 
-  @retval EFI_SUCCESS            The string text was outputed successfully.
+  @retval EFI_SUCCESS            The string text was outputted successfully.
   @retval EFI_OUT_OF_RESOURCES   Out of resource.
 
 **/
@@ -779,6 +781,7 @@ GetStringIdFromString (
   UINTN                                StringSize;
   CHAR16                               *String;
   CHAR8                                *AsciiKeywordValue;
+  UINTN                                KeywordValueSize;
   EFI_STATUS                           Status;
 
   ASSERT (StringPackage != NULL && KeywordValue != NULL && StringId != NULL);
@@ -794,11 +797,12 @@ GetStringIdFromString (
   //
   // Make a ascii keyword value for later use.
   //
-  AsciiKeywordValue = AllocatePool (StrLen (KeywordValue) + 1);
+  KeywordValueSize = StrLen (KeywordValue) + 1;
+  AsciiKeywordValue = AllocatePool (KeywordValueSize);
   if (AsciiKeywordValue == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  UnicodeStrToAsciiStr(KeywordValue, AsciiKeywordValue);
+  UnicodeStrToAsciiStrS (KeywordValue, AsciiKeywordValue, KeywordValueSize);
 
   while (*BlockHdr != EFI_HII_SIBT_END) {
     switch (*BlockHdr) {
@@ -871,7 +875,7 @@ GetStringIdFromString (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-      
+      ASSERT (String != NULL);
       if (StrCmp(KeywordValue, String) == 0) {
         *StringId = CurrentStringId;
         goto Done;
@@ -891,7 +895,7 @@ GetStringIdFromString (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-      
+      ASSERT (String != NULL);
       if (StrCmp(KeywordValue, String) == 0) {
         *StringId = CurrentStringId;
         goto Done;
@@ -910,7 +914,7 @@ GetStringIdFromString (
         if (EFI_ERROR (Status)) {
           goto Done;
         }
-
+        ASSERT (String != NULL);
         BlockSize += StringSize;
         if (StrCmp(KeywordValue, String) == 0) {
           *StringId = CurrentStringId;
@@ -935,7 +939,7 @@ GetStringIdFromString (
         if (EFI_ERROR (Status)) {
           goto Done;
         }
-
+        ASSERT (String != NULL);
         BlockSize += StringSize;
         if (StrCmp(KeywordValue, String) == 0) {
           *StringId = CurrentStringId;
@@ -1065,11 +1069,12 @@ GetNextStringId (
       StringTextPtr = BlockHdr + Offset;
       
       if (FindString) {
-        *KeywordValue = AllocatePool (AsciiStrSize ((CHAR8 *) StringTextPtr) * sizeof (CHAR16));
+        StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
+        *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
         if (*KeywordValue == NULL) {
           return 0;
         }
-        AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
+        AsciiStrToUnicodeStrS ((CHAR8 *) StringTextPtr, *KeywordValue, StringSize);
         return CurrentStringId;
       } else if (CurrentStringId == StringId) {
         FindString = TRUE;
@@ -1084,11 +1089,12 @@ GetNextStringId (
       StringTextPtr = BlockHdr + Offset;
       
       if (FindString) {
-        *KeywordValue = AllocatePool (AsciiStrSize ((CHAR8 *) StringTextPtr) * sizeof (CHAR16));
+        StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
+        *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
         if (*KeywordValue == NULL) {
           return 0;
         }
-        AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
+        AsciiStrToUnicodeStrS ((CHAR8 *) StringTextPtr, *KeywordValue, StringSize);
         return CurrentStringId;
       } else if (CurrentStringId == StringId) {
         FindString = TRUE;
@@ -1105,11 +1111,12 @@ GetNextStringId (
 
       for (Index = 0; Index < StringCount; Index++) {
         if (FindString) {
-          *KeywordValue = AllocatePool (AsciiStrSize ((CHAR8 *) StringTextPtr) * sizeof (CHAR16));
+          StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
+          *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
           if (*KeywordValue == NULL) {
             return 0;
           }
-          AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
+          AsciiStrToUnicodeStrS ((CHAR8 *) StringTextPtr, *KeywordValue, StringSize);
           return CurrentStringId;
         } else if (CurrentStringId == StringId) {
           FindString = TRUE;
@@ -1132,11 +1139,12 @@ GetNextStringId (
 
       for (Index = 0; Index < StringCount; Index++) {
         if (FindString) {
-          *KeywordValue = AllocatePool (AsciiStrSize ((CHAR8 *) StringTextPtr) * sizeof (CHAR16));
+          StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
+          *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
           if (*KeywordValue == NULL) {
             return 0;
           }
-          AsciiStrToUnicodeStr ((CHAR8 *) StringTextPtr, *KeywordValue);
+          AsciiStrToUnicodeStrS ((CHAR8 *) StringTextPtr, *KeywordValue, StringSize);
           return CurrentStringId;
         } else if (CurrentStringId == StringId) {
           FindString = TRUE;
@@ -1302,7 +1310,7 @@ GetNextStringId (
   @param  KeywordValue                   Keyword value.
   @param  StringId                       String Id for this keyword.
 
-  @retval KEYWORD_HANDLER_NO_ERROR                     Get String id succes.
+  @retval KEYWORD_HANDLER_NO_ERROR                     Get String id successfully.
   @retval KEYWORD_HANDLER_KEYWORD_NOT_FOUND            Not found the string id in the string package.
   @retval KEYWORD_HANDLER_NAMESPACE_ID_NOT_FOUND       Not found the string package for this namespace.
   @retval KEYWORD_HANDLER_UNDEFINED_PROCESSING_ERROR   Out of resource error.
@@ -1583,6 +1591,8 @@ GetWidth (
     return (UINT16) sizeof (BOOLEAN);
     
   case EFI_IFR_PASSWORD_OP:
+    return (UINT16)((UINTN) ((EFI_IFR_PASSWORD *) OpCodeData)->MaxSize * sizeof (CHAR16));
+
   case EFI_IFR_STRING_OP:
     return (UINT16)((UINTN) ((EFI_IFR_STRING *) OpCodeData)->MaxSize * sizeof (CHAR16));
 
@@ -1599,7 +1609,7 @@ GetWidth (
 }
 
 /**
-  Converts all hex dtring characters in range ['A'..'F'] to ['a'..'f'] for 
+  Converts all hex string characters in range ['A'..'F'] to ['a'..'f'] for
   hex digits that appear between a '=' and a '&' in a config string.
 
   If ConfigString is NULL, then ASSERT().
@@ -1647,7 +1657,7 @@ InternalLowerConfigString (
   @param[in]  DriverHandle  The driver handle which supports a Device Path Protocol
                             that is the routing information PATH.  Each byte of
                             the Device Path associated with DriverHandle is converted
-                            to a 2 Unicode character hexidecimal string.
+                            to a 2 Unicode character hexadecimal string.
 
   @retval NULL   DriverHandle does not support the Device Path Protocol.
   @retval Other  A pointer to the Null-terminate Unicode <ConfigHdr> string
@@ -1668,6 +1678,7 @@ ConstructConfigHdr (
   UINT8                     *Buffer;
   CHAR16                    *Name;
   CHAR8                     *AsciiName;
+  UINTN                     NameSize;
   EFI_GUID                  *Guid;
   UINTN                     MaxLen;
 
@@ -1697,9 +1708,10 @@ ConstructConfigHdr (
   }
 
   if (AsciiName != NULL) {
-    Name = AllocateZeroPool (AsciiStrSize (AsciiName) * 2);
+    NameSize = AsciiStrSize (AsciiName);
+    Name = AllocateZeroPool (NameSize * sizeof (CHAR16));
     ASSERT (Name != NULL);
-    AsciiStrToUnicodeStr(AsciiName, Name);
+    AsciiStrToUnicodeStrS (AsciiName, Name, NameSize);
   } else {
     Name = NULL;
   }
@@ -1751,7 +1763,14 @@ ConstructConfigHdr (
     // Append Guid converted to <HexCh>32
     //
     for (Index = 0, Buffer = (UINT8 *)Guid; Index < sizeof (EFI_GUID); Index++) {
-      String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, *(Buffer++), 2);
+      UnicodeValueToStringS (
+        String,
+        MaxLen * sizeof (CHAR16) - ((UINTN)String - (UINTN)ReturnString),
+        PREFIX_ZERO | RADIX_HEX,
+        *(Buffer++),
+        2
+        );
+      String += StrnLenS (String, MaxLen - ((UINTN)String - (UINTN)ReturnString) / sizeof (CHAR16));
     }
   }
   
@@ -1766,7 +1785,14 @@ ConstructConfigHdr (
     // Append Name converted to <Char>NameLength
     //
     for (; *Name != L'\0'; Name++) {
-      String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, *Name, 4);
+      UnicodeValueToStringS (
+        String,
+        MaxLen * sizeof (CHAR16) - ((UINTN)String - (UINTN)ReturnString),
+        PREFIX_ZERO | RADIX_HEX,
+        *Name,
+        4
+        );
+      String += StrnLenS (String, MaxLen - ((UINTN)String - (UINTN)ReturnString) / sizeof (CHAR16));
     }
   }
 
@@ -1780,7 +1806,14 @@ ConstructConfigHdr (
   // Append the device path associated with DriverHandle converted to <HexChar>DevicePathSize
   //
   for (Index = 0, Buffer = (UINT8 *)DevicePath; Index < DevicePathSize; Index++) {
-    String += UnicodeValueToString (String, PREFIX_ZERO | RADIX_HEX, *(Buffer++), 2);
+    UnicodeValueToStringS (
+      String,
+      MaxLen * sizeof (CHAR16) - ((UINTN)String - (UINTN)ReturnString),
+      PREFIX_ZERO | RADIX_HEX,
+      *(Buffer++),
+      2
+      );
+    String += StrnLenS (String, MaxLen - ((UINTN)String - (UINTN)ReturnString) / sizeof (CHAR16));
   }
 
   //
@@ -2344,7 +2377,7 @@ GetStringIdFromDatabase (
 }
 
 /**
-  Genereate the KeywordResp String.
+  Generate the KeywordResp String.
 
   <KeywordResp> ::= <NameSpaceId><PathHdr>'&'<Keyword>'&VALUE='<Number>['&READONLY']
 
@@ -2373,6 +2406,7 @@ GenerateKeywordResp (
   CHAR16    *RespStr;
   CHAR16    *PathHdr;
   CHAR16    *UnicodeNameSpace;
+  UINTN     NameSpaceLength;
 
   ASSERT ((NameSpace != NULL) && (DevicePath != NULL) && (KeywordData != NULL) && (ValueStr != NULL) && (KeywordResp != NULL));
 
@@ -2383,12 +2417,13 @@ GenerateKeywordResp (
   // 1.1 NameSpaceId size.
   // 'NAMESPACE='<String>
   //
-  RespStrLen = 10 + AsciiStrLen (NameSpace);
-  UnicodeNameSpace = AllocatePool ((AsciiStrLen (NameSpace) + 1) * sizeof (CHAR16));
+  NameSpaceLength = AsciiStrLen (NameSpace);
+  RespStrLen = 10 + NameSpaceLength;
+  UnicodeNameSpace = AllocatePool ((NameSpaceLength + 1) * sizeof (CHAR16));
   if (UnicodeNameSpace == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  AsciiStrToUnicodeStr(NameSpace, UnicodeNameSpace);
+  AsciiStrToUnicodeStrS (NameSpace, UnicodeNameSpace, NameSpaceLength + 1);
 
   //
   // 1.2 PathHdr size.
@@ -2405,7 +2440,7 @@ GenerateKeywordResp (
   RespStrLen += StrLen (PathHdr);
 
   //
-  // 1.3 Keyword setion.
+  // 1.3 Keyword section.
   // 'KEYWORD='<String>[':'<DecCh>(1/4)]
   //
   RespStrLen += 8 + StrLen (KeywordData);
@@ -2508,12 +2543,15 @@ MergeToMultiKeywordResp (
 
   MultiKeywordRespLen = (StrLen (*MultiKeywordResp) + 1 + StrLen (*KeywordResp) + 1) * sizeof (CHAR16);
 
-  StringPtr = AllocateCopyPool (MultiKeywordRespLen, *MultiKeywordResp);
+  StringPtr = ReallocatePool (
+                StrSize (*MultiKeywordResp),
+                MultiKeywordRespLen,
+                *MultiKeywordResp
+                );
   if (StringPtr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
-  FreePool (*MultiKeywordResp);
+
   *MultiKeywordResp = StringPtr;
 
   StrCatS (StringPtr, MultiKeywordRespLen / sizeof (CHAR16), L"&");
@@ -2695,7 +2733,7 @@ Error:
   }
 
   //
-  // return the already get MultiKeywordString even error occured.
+  // return the already get MultiKeywordString even error occurred.
   //
   if (MultiKeywordResp == NULL) {
     Status = EFI_NOT_FOUND;
@@ -2752,8 +2790,9 @@ Done:
   @param Progress         On return, points to a character in the KeywordString. 
                           Points to the string's NULL terminator if the request 
                           was successful. Points to the most recent '&' before 
-                          the first failing string element if the request was 
-                          not successful.
+                          the first failing name / value pair (or the beginning
+                          of the string if the failure is in the first name / value
+                          pair) if the request was not successful.
 
   @param ProgressErr      If during the processing of the KeywordString there was
                           a failure, this parameter gives additional information 
@@ -2892,11 +2931,11 @@ EfiConfigKeywordHandlerSetData (
     StringPtr = NextStringPtr;
 
     //
-    // 5. Find ReadOnly filter.
+    // 5. Find READONLY tag.
     //
-    if ((StringPtr != NULL) && StrnCmp (StringPtr, L"&ReadOnly", StrLen (L"&ReadOnly")) == 0) {
+    if ((StringPtr != NULL) && StrnCmp (StringPtr, L"&READONLY", StrLen (L"&READONLY")) == 0) {
       ReadOnly = TRUE;
-      StringPtr += StrLen (L"&ReadOnly");
+      StringPtr += StrLen (L"&READONLY");
     } else {
       ReadOnly = FALSE;
     }
@@ -2922,9 +2961,18 @@ EfiConfigKeywordHandlerSetData (
     // 8. Check the readonly flag.
     //
     if (ExtractReadOnlyFromOpCode (OpCode) != ReadOnly) {
+      //
+      // Extracting readonly flag form opcode and extracting "READONLY" tag form KeywordString should have the same results.
+      // If not, the input KeywordString must be incorrect, return the error status to caller.
+      //
+      *ProgressErr = KEYWORD_HANDLER_INCOMPATIBLE_VALUE_DETECTED;
+      Status = EFI_INVALID_PARAMETER;
+      goto Done;
+    }
+    if (ReadOnly) {
       *ProgressErr = KEYWORD_HANDLER_ACCESS_NOT_PERMITTED;
       Status = EFI_ACCESS_DENIED;
-      goto Done;      
+      goto Done;
     }
     
     //
@@ -3030,8 +3078,9 @@ Done:
   
   @param Progress       On return, points to a character in the KeywordString. Points
                         to the string's NULL terminator if the request was successful. 
-                        Points to the most recent '&' before the first failing string
-                        element if the request was not successful.
+                        Points to the most recent '&' before the first failing name / value
+                        pair (or the beginning of the string if the failure is in the first
+                        name / value pair) if the request was not successful.
                         
   @param ProgressErr    If during the processing of the KeywordString there was a
                         failure, this parameter gives additional information about the 
@@ -3046,7 +3095,7 @@ Done:
   @retval EFI_SUCCESS             The specified action was completed successfully.
   
   @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
-                                  1.Progress, ProgressErr, or Resuts is NULL.
+                                  1.Progress, ProgressErr, or Results is NULL.
                                   2.Parsing of the KeywordString resulted in an error. See
                                     Progress and ProgressErr for more data.
   

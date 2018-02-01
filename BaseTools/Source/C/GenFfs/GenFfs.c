@@ -1,7 +1,7 @@
 /** @file
 This file contains functions required to generate a Firmware File System file.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -11,6 +11,13 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
+
+#ifndef __GNUC__
+#include <windows.h>
+#include <io.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +31,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "CommonLib.h"
 #include "ParseInf.h"
 #include "EfiUtilityMsgs.h"
+#include "FvLib.h"
+#include "PeCoffLib.h"
 
 #define UTILITY_NAME            "GenFfs"
 #define UTILITY_MAJOR_VERSION   0
@@ -43,19 +52,24 @@ STATIC CHAR8 *mFfsFileType[] = {
   "EFI_FV_FILETYPE_SMM",                  // 0x0A
   "EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE",// 0x0B
   "EFI_FV_FILETYPE_COMBINED_SMM_DXE",     // 0x0C
-  "EFI_FV_FILETYPE_SMM_CORE"              // 0x0D
- };
+  "EFI_FV_FILETYPE_SMM_CORE",             // 0x0D
+  "EFI_FV_FILETYPE_MM_STANDALONE",        // 0x0E
+  "EFI_FV_FILETYPE_MM_CORE_STANDALONE"    // 0x0F
+};
 
 STATIC CHAR8 *mAlignName[] = {
   "1", "2", "4", "8", "16", "32", "64", "128", "256", "512",
-  "1K", "2K", "4K", "8K", "16K", "32K", "64K"
+  "1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K",
+  "512K", "1M", "2M", "4M", "8M", "16M"
  };
 
 STATIC CHAR8 *mFfsValidAlignName[] = {
-  "8", "16", "128", "512", "1K", "4K", "32K", "64K"
+  "8", "16", "128", "512", "1K", "4K", "32K", "64K", "128K","256K",
+  "512K", "1M", "2M", "4M", "8M", "16M"
  };
 
-STATIC UINT32 mFfsValidAlign[] = {0, 8, 16, 128, 512, 1024, 4096, 32768, 65536};
+STATIC UINT32 mFfsValidAlign[] = {0, 8, 16, 128, 512, 1024, 4096, 32768, 65536, 131072, 262144,
+                                  524288, 1048576, 2097152, 4194304, 8388608, 16777216};
 
 STATIC EFI_GUID mZeroGuid = {0};
 
@@ -114,7 +128,7 @@ Returns:
   //
   // Copyright declaration
   // 
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -130,6 +144,8 @@ Returns:
                         EFI_FV_FILETYPE_DRIVER, EFI_FV_FILETYPE_APPLICATION,\n\
                         EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER,\n\
                         EFI_FV_FILETYPE_SMM, EFI_FV_FILETYPE_SMM_CORE,\n\
+                        EFI_FV_FILETYPE_MM_STANDALONE,\n\
+                        EFI_FV_FILETYPE_MM_CORE_STANDALONE,\n\
                         EFI_FV_FILETYPE_COMBINED_SMM_DXE, \n\
                         EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE.\n");
   fprintf (stdout, "  -g FileGuid, --fileguid FileGuid\n\
@@ -140,13 +156,16 @@ Returns:
   fprintf (stdout, "  -s, --checksum        Indicates to calculate file checksum.\n");
   fprintf (stdout, "  -a FileAlign, --align FileAlign\n\
                         FileAlign points to file alignment, which only support\n\
-                        the following align: 1,2,4,8,16,128,512,1K,4K,32K,64K\n");
+                        the following align: 1,2,4,8,16,128,512,1K,4K,32K,64K\n\
+                        128K,256K,512K,1M,2M,4M,8M,16M\n");
   fprintf (stdout, "  -i SectionFile, --sectionfile SectionFile\n\
                         Section file will be contained in this FFS file.\n");
   fprintf (stdout, "  -n SectionAlign, --sectionalign SectionAlign\n\
                         SectionAlign points to section alignment, which support\n\
-                        the alignment scope 1~64K. It is specified together\n\
-                        with sectionfile to point its alignment in FFS file.\n");
+                        the alignment scope 0~16M. If SectionAlign is specified\n\
+                        as 0, tool get alignment value from SectionFile. It is\n\
+                        specified together with sectionfile to point its\n\
+                        alignment in FFS file.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
   fprintf (stdout, "  -d, --debug level     Enable debug messages, at input debug level.\n");
@@ -164,7 +183,7 @@ StringtoAlignment (
 
 Routine Description:
 
-  Converts Align String to align value (1~64K). 
+  Converts Align String to align value (1~16M).
 
 Arguments:
 
@@ -449,6 +468,103 @@ Returns:
   }
 }
 
+EFI_STATUS
+FfsRebaseImageRead (
+    IN      VOID    *FileHandle,
+    IN      UINTN   FileOffset,
+    IN OUT  UINT32  *ReadSize,
+    OUT     VOID    *Buffer
+    )
+  /*++
+
+    Routine Description:
+
+    Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
+
+    Arguments:
+
+   FileHandle - The handle to the PE/COFF file
+
+   FileOffset - The offset, in bytes, into the file to read
+
+   ReadSize   - The number of bytes to read from the file starting at FileOffset
+
+   Buffer     - A pointer to the buffer to read the data into.
+
+   Returns:
+
+   EFI_SUCCESS - ReadSize bytes of data were read into Buffer from the PE/COFF file starting at FileOffset
+
+   --*/
+{
+  CHAR8   *Destination8;
+  CHAR8   *Source8;
+  UINT32  Length;
+
+  Destination8  = Buffer;
+  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
+  Length        = *ReadSize;
+  while (Length--) {
+    *(Destination8++) = *(Source8++);
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+GetAlignmentFromFile(char *InFile, UINT32 *Alignment)
+  /*++
+    InFile is input file for getting alignment
+    return the alignment
+    --*/
+{
+  FILE                           *InFileHandle;
+  UINT8                          *PeFileBuffer;
+  UINTN                          PeFileSize;
+  UINT32                         CurSecHdrSize;
+  PE_COFF_LOADER_IMAGE_CONTEXT   ImageContext;
+  EFI_COMMON_SECTION_HEADER      *CommonHeader;
+  EFI_STATUS                     Status;
+
+  InFileHandle        = NULL;
+  PeFileBuffer        = NULL;
+  *Alignment          = 0;
+
+  memset (&ImageContext, 0, sizeof (ImageContext));
+
+  InFileHandle = fopen(LongFilePath(InFile), "rb");
+  if (InFileHandle == NULL){
+    Error (NULL, 0, 0001, "Error opening file", InFile);
+    return EFI_ABORTED;
+  }
+  PeFileSize = _filelength (fileno(InFileHandle));
+  PeFileBuffer = (UINT8 *) malloc (PeFileSize);
+  if (PeFileBuffer == NULL) {
+    fclose (InFileHandle);
+    Error(NULL, 0, 4001, "Resource", "memory cannot be allocated  of %s", InFileHandle);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  fread (PeFileBuffer, sizeof (UINT8), PeFileSize, InFileHandle);
+  fclose (InFileHandle);
+  CommonHeader = (EFI_COMMON_SECTION_HEADER *) PeFileBuffer;
+  CurSecHdrSize = GetSectionHeaderLength(CommonHeader);
+  ImageContext.Handle = (VOID *) ((UINTN)PeFileBuffer + CurSecHdrSize);
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE)FfsRebaseImageRead;
+  Status               = PeCoffLoaderGetImageInfo(&ImageContext);
+  if (EFI_ERROR (Status)) {
+    Error (NULL, 0, 3000, "Invalid PeImage", "The input file is %s and return status is %x", InFile, (int) Status);
+    return Status;
+   }
+  *Alignment = ImageContext.SectionAlignment;
+  // Free the allocated memory resource
+  if (PeFileBuffer != NULL) {
+    free (PeFileBuffer);
+    PeFileBuffer = NULL;
+  }
+  return EFI_SUCCESS;
+}
+
 int
 main (
   int   argc,
@@ -489,6 +605,13 @@ Returns:
   UINT64                  LogLevel;
   UINT8                   PeSectionNum;
   UINT32                  HeaderSize;
+  UINT32                  Alignment;
+  //
+  // Workaround for static code checkers.
+  // Ensures the size of 'AlignmentBuffer' can hold all the digits of an
+  // unsigned 32-bit integer plus the size unit character.
+  //
+  CHAR8                   AlignmentBuffer[16];
   
   //
   // Init local variables
@@ -682,7 +805,27 @@ Returns:
       // Section File alignment requirement
       //
       if ((stricmp (argv[0], "-n") == 0) || (stricmp (argv[0], "--sectionalign") == 0)) {
-        Status = StringtoAlignment (argv[1], &(InputFileAlign[InputFileNum]));
+        if ((argv[1] != NULL) && (stricmp("0", argv[1]) == 0)) {
+          Status = GetAlignmentFromFile(InputFileName[InputFileNum], &Alignment);
+          if (EFI_ERROR(Status)) {
+            Error (NULL, 0, 1003, "Fail to get Alignment from %s", InputFileName[InputFileNum]);
+            goto Finish;
+          }
+          if (Alignment < 0x400){
+            sprintf (AlignmentBuffer, "%d", Alignment);
+          }
+          else if (Alignment >= 0x400) {
+            if (Alignment >= 0x100000) {
+              sprintf (AlignmentBuffer, "%dM", Alignment/0x100000);
+            } else {
+              sprintf (AlignmentBuffer, "%dK", Alignment/0x400);
+            }
+          }
+          Status = StringtoAlignment (AlignmentBuffer, &(InputFileAlign[InputFileNum]));
+        }
+        else {
+          Status = StringtoAlignment (argv[1], &(InputFileAlign[InputFileNum]));
+        }
         if (EFI_ERROR (Status)) {
           Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
           goto Finish;
@@ -732,14 +875,14 @@ Returns:
       continue;
     }
 
-    Error (NULL, 0, 1000, "Unknown option", argv[0]);
+    Error (NULL, 0, 1000, "Unknown option", "%s", argv[0]);
     goto Finish;
   }
 
   VerboseMsg ("%s tool start.", UTILITY_NAME);
 
   //
-  // Check the complete input paramters.
+  // Check the complete input parameters.
   //
   if (FfsFiletype == EFI_FV_FILETYPE_ALL) {
     Error (NULL, 0, 1001, "Missing option", "filetype");
@@ -845,6 +988,11 @@ Returns:
   if (EFI_ERROR (Status)) {
     goto Finish;
   }
+
+  if (FileBuffer == NULL && FileSize != 0) {
+    Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    goto Finish;
+  }
   
   //
   // Create Ffs file header.
@@ -884,7 +1032,12 @@ Returns:
   }
   VerboseMsg ("the size of the generated FFS file is %u bytes", (unsigned) FileSize);
 
-  FfsFileHeader.Attributes = (EFI_FFS_FILE_ATTRIBUTES) (FfsAttrib | (FfsAlign << 3));
+  //FfsAlign larger than 7, set FFS_ATTRIB_DATA_ALIGNMENT2
+  if (FfsAlign < 8) {
+    FfsFileHeader.Attributes = (EFI_FFS_FILE_ATTRIBUTES) (FfsAttrib | (FfsAlign << 3));
+  } else {
+    FfsFileHeader.Attributes = (EFI_FFS_FILE_ATTRIBUTES) (FfsAttrib | ((FfsAlign & 0x7) << 3) | FFS_ATTRIB_DATA_ALIGNMENT2);
+  }
 
   //
   // Fill in checksums and state, these must be zero for checksumming
@@ -915,22 +1068,26 @@ Returns:
   //
   // Open output file to write ffs data.
   //
-  remove(OutputFileName);
-  FfsFile = fopen (LongFilePath (OutputFileName), "wb");
-  if (FfsFile == NULL) {
-    Error (NULL, 0, 0001, "Error opening file", OutputFileName);
-    goto Finish;
-  }
-  //
-  // write header
-  //
-  fwrite (&FfsFileHeader, 1, HeaderSize, FfsFile);
-  //
-  // write data
-  //
-  fwrite (FileBuffer, 1, FileSize - HeaderSize, FfsFile);
+  if (OutputFileName != NULL) {
+    remove(OutputFileName);
+    FfsFile = fopen (LongFilePath (OutputFileName), "wb");
+    if (FfsFile == NULL) {
+      Error (NULL, 0, 0001, "Error opening file", OutputFileName);
+      goto Finish;
+    }
+    //
+    // write header
+    //
+    fwrite (&FfsFileHeader, 1, HeaderSize, FfsFile);
+    //
+    // write data
+    //
+    if (FileBuffer != NULL) {
+      fwrite (FileBuffer, 1, FileSize - HeaderSize, FfsFile);
+    }
 
-  fclose (FfsFile);
+    fclose (FfsFile);
+  }
 
 Finish:
   if (InputFileName != NULL) {

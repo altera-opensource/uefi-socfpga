@@ -8,7 +8,7 @@
   PCI Root Bridges. So it means platform needs install PCI Root Bridge IO protocol for each
   PCI Root Bus and install PCI Host Bridge Resource Allocation Protocol.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,7 +34,7 @@ EFI_DRIVER_BINDING_PROTOCOL                   gPciBusDriverBinding = {
 };
 
 EFI_HANDLE                                    gPciHostBrigeHandles[PCI_MAX_HOST_BRIDGE_NUM];
-EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL  *gEfiIncompatiblePciDeviceSupport = NULL;
+EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL  *gIncompatiblePciDeviceSupport = NULL;
 UINTN                                         gPciHostBridgeNumber = 0;
 BOOLEAN                                       gFullEnumeration     = TRUE;
 UINT64                                        gAllOne              = 0xFFFFFFFFFFFFFFFFULL;
@@ -42,6 +42,7 @@ UINT64                                        gAllZero             = 0;
 
 EFI_PCI_PLATFORM_PROTOCOL                     *gPciPlatformProtocol;
 EFI_PCI_OVERRIDE_PROTOCOL                     *gPciOverrideProtocol;
+EDKII_IOMMU_PROTOCOL                          *mIoMmuProtocol;
 
 
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_PCI_HOTPLUG_REQUEST_PROTOCOL mPciHotPlugRequest = {
@@ -113,7 +114,7 @@ PciBusEntryPoint (
 
   @param  This                Protocol instance pointer.
   @param  Controller          Handle of device to test.
-  @param  RemainingDevicePath Optional parameter use to pick a specific child.
+  @param  RemainingDevicePath Optional parameter use to pick a specific child
                               device to start.
 
   @retval EFI_SUCCESS         This driver supports this device.
@@ -223,7 +224,7 @@ PciBusDriverBindingSupported (
 
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to bind driver to.
-  @param  RemainingDevicePath  Optional parameter use to pick a specific child.
+  @param  RemainingDevicePath  Optional parameter use to pick a specific child
                                device to start.
 
   @retval EFI_SUCCESS          This driver is added to ControllerHandle.
@@ -258,7 +259,7 @@ PciBusDriverBindingStart (
   gBS->LocateProtocol (
          &gEfiIncompatiblePciDeviceSupportProtocolGuid,
          NULL,
-         (VOID **) &gEfiIncompatiblePciDeviceSupport
+         (VOID **) &gIncompatiblePciDeviceSupport
          );
 
   //
@@ -283,6 +284,14 @@ PciBusDriverBindingStart (
           (VOID **) &gPciOverrideProtocol
           );
   }  
+
+  if (mIoMmuProtocol == NULL) {
+    gBS->LocateProtocol (
+          &gEdkiiIoMmuProtocolGuid,
+          NULL,
+          (VOID **) &mIoMmuProtocol
+          );
+  }
 
   if (PcdGetBool (PcdPciDisableBusEnumeration)) {
     gFullEnumeration = FALSE;
@@ -332,7 +341,7 @@ PciBusDriverBindingStart (
 }
 
 /**
-  Stop this driver on ControllerHandle. Support stoping any child handles
+  Stop this driver on ControllerHandle. Support stopping any child handles
   created by this driver.
 
   @param  This              Protocol instance pointer.

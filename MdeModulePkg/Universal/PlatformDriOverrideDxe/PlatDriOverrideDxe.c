@@ -13,7 +13,7 @@
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -541,7 +541,7 @@ UpdateDeviceSelectPage (
   @param  ImageHandle          The Image handle
 
   @return                      Handle to Driver binding
-  @retval NULL                 The paramter is not valid or the driver binding handle is not found.
+  @retval NULL                 The parameter is not valid or the driver binding handle is not found.
 
 **/
 EFI_HANDLE
@@ -1500,7 +1500,7 @@ GetDriver (
 
     Status = InitOverridesMapping (&mMappingDataBase);
     if (EFI_ERROR (Status)){
-      DEBUG ((DEBUG_ERROR, "The status to Get Platform Driver Override Variable is %r\n", Status));
+      DEBUG ((DEBUG_INFO, "The status to Get Platform Driver Override Variable is %r\n", Status));
       InitializeListHead (&mMappingDataBase);
       return EFI_NOT_FOUND;
     }
@@ -1577,7 +1577,7 @@ DriverLoaded (
 }
 
 /**
-  The driver Entry Point. The funciton will export a disk device class formset and
+  The driver Entry Point. The function will export a disk device class formset and
   its callback function to hii database.
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.

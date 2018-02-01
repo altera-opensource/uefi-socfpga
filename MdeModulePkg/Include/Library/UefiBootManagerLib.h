@@ -1,7 +1,8 @@
 /** @file
   Provide Boot Manager related library APIs.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,6 +31,7 @@ typedef enum {
   LoadOptionTypeDriver,
   LoadOptionTypeSysPrep,
   LoadOptionTypeBoot,
+  LoadOptionTypePlatformRecovery,
   LoadOptionTypeMax
 } EFI_BOOT_MANAGER_LOAD_OPTION_TYPE;
 
@@ -222,6 +224,27 @@ EfiBootManagerSortLoadOptionVariable (
   IN SORT_COMPARE                      CompareFunction
   );
 
+/**
+  Return the index of the load option in the load option array.
+
+  The function consider two load options are equal when the 
+  OptionType, Attributes, Description, FilePath and OptionalData are equal.
+
+  @param Key    Pointer to the load option to be found.
+  @param Array  Pointer to the array of load options to be found.
+  @param Count  Number of entries in the Array.
+
+  @retval -1          Key wasn't found in the Array.
+  @retval 0 ~ Count-1 The index of the Key in the Array.
+**/
+INTN
+EFIAPI
+EfiBootManagerFindLoadOption (
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Key,
+  IN CONST EFI_BOOT_MANAGER_LOAD_OPTION *Array,
+  IN UINTN                              Count
+  );
+
 //
 // Boot Manager hot key library functions.
 //
@@ -395,17 +418,42 @@ EfiBootManagerBoot (
   );
 
 /**
-  Return the Boot Manager Menu.
- 
+  Return the boot option corresponding to the Boot Manager Menu.
+  It may automatically create one if the boot option hasn't been created yet.
+
   @param BootOption    Return the Boot Manager Menu.
 
   @retval EFI_SUCCESS   The Boot Manager Menu is successfully returned.
-  @retval EFI_NOT_FOUND The Boot Manager Menu is not found.
+  @retval EFI_NOT_FOUND The Boot Manager Menu cannot be found.
+  @retval others        Return status of gRT->SetVariable (). BootOption still points
+                        to the Boot Manager Menu even the Status is not EFI_SUCCESS
+                        and EFI_NOT_FOUND.
 **/
 EFI_STATUS
 EFIAPI
 EfiBootManagerGetBootManagerMenu (
   EFI_BOOT_MANAGER_LOAD_OPTION *BootOption
+  );
+
+
+/**
+  Get the load option by its device path.
+
+  @param FilePath  The device path pointing to a load option.
+                   It could be a short-form device path.
+  @param FullPath  Return the full device path of the load option after
+                   short-form device path expanding.
+                   Caller is responsible to free it.
+  @param FileSize  Return the load option size.
+
+  @return The load option buffer. Caller is responsible to free the memory.
+**/
+VOID *
+EFIAPI
+EfiBootManagerGetLoadOptionBuffer (
+  IN  EFI_DEVICE_PATH_PROTOCOL          *FilePath,
+  OUT EFI_DEVICE_PATH_PROTOCOL          **FullPath,
+  OUT UINTN                             *FileSize
   );
 
 /**
@@ -707,5 +755,39 @@ EFI_STATUS
 EFIAPI
 EfiBootManagerProcessLoadOption (
   EFI_BOOT_MANAGER_LOAD_OPTION       *LoadOption
+  );
+
+/**
+  Check whether the VariableName is a valid load option variable name
+  and return the load option type and option number.
+
+  @param VariableName The name of the load option variable.
+  @param OptionType   Return the load option type.
+  @param OptionNumber Return the load option number.
+
+  @retval TRUE  The variable name is valid; The load option type and
+                load option number are returned.
+  @retval FALSE The variable name is NOT valid.
+**/
+BOOLEAN
+EFIAPI
+EfiBootManagerIsValidLoadOptionVariableName (
+  IN CHAR16                             *VariableName,
+  OUT EFI_BOOT_MANAGER_LOAD_OPTION_TYPE *OptionType   OPTIONAL,
+  OUT UINT16                            *OptionNumber OPTIONAL
+  );
+
+
+/**
+  Dispatch the deferred images that are returned from all DeferredImageLoad instances.
+
+  @retval EFI_SUCCESS       At least one deferred image is loaded successfully and started.
+  @retval EFI_NOT_FOUND     There is no deferred image.
+  @retval EFI_ACCESS_DENIED There are deferred images but all of them are failed to load.
+**/
+EFI_STATUS
+EFIAPI
+EfiBootManagerDispatchDeferredImages (
+  VOID
   );
 #endif

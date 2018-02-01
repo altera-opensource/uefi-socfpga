@@ -1,7 +1,8 @@
 /** @file
   Definitions for EFI IPv4 Configuration II Protocol implementation.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -24,13 +25,9 @@
 #define DATA_ATTRIB_SIZE_FIXED              0x1
 #define DATA_ATTRIB_VOLATILE                0x2
 
-#define DHCP_TAG_PARA_LIST             55
-#define DHCP_TAG_NETMASK               1
-#define DHCP_TAG_ROUTER                3
-
-
 #define DATA_ATTRIB_SET(Attrib, Bits)       (BOOLEAN)((Attrib) & (Bits))
 #define SET_DATA_ATTRIB(Attrib, Bits)       ((Attrib) |= (Bits))
+#define REMOVE_DATA_ATTRIB(Attrib, Bits)    ((Attrib) &= (~Bits))
 
 typedef struct _IP4_CONFIG2_INSTANCE IP4_CONFIG2_INSTANCE;
 
@@ -201,14 +198,35 @@ struct _IP4_CONFIG2_INSTANCE {
 
 //
 // Configure the DHCP to request the routers and netmask
-// from server. The DHCP_TAG_NETMASK is included in Head.
+// from server. The DHCP4_TAG_NETMASK is included in Head.
 //
 #pragma pack(1)
 typedef struct {
   EFI_DHCP4_PACKET_OPTION Head;
   UINT8                   Route;
+  UINT8                   Dns;
 } IP4_CONFIG2_DHCP4_OPTION;
 #pragma pack()
+
+/**
+  Read the configuration data from variable storage according to the VarName and
+  gEfiIp4Config2ProtocolGuid. It checks the integrity of variable data. If the
+  data is corrupted, it clears the variable data to ZERO. Othewise, it outputs the
+  configuration data to IP4_CONFIG2_INSTANCE.
+
+  @param[in]      VarName       The pointer to the variable name
+  @param[in, out] Instance      The pointer to the IP4 config2 instance data.
+
+  @retval EFI_NOT_FOUND         The variable can not be found or already corrupted.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate resource to complete the operation.
+  @retval EFI_SUCCESS           The configuration data was retrieved successfully.
+
+**/
+EFI_STATUS
+Ip4Config2ReadConfigData (
+  IN     CHAR16               *VarName,
+  IN OUT IP4_CONFIG2_INSTANCE *Instance
+  );
 
 /**
   Start the DHCP configuration for this IP service instance.
@@ -217,7 +235,7 @@ typedef struct {
 
   @param[in]  Instance           The IP4 config2 instance to configure.
 
-  @retval EFI_SUCCESS            The auto configuration is successfull started.
+  @retval EFI_SUCCESS            The auto configuration is successfully started.
   @retval Others                 Failed to start auto configuration.
 
 **/
@@ -249,6 +267,20 @@ Ip4Config2InitInstance (
 VOID
 Ip4Config2CleanInstance (
   IN OUT IP4_CONFIG2_INSTANCE  *Instance
+  );
+
+/**
+  Request Ip4AutoReconfigCallBackDpc as a DPC at TPL_CALLBACK.
+
+  @param Event     The event that is signalled.
+  @param Context   The IP4 service binding instance.
+
+**/
+VOID
+EFIAPI
+Ip4AutoReconfigCallBack (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
   );
 
 /**

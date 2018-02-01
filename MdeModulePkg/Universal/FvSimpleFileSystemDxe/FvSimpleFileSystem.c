@@ -526,7 +526,10 @@ FvSimpleFileSystemOpen (
     InitializeListHead (&NewFile->Link);
     InsertHeadList (&Instance->FileHead, &NewFile->Link);
 
-    NewFile->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
+    NewFile->DirReadNext = NULL;
+    if (!IsListEmpty (&Instance->FileInfoHead)) {
+      NewFile->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
+    }
 
     *NewHandle = &NewFile->FileProtocol;
     return EFI_SUCCESS;
@@ -559,7 +562,8 @@ FvSimpleFileSystemOpen (
       // No, there was no extension. So add one and search again for the file
       // NewFileNameLength = FileNameLength + 1 + 4 = (Number of non-null character) + (file extension) + (a null character)
       NewFileNameLength = FileNameLength + 1 + 4;
-      FileNameWithExtension = AllocateCopyPool (NewFileNameLength * 2, FileName);
+      FileNameWithExtension = AllocatePool (NewFileNameLength * 2);
+      StrCpyS (FileNameWithExtension, NewFileNameLength, FileName);
       StrCatS (FileNameWithExtension, NewFileNameLength, L".EFI");
 
       for (FvFileInfoLink = GetFirstNode (&Instance->FileInfoHead);
@@ -821,7 +825,9 @@ FvSimpleFileSystemSetPosition (
     //
     // Reset directory position to first entry
     //
-    File->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
+    if (File->DirReadNext) {
+      File->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance); 
+    }
   } else if (Position == 0xFFFFFFFFFFFFFFFFull) {
     File->Position = File->FvFileInfo->FileInfo.FileSize;
   } else {

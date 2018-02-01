@@ -7,7 +7,9 @@
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
     4) AMD64 Architecture Programmer's Manual Volume 2: System Programming
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #define SYS_CODE64_SEL 0x38
+
 
 #pragma pack(1)
 
@@ -145,8 +148,36 @@ typedef union {
 
 #pragma pack()
 
+#define CR0_WP                      BIT16
+
 #define IA32_PG_P                   BIT0
 #define IA32_PG_RW                  BIT1
+#define IA32_PG_PS                  BIT7
+
+#define PAGING_PAE_INDEX_MASK       0x1FF
+
+#define PAGING_4K_ADDRESS_MASK_64   0x000FFFFFFFFFF000ull
+#define PAGING_2M_ADDRESS_MASK_64   0x000FFFFFFFE00000ull
+#define PAGING_1G_ADDRESS_MASK_64   0x000FFFFFC0000000ull
+
+#define PAGING_L1_ADDRESS_SHIFT     12
+#define PAGING_L2_ADDRESS_SHIFT     21
+#define PAGING_L3_ADDRESS_SHIFT     30
+#define PAGING_L4_ADDRESS_SHIFT     39
+
+#define PAGING_PML4E_NUMBER         4
+
+#define PAGE_TABLE_POOL_ALIGNMENT   BASE_2MB
+#define PAGE_TABLE_POOL_UNIT_SIZE   SIZE_2MB
+#define PAGE_TABLE_POOL_UNIT_PAGES  EFI_SIZE_TO_PAGES (PAGE_TABLE_POOL_UNIT_SIZE)
+#define PAGE_TABLE_POOL_ALIGN_MASK  \
+  (~(EFI_PHYSICAL_ADDRESS)(PAGE_TABLE_POOL_ALIGNMENT - 1))
+
+typedef struct {
+  VOID            *NextPool;
+  UINTN           Offset;
+  UINTN           FreePages;
+} PAGE_TABLE_POOL;
 
 /**
   Enable Execute Disable Bit.
@@ -222,5 +253,64 @@ AsmGetVectorTemplatInfo (
   OUT   VOID  **TemplateBase
   );
 
+/**
+  Clear legacy memory located at the first 4K-page.
+
+  This function traverses the whole HOB list to check if memory from 0 to 4095
+  exists and has not been allocated, and then clear it if so.
+
+  @param HobStart         The start of HobList passed to DxeCore.
+
+**/
+VOID
+ClearFirst4KPage (
+  IN  VOID *HobStart
+  );
+
+/**
+  Return configure status of NULL pointer detection feature.
+
+  @return TRUE   NULL pointer detection feature is enabled
+  @return FALSE  NULL pointer detection feature is disabled
+**/
+BOOLEAN
+IsNullDetectionEnabled (
+  VOID
+  );
+
+/**
+  Prevent the memory pages used for page table from been overwritten.
+
+  @param[in] PageTableBase    Base address of page table (CR3).
+  @param[in] Level4Paging     Level 4 paging flag.
+
+**/
+VOID
+EnablePageTableProtection (
+  IN  UINTN     PageTableBase,
+  IN  BOOLEAN   Level4Paging
+  );
+
+/**
+  This API provides a way to allocate memory for page table.
+
+  This API can be called more than once to allocate memory for page tables.
+
+  Allocates the number of 4KB pages and returns a pointer to the allocated
+  buffer. The buffer returned is aligned on a 4KB boundary.
+
+  If Pages is 0, then NULL is returned.
+  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
+
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
+
+**/
+VOID *
+AllocatePageTableMemory (
+  IN UINTN           Pages
+  );
 
 #endif 

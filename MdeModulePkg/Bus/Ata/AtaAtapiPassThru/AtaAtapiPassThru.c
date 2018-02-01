@@ -2,7 +2,7 @@
   This file implements ATA_PASSTHRU_PROCTOCOL and EXT_SCSI_PASSTHRU_PROTOCOL interfaces
   for managed ATA controllers.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -94,6 +94,7 @@ ATA_ATAPI_PASS_THRU_INSTANCE gAtaAtapiPassThruInstanceTemplate = {
     NULL,
     NULL
   },
+  0,                  // EnabledPciAttributes
   0,                  // OriginalAttributes
   0,                  // PreviousPort
   0,                  // PreviousPortMultiplier
@@ -148,7 +149,7 @@ UINT8 mScsiId[TARGET_MAX_BYTES] = {
 
   @param[in]      Port               The port number of the ATA device to send the command.
   @param[in]      PortMultiplierPort The port multiplier port number of the ATA device to send the command.
-                                     If there is no port multiplier, then specify 0.
+                                     If there is no port multiplier, then specify 0xFFFF.
   @param[in, out] Packet             A pointer to the ATA command to send to the ATA device specified by Port
                                      and PortMultiplierPort.
   @param[in]      Instance           Pointer to the ATA_ATAPI_PASS_THRU_INSTANCE.
@@ -272,6 +273,14 @@ AtaPassThruPassThruExecute (
       }
       break;
     case EfiAtaAhciMode :
+      if (PortMultiplierPort == 0xFFFF) {
+        //
+        // If there is no port multiplier, PortMultiplierPort will be 0xFFFF
+        // according to UEFI spec. Here, we convert its value to 0 to follow
+        // AHCI spec.
+        //
+        PortMultiplierPort = 0;
+      }
       switch (Protocol) {
         case EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA:
           Status = AhciNonDataTransfer (
@@ -662,7 +671,7 @@ AtaAtapiPassThruStart (
   EFI_IDE_CONTROLLER_INIT_PROTOCOL  *IdeControllerInit;
   ATA_ATAPI_PASS_THRU_INSTANCE      *Instance;
   EFI_PCI_IO_PROTOCOL               *PciIo;
-  UINT64                            Supports;
+  UINT64                            EnabledPciAttributes;
   UINT64                            OriginalPciAttributes;
 
   Status                = EFI_SUCCESS;
@@ -714,14 +723,14 @@ AtaAtapiPassThruStart (
                     PciIo,
                     EfiPciIoAttributeOperationSupported,
                     0,
-                    &Supports
+                    &EnabledPciAttributes
                     );
   if (!EFI_ERROR (Status)) {
-    Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+    EnabledPciAttributes &= (UINT64)EFI_PCI_DEVICE_ENABLE;
     Status = PciIo->Attributes (
                       PciIo,
                       EfiPciIoAttributeOperationEnable,
-                      Supports,
+                      EnabledPciAttributes,
                       NULL
                       );
   }
@@ -741,6 +750,7 @@ AtaAtapiPassThruStart (
   Instance->ControllerHandle      = Controller;
   Instance->IdeControllerInit     = IdeControllerInit;
   Instance->PciIo                 = PciIo;
+  Instance->EnabledPciAttributes  = EnabledPciAttributes;
   Instance->OriginalPciAttributes = OriginalPciAttributes;
   Instance->AtaPassThru.Mode      = &Instance->AtaPassThruMode;
   Instance->ExtScsiPassThru.Mode  = &Instance->ExtScsiPassThruMode;
@@ -851,7 +861,6 @@ AtaAtapiPassThruStop (
   EFI_ATA_PASS_THRU_PROTOCOL        *AtaPassThru;
   EFI_PCI_IO_PROTOCOL               *PciIo;
   EFI_AHCI_REGISTERS                *AhciRegisters;
-  UINT64                            Supports;
 
   DEBUG ((EFI_D_INFO, "==AtaAtapiPassThru Stop== Controller = %x\n", Controller));
 
@@ -904,12 +913,22 @@ AtaAtapiPassThruStop (
   //
   DestroyDeviceInfoList (Instance);
 
+  PciIo = Instance->PciIo;
+
+  //
+  // Disable this ATA host controller.
+  //
+  PciIo->Attributes (
+           PciIo,
+           EfiPciIoAttributeOperationDisable,
+           Instance->EnabledPciAttributes,
+           NULL
+           );
+
   //
   // If the current working mode is AHCI mode, then pre-allocated resource
   // for AHCI initialization should be released.
   //
-  PciIo = Instance->PciIo;
-
   if (Instance->Mode == EfiAtaAhciMode) {
     AhciRegisters = &Instance->AhciRegisters;
     PciIo->Unmap (
@@ -942,25 +961,6 @@ AtaAtapiPassThruStop (
   }
 
   //
-  // Disable this ATA host controller.
-  //
-  Status = PciIo->Attributes (
-                    PciIo,
-                    EfiPciIoAttributeOperationSupported,
-                    0,
-                    &Supports
-                    );
-  if (!EFI_ERROR (Status)) {
-    Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
-    PciIo->Attributes (
-             PciIo,
-             EfiPciIoAttributeOperationDisable,
-             Supports,
-             NULL
-             );
-  }
-
-  //
   // Restore original PCI attributes
   //
   Status = PciIo->Attributes (
@@ -982,7 +982,7 @@ AtaAtapiPassThruStop (
   @param[in]  Instance            A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
   @param[in]  Port                The port number of the ATA device to send the command.
   @param[in]  PortMultiplierPort  The port multiplier port number of the ATA device to send the command.
-                                  If there is no port multiplier, then specify 0.
+                                  If there is no port multiplier, then specify 0xFFFF.
   @param[in]  DeviceType          The device type of the ATA device.
 
   @retval     The pointer to the data structure of the device info to access.
@@ -1004,6 +1004,18 @@ SearchDeviceInfoList (
   while (!IsNull (&Instance->DeviceList, Node)) {
     DeviceInfo = ATA_ATAPI_DEVICE_INFO_FROM_THIS (Node);
 
+    //
+    // For CD-ROM working in the AHCI mode, only 8 bits are used to record
+    // the PortMultiplier information. If the CD-ROM is directly attached
+    // on a SATA port, the PortMultiplier should be translated from 0xFF
+    // to 0xFFFF according to the UEFI spec.
+    //
+    if ((Instance->Mode == EfiAtaAhciMode) &&
+        (DeviceInfo->Type == EfiIdeCdrom) &&
+        (PortMultiplier == 0xFF)) {
+        PortMultiplier = 0xFFFF;
+    }
+
     if ((DeviceInfo->Type == DeviceType) &&
         (Port == DeviceInfo->Port) &&
         (PortMultiplier == DeviceInfo->PortMultiplier)) {
@@ -1023,7 +1035,7 @@ SearchDeviceInfoList (
   @param[in]  Instance            A pointer to the ATA_ATAPI_PASS_THRU_INSTANCE instance.
   @param[in]  Port                The port number of the ATA device to send the command.
   @param[in]  PortMultiplierPort  The port multiplier port number of the ATA device to send the command.
-                                  If there is no port multiplier, then specify 0.
+                                  If there is no port multiplier, then specify 0xFFFF.
   @param[in]  DeviceType          The device type of the ATA device.
   @param[in]  IdentifyData        The data buffer to store the output of the IDENTIFY cmd.
 
@@ -1216,7 +1228,7 @@ Done:
   @param[in]      This               A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance.
   @param[in]      Port               The port number of the ATA device to send the command.
   @param[in]      PortMultiplierPort The port multiplier port number of the ATA device to send the command.
-                                     If there is no port multiplier, then specify 0.
+                                     If there is no port multiplier, then specify 0xFFFF.
   @param[in, out] Packet             A pointer to the ATA command to send to the ATA device specified by Port
                                      and PortMultiplierPort.
   @param[in]      Event               If non-blocking I/O is not supported then Event is ignored, and blocking
@@ -1531,7 +1543,34 @@ AtaPassThruGetNextDevice (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (*PortMultiplierPort == 0xFFFF) {
+  if (Instance->PreviousPortMultiplier == 0xFFFF) {
+    //
+    // If a device is directly attached on a port, previous call to this
+    // function will return the value 0xFFFF for PortMultiplierPort. In
+    // this case, there should be no more device on the port multiplier.
+    //
+    Instance->PreviousPortMultiplier = 0;
+    return EFI_NOT_FOUND;
+  }
+
+  if (*PortMultiplierPort == Instance->PreviousPortMultiplier) {
+    Node = GetFirstNode (&Instance->DeviceList);
+
+    while (!IsNull (&Instance->DeviceList, Node)) {
+      DeviceInfo = ATA_ATAPI_DEVICE_INFO_FROM_THIS (Node);
+
+      if ((DeviceInfo->Type == EfiIdeHarddisk) &&
+           (DeviceInfo->Port == Port) &&
+           (DeviceInfo->PortMultiplier > *PortMultiplierPort)){
+        *PortMultiplierPort = DeviceInfo->PortMultiplier;
+        goto Exit;
+      }
+
+      Node = GetNextNode (&Instance->DeviceList, Node);
+    }
+
+    return EFI_NOT_FOUND;
+  } else if (*PortMultiplierPort == 0xFFFF) {
     //
     // If the PortMultiplierPort is all 0xFF's, start to traverse the device list from the beginning
     //
@@ -1542,23 +1581,6 @@ AtaPassThruGetNextDevice (
 
       if ((DeviceInfo->Type == EfiIdeHarddisk) &&
            (DeviceInfo->Port == Port)){
-        *PortMultiplierPort = DeviceInfo->PortMultiplier;
-        goto Exit;
-      }
-
-      Node = GetNextNode (&Instance->DeviceList, Node);
-    }
-
-    return EFI_NOT_FOUND;
-  } else if (*PortMultiplierPort == Instance->PreviousPortMultiplier) {
-    Node = GetFirstNode (&Instance->DeviceList);
-
-    while (!IsNull (&Instance->DeviceList, Node)) {
-      DeviceInfo = ATA_ATAPI_DEVICE_INFO_FROM_THIS (Node);
-
-      if ((DeviceInfo->Type == EfiIdeHarddisk) &&
-           (DeviceInfo->Port == Port) &&
-           (DeviceInfo->PortMultiplier > *PortMultiplierPort)){
         *PortMultiplierPort = DeviceInfo->PortMultiplier;
         goto Exit;
       }
@@ -1601,7 +1623,7 @@ Exit:
                                      device path node is to be allocated and built.
   @param[in]      PortMultiplierPort The port multiplier port number of the ATA device for which a
                                      device path node is to be allocated and built. If there is no
-                                     port multiplier, then specify 0.
+                                     port multiplier, then specify 0xFFFF.
   @param[in, out] DevicePath         A pointer to a single device path node that describes the ATA
                                      device specified by Port and PortMultiplierPort. This function
                                      is responsible for allocating the buffer DevicePath with the
@@ -1812,7 +1834,7 @@ AtaPassThruResetPort (
   @param[in] This                A pointer to the EFI_ATA_PASS_THRU_PROTOCOL instance.
   @param[in] Port                Port represents the port number of the ATA device to be reset.
   @param[in] PortMultiplierPort  The port multiplier port number of the ATA device to reset.
-                                 If there is no port multiplier, then specify 0.
+                                 If there is no port multiplier, then specify 0xFFFF.
   @retval EFI_SUCCESS            The ATA device specified by Port and PortMultiplierPort was reset.
   @retval EFI_UNSUPPORTED        The ATA controller does not support a device reset operation.
   @retval EFI_INVALID_PARAMETER  Port or PortMultiplierPort are invalid.
@@ -1848,7 +1870,7 @@ AtaPassThruResetDevice (
 }
 
 /**
-  Sumbit ATAPI request sense command.
+  Submit ATAPI request sense command.
 
   @param[in] This            A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param[in] Target          The Target is an array of size TARGET_MAX_BYTES and it represents
@@ -2049,6 +2071,13 @@ ExtScsiPassThruPassThru (
       Status = AtaPacketCommandExecute (Instance->PciIo, &Instance->IdeRegisters[Port], Port, PortMultiplier, Packet);
       break;
     case EfiAtaAhciMode:
+      if (PortMultiplier == 0xFF) {
+        //
+        // If there is no port multiplier, the PortMultiplier will be 0xFF
+        // Here, we convert its value to 0 to follow the AHCI spec.
+        //
+        PortMultiplier = 0;
+      }
       Status = AhciPacketCommandExecute (Instance->PciIo, &Instance->AhciRegisters, Port, PortMultiplier, Packet);
       break;
     default :
@@ -2186,7 +2215,7 @@ ExtScsiPassThruGetNextTargetLun (
       if ((DeviceInfo->Type == EfiIdeCdrom) &&
          ((Target8[0] < DeviceInfo->Port) ||
           ((Target8[0] == DeviceInfo->Port) &&
-           (Target8[1] < DeviceInfo->PortMultiplier)))) {
+           (Target8[1] < (UINT8)DeviceInfo->PortMultiplier)))) {
         Target8[0] = (UINT8)DeviceInfo->Port;
         Target8[1] = (UINT8)DeviceInfo->PortMultiplier;
         goto Exit;
@@ -2308,7 +2337,13 @@ ExtScsiPassThruBuildDevicePath (
     }
 
     DevicePathNode->Sata.HBAPortNumber            = Port;
-    DevicePathNode->Sata.PortMultiplierPortNumber = PortMultiplier;
+    //
+    // For CD-ROM working in the AHCI mode, only 8 bits are used to record
+    // the PortMultiplier information. If the CD-ROM is directly attached
+    // on a SATA port, the PortMultiplier should be translated from 0xFF
+    // to 0xFFFF according to the UEFI spec.
+    //
+    DevicePathNode->Sata.PortMultiplierPortNumber = PortMultiplier == 0xFF ? 0xFFFF : PortMultiplier;
     DevicePathNode->Sata.Lun                      = (UINT16) Lun;
   }
 
@@ -2562,7 +2597,7 @@ ExtScsiPassThruGetNextTarget (
       if ((DeviceInfo->Type == EfiIdeCdrom) &&
          ((Target8[0] < DeviceInfo->Port) ||
           ((Target8[0] == DeviceInfo->Port) &&
-           (Target8[1] < DeviceInfo->PortMultiplier)))) {
+           (Target8[1] < (UINT8)DeviceInfo->PortMultiplier)))) {
         Target8[0] = (UINT8)DeviceInfo->Port;
         Target8[1] = (UINT8)DeviceInfo->PortMultiplier;
         goto Exit;

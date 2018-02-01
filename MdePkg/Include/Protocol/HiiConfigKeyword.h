@@ -3,7 +3,7 @@
   associated with a keyword exposed through a x-UEFI- prefixed 
   configuration language namespace.
   
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -64,8 +64,9 @@ typedef struct _EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL EFI_CONFIG_KEYWORD_HANDLER_P
   @param Progress         On return, points to a character in the KeywordString. 
                           Points to the string's NULL terminator if the request 
                           was successful. Points to the most recent '&' before 
-                          the first failing string element if the request was 
-                          not successful.
+                          the first failing name / value pair (or the beginning
+                          of the string if the failure is in the first name / value
+                          pair) if the request was not successful.
 
   @param ProgressErr      If during the processing of the KeywordString there was
                           a failure, this parameter gives additional information 
@@ -134,8 +135,9 @@ EFI_STATUS
   
   @param Progress       On return, points to a character in the KeywordString. Points
                         to the string's NULL terminator if the request was successful. 
-                        Points to the most recent '&' before the first failing string
-                        element if the request was not successful.
+                        Points to the most recent '&' before the first failing name / value
+                        pair (or the beginning of the string if the failure is in the first
+                        name / value pair) if the request was not successful.
                         
   @param ProgressErr    If during the processing of the KeywordString there was a
                         failure, this parameter gives additional information about the 
@@ -150,7 +152,7 @@ EFI_STATUS
   @retval EFI_SUCCESS             The specified action was completed successfully.
   
   @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
-                                  1.Progress, ProgressErr, or Resuts is NULL.
+                                  1.Progress, ProgressErr, or Results is NULL.
                                   2.Parsing of the KeywordString resulted in an error. See
                                     Progress and ProgressErr for more data.
   

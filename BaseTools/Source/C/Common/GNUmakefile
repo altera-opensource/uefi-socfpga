@@ -10,7 +10,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-ARCH ?= IA32
+HOST_ARCH ?= IA32
 MAKEROOT ?= ..
 
 # VPATH = ..
@@ -35,6 +35,7 @@ OBJECTS = \
   PeCoffLoaderEx.o \
   SimpleFileParsing.o \
   StringFuncs.o \
-  TianoCompress.o
+  TianoCompress.o \
+  PcdValueCommon.o
 
 include $(MAKEROOT)/Makefiles/lib.makefile

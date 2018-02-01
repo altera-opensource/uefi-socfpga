@@ -4,7 +4,7 @@ Reading/writing MBR/DBR.
     If we write MBR to disk, we just update the MBR code and the partition table wouldn't be over written.
     If we process DBR, we will patch MBR to set first partition active if no active partition exists.
     
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -167,7 +167,7 @@ Return:
   if (VolumeHandle == INVALID_HANDLE_VALUE) {
     fprintf (
       stderr, 
-      "error E0005: CreateFile failed: Volume = %s, LastError = 0x%x\n", 
+      "error E0005: CreateFile failed: Volume = %s, LastError = 0x%lx\n", 
       VolumeAccessPath, 
       GetLastError ()
       );
@@ -201,6 +201,7 @@ Return:
     //
     // Only care about the disk.
     //
+    CloseHandle(VolumeHandle);
     return FALSE;
   } else{
     DriveInfo->DiskNumber = StorageDeviceNumber.DeviceNumber;
@@ -278,7 +279,7 @@ GetBootSectorOffset (
 Description:
   Get the offset of boot sector.
   For non-MBR disk, offset is just 0
-  for disk with MBR, offset needs to be caculated by parsing MBR
+  for disk with MBR, offset needs to be calculated by parsing MBR
 
   NOTE: if no one is active, we will patch MBR to select first partition as active.
 
@@ -437,8 +438,8 @@ ProcessBsOrMbr (
   BYTE              DiskPartitionBackup[0x200] = {0};
   DWORD             BytesReturn;
   INT               DrvNumOffset;
-  HANDLE            InputHandle;
-  HANDLE            OutputHandle;
+  HANDLE            InputHandle = INVALID_HANDLE_VALUE;
+  HANDLE            OutputHandle = INVALID_HANDLE_VALUE;
   ERROR_STATUS      Status;
   DWORD             InputDbrOffset;
   DWORD             OutputDbrOffset;
@@ -448,7 +449,7 @@ ProcessBsOrMbr (
   //
   Status =  GetFileHandle(InputInfo, ProcessMbr, &InputHandle, &InputDbrOffset);
   if (Status != ErrorSuccess) {
-    return Status;
+    goto Done;
   }
 
   //
@@ -456,14 +457,15 @@ ProcessBsOrMbr (
   //
   Status = GetFileHandle(OutputInfo, ProcessMbr, &OutputHandle, &OutputDbrOffset);
   if (Status != ErrorSuccess) {
-    return Status;
+    goto Done;
   }
 
   //
   // Read boot sector from source disk/file
   // 
   if (!ReadFile (InputHandle, DiskPartition, 0x200, &BytesReturn, NULL)) {
-    return ErrorFileReadWrite;
+    Status = ErrorFileReadWrite;
+    goto Done;
   }
 
   if (InputInfo->Type == PathUsb) {
@@ -473,7 +475,8 @@ ProcessBsOrMbr (
       //
       DrvNumOffset = GetDrvNumOffset (DiskPartition);
       if (DrvNumOffset == -1) {
-        return ErrorFatType;
+        Status = ErrorFatType;
+        goto Done;
       }
       //
       // Some legacy BIOS require 0x80 discarding MBR.
@@ -495,7 +498,8 @@ ProcessBsOrMbr (
       // Use original partition table
       //
       if (!ReadFile (OutputHandle, DiskPartitionBackup, 0x200, &BytesReturn, NULL)) {
-        return ErrorFileReadWrite;
+        Status = ErrorFileReadWrite;
+        goto Done;
       }
       memcpy (DiskPartition + 0x1BE, DiskPartitionBackup + 0x1BE, 0x40);
       SetFilePointer (OutputHandle, 0, NULL, FILE_BEGIN);
@@ -507,13 +511,19 @@ ProcessBsOrMbr (
   // Write boot sector to taget disk/file
   // 
   if (!WriteFile (OutputHandle, DiskPartition, 0x200, &BytesReturn, NULL)) {
-    return ErrorFileReadWrite;
+    Status = ErrorFileReadWrite;
+    goto Done;
   }
 
-  CloseHandle (InputHandle);
-  CloseHandle (OutputHandle);
+Done:
+  if (InputHandle != INVALID_HANDLE_VALUE) {
+    CloseHandle (InputHandle);
+  }
+  if (OutputHandle != INVALID_HANDLE_VALUE) {
+    CloseHandle (OutputHandle);
+  }
 
-  return ErrorSuccess;
+  return Status;
 }
 
 void
@@ -599,7 +609,7 @@ GetPathInfo (
     }
 
     if (!GetDriveInfo(VolumeLetter, &DriveInfo)) {
-      fprintf (stderr, "ERROR: GetDriveInfo - 0x%x\n", GetLastError ());
+      fprintf (stderr, "ERROR: GetDriveInfo - 0x%lx\n", GetLastError ());
       return ErrorPath;
     }
 
@@ -621,6 +631,14 @@ GetPathInfo (
 	return ErrorSuccess;
   } 
 
+  //
+  // Check the path length
+  //
+  if (strlen (PathInfo->Path) >= (sizeof (PathInfo->PhysicalPath) / sizeof (PathInfo->PhysicalPath[0]))) {
+    fprintf (stderr, "ERROR, Path is too long for - %s", PathInfo->Path);
+    return ErrorPath;
+  }
+
   PathInfo->Type = PathFile;
   if (PathInfo->Input) {
     //
@@ -630,10 +648,16 @@ GetPathInfo (
     if (f == NULL) {
       fprintf (stderr, "error E2003: File was not provided!\n");
       return ErrorPath;
-    }  
+    }
+    fclose (f);
   }
   PathInfo->Type = PathFile;
-  strcpy(PathInfo->PhysicalPath, PathInfo->Path);
+  strncpy(
+    PathInfo->PhysicalPath,
+    PathInfo->Path,
+    sizeof (PathInfo->PhysicalPath) / sizeof (PathInfo->PhysicalPath[0]) - 1
+    );
+  PathInfo->PhysicalPath[sizeof (PathInfo->PhysicalPath) / sizeof (PathInfo->PhysicalPath[0]) - 1] = 0;
 
   return ErrorSuccess;
 }    
@@ -787,7 +811,7 @@ main (
   } else {
     fprintf (
       stderr, 
-      "%s: %s %s: failed - %s (LastError: 0x%x)!\n",
+      "%s: %s %s: failed - %s (LastError: 0x%lx)!\n",
       (Status == ErrorNoMbr) ? "WARNING" : "ERROR",
       (OutputPathInfo.Type != PathFile) ? "Write" : "Read", 
       ProcessMbr ? "MBR" : "DBR", 

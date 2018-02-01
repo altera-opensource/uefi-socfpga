@@ -1,7 +1,7 @@
 /** @file
   Source file for CD recovery PEIM
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -17,6 +17,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PeiCdExpress.h"
 
 PEI_CD_EXPRESS_PRIVATE_DATA *mPrivateData = NULL;
+CHAR8 *mRecoveryFileName;
+UINTN mRecoveryFileNameSize;
 
 /**
   Installs the Device Recovery Module PPI, Initialize BlockIo Ppi 
@@ -46,6 +48,16 @@ CdExpressPeimEntry (
   PrivateData = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (*PrivateData)));
   if (PrivateData == NULL) {
     return EFI_OUT_OF_RESOURCES;
+  }
+
+  mRecoveryFileNameSize = PcdGetSize(PcdRecoveryFileName) / sizeof(CHAR16);
+  mRecoveryFileName = AllocatePool(mRecoveryFileNameSize);
+  if (mRecoveryFileName == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+  Status = UnicodeStrToAsciiStrS(PcdGetPtr(PcdRecoveryFileName), mRecoveryFileName, mRecoveryFileNameSize);
+  if (EFI_ERROR(Status)) {
+    return Status;
   }
 
   //
@@ -466,24 +478,25 @@ RetrieveCapsuleFileFromRoot (
       }
     }
 
-    if (Index != (sizeof (PEI_RECOVERY_FILE_NAME) - 1)) {
+    if (Index != mRecoveryFileNameSize - 1) {
       Buffer += FileRecord->Length;
       continue;
     }
 
-    if (!StringCmp (FileRecord->FileID, (UINT8 *) PEI_RECOVERY_FILE_NAME, sizeof (PEI_RECOVERY_FILE_NAME) - 1, FALSE)) {
+    if (!StringCmp (FileRecord->FileID, (UINT8 *)mRecoveryFileName, mRecoveryFileNameSize - 1, FALSE)) {
       Buffer += FileRecord->Length;
       continue;
     }
 
     PrivateData->CapsuleData[PrivateData->CapsuleCount].CapsuleStartLBA = FileRecord->LocationOfExtent[0];
-    PrivateData->CapsuleData[PrivateData->CapsuleCount].CapsuleSize =
+    PrivateData->CapsuleData[PrivateData->CapsuleCount].CapsuleBlockAlignedSize =
       (
         FileRecord->DataLength[0] /
         PEI_CD_BLOCK_SIZE +
         1
       ) *
       PEI_CD_BLOCK_SIZE;
+    PrivateData->CapsuleData[PrivateData->CapsuleCount].CapsuleSize = FileRecord->DataLength[0];
 
     return EFI_SUCCESS;
   }
@@ -659,7 +672,7 @@ LoadRecoveryCapsule (
                           BlockIo2Ppi,
                           PrivateData->CapsuleData[CapsuleInstance - 1].IndexBlock,
                           PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleStartLBA,
-                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleSize,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleBlockAlignedSize,
                           Buffer
                           );
   } else {
@@ -668,7 +681,7 @@ LoadRecoveryCapsule (
                           BlockIoPpi,
                           PrivateData->CapsuleData[CapsuleInstance - 1].IndexBlock,
                           PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleStartLBA,
-                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleSize,
+                          PrivateData->CapsuleData[CapsuleInstance - 1].CapsuleBlockAlignedSize,
                           Buffer
                           );
   }

@@ -18,7 +18,7 @@
 #  may not be modified without authorization. If platform fails to protect these resources,
 #  the authentication service provided in this driver will be broken, and the behavior is undefined.
 #
-# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -51,7 +51,9 @@
   VariableSmm.c
   VarCheck.c
   Variable.h
+  PrivilegePolymorphic.h
   VariableExLib.c
+  TcgMorLockSmm.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -72,6 +74,7 @@
   SmmMemLib
   AuthVariableLib
   VarCheckLib
+  UefiBootServicesTableLib
 
 [Protocols]
   gEfiSmmFirmwareVolumeBlockProtocolGuid        ## CONSUMES
@@ -83,16 +86,18 @@
   gEfiSmmVariableProtocolGuid
   gEfiSmmEndOfDxeProtocolGuid                   ## NOTIFY
   gEdkiiSmmVarCheckProtocolGuid                 ## PRODUCES
+  gEfiTcgProtocolGuid                           ## SOMETIMES_CONSUMES
+  gEfiTcg2ProtocolGuid                          ## SOMETIMES_CONSUMES
 
 [Guids]
-  ## PRODUCES             ## GUID # Signature of Variable store header
-  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## GUID # Signature of Variable store header
   ## SOMETIMES_CONSUMES   ## HOB
   ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiAuthenticatedVariableGuid
 
-  ## PRODUCES             ## GUID # Signature of Variable store header
-  ## CONSUMES             ## GUID # Signature of Variable store header
+  ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
+  ## SOMETIMES_PRODUCES   ## GUID # Signature of Variable store header
   ## SOMETIMES_CONSUMES   ## HOB
   ## SOMETIMES_PRODUCES   ## SystemTable
   gEfiVariableGuid
@@ -103,11 +108,16 @@
   ## SOMETIMES_PRODUCES   ## Variable:L"Lang"
   gEfiGlobalVariableGuid
 
+  gEfiMemoryOverwriteControlDataGuid            ## SOMETIMES_CONSUMES   ## Variable:L"MemoryOverwriteRequestControl"
+  gEfiMemoryOverwriteRequestControlLockGuid     ## SOMETIMES_PRODUCES   ## Variable:L"MemoryOverwriteRequestControlLock"
+
   gSmmVariableWriteGuid                         ## PRODUCES             ## GUID # Install protocol
   gEfiSystemNvDataFvGuid                        ## CONSUMES             ## GUID
   gEdkiiFaultTolerantWriteGuid                  ## SOMETIMES_CONSUMES   ## HOB
-  gEdkiiVarErrorFlagGuid                        ## CONSUMES             ## GUID
-  gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
+
+  ## SOMETIMES_CONSUMES   ## Variable:L"VarErrorFlag"
+  ## SOMETIMES_PRODUCES   ## Variable:L"VarErrorFlag"
+  gEdkiiVarErrorFlagGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize       ## CONSUMES

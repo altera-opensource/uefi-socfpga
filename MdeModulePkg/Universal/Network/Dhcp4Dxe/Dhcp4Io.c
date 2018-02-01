@@ -1,7 +1,7 @@
 /** @file
   EFI DHCP protocol implementation.
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -393,8 +393,6 @@ DhcpLeaseAcquired (
   IN OUT DHCP_SERVICE           *DhcpSb
   )
 {
-  INTN                      Class;
-
   DhcpSb->ClientAddr = EFI_NTOHL (DhcpSb->Selected->Dhcp4.Header.YourAddr);
 
   if (DhcpSb->Para != NULL) {
@@ -403,9 +401,7 @@ DhcpLeaseAcquired (
   }
 
   if (DhcpSb->Netmask == 0) {
-    Class           = NetGetIpClass (DhcpSb->ClientAddr);
-    ASSERT (Class < IP4_ADDR_CLASSE);
-    DhcpSb->Netmask = gIp4AllMasks[Class << 3];
+    return EFI_ABORTED;
   }
 
   if (DhcpSb->LeaseIoPort != NULL) {
@@ -1240,7 +1236,7 @@ DhcpSendMessage (
   //
   Packet->Dhcp4.Magik = DHCP_OPTION_MAGIC;
   Buf                 = Packet->Dhcp4.Option;
-  Buf                 = DhcpAppendOption (Buf, DHCP_TAG_TYPE, 1, &Type);
+  Buf                 = DhcpAppendOption (Buf, DHCP4_TAG_MSG_TYPE, 1, &Type);
 
   //
   // Append the serverid option if necessary:
@@ -1255,7 +1251,7 @@ DhcpSendMessage (
     ASSERT ((Para != NULL) && (Para->ServerId != 0));
 
     IpAddr  = HTONL (Para->ServerId);
-    Buf     = DhcpAppendOption (Buf, DHCP_TAG_SERVER_ID, 4, (UINT8 *) &IpAddr);
+    Buf     = DhcpAppendOption (Buf, DHCP4_TAG_SERVER_ID, 4, (UINT8 *) &IpAddr);
   }
 
   //
@@ -1281,7 +1277,7 @@ DhcpSendMessage (
   }
 
   if (IpAddr != 0) {
-    Buf = DhcpAppendOption (Buf, DHCP_TAG_REQUEST_IP, 4, (UINT8 *) &IpAddr);
+    Buf = DhcpAppendOption (Buf, DHCP4_TAG_REQUEST_IP, 4, (UINT8 *) &IpAddr);
   }
 
   //
@@ -1291,7 +1287,7 @@ DhcpSendMessage (
   //
   if ((Type != DHCP_MSG_DECLINE) && (Type != DHCP_MSG_RELEASE)) {
     MaxMsg  = HTONS (0xFF00);
-    Buf     = DhcpAppendOption (Buf, DHCP_TAG_MAXMSG, 2, (UINT8 *) &MaxMsg);
+    Buf     = DhcpAppendOption (Buf, DHCP4_TAG_MAXMSG, 2, (UINT8 *) &MaxMsg);
   }
 
   //
@@ -1299,7 +1295,7 @@ DhcpSendMessage (
   //
   if (Msg != NULL) {
     Len     = MIN ((UINT32) AsciiStrLen ((CHAR8 *) Msg), 255);
-    Buf     = DhcpAppendOption (Buf, DHCP_TAG_MESSAGE, (UINT16) Len, Msg);
+    Buf     = DhcpAppendOption (Buf, DHCP4_TAG_MESSAGE, (UINT16) Len, Msg);
   }
 
   //
@@ -1312,7 +1308,7 @@ DhcpSendMessage (
       // if it is a DHCP decline or DHCP release .
       //
       if (((Type == DHCP_MSG_DECLINE) || (Type == DHCP_MSG_RELEASE)) &&
-          (Config->OptionList[Index]->OpCode != DHCP_TAG_CLIENT_ID)) {
+          (Config->OptionList[Index]->OpCode != DHCP4_TAG_CLIENT_ID)) {
         continue;
       }
 
@@ -1325,7 +1321,7 @@ DhcpSendMessage (
     }
   }
 
-  *(Buf++) = DHCP_TAG_EOP;
+  *(Buf++) = DHCP4_TAG_EOP;
   Packet->Length += (UINT32) (Buf - Packet->Dhcp4.Option);
 
   //

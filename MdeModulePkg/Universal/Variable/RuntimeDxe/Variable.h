@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Variable modules.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,11 +44,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/FaultTolerantWrite.h>
 #include <Guid/VarErrorFlag.h>
 
+#include "PrivilegePolymorphic.h"
+
 #define EFI_VARIABLE_ATTRIBUTES_MASK (EFI_VARIABLE_NON_VOLATILE | \
                                       EFI_VARIABLE_BOOTSERVICE_ACCESS | \
                                       EFI_VARIABLE_RUNTIME_ACCESS | \
                                       EFI_VARIABLE_HARDWARE_ERROR_RECORD | \
-                                      EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS | \
                                       EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS | \
                                       EFI_VARIABLE_APPEND_WRITE)
 
@@ -389,7 +390,7 @@ ReleaseLockOnlyAtBootTime (
   );
 
 /**
-  Retrive the FVB protocol interface by HANDLE.
+  Retrieve the FVB protocol interface by HANDLE.
 
   @param[in]  FvBlockHandle     The handle of FVB protocol that provides services for
                                 reading, writing, and erasing the target block.
@@ -472,7 +473,7 @@ VariableWriteServiceInitialize (
   );
 
 /**
-  Retrive the SMM Fault Tolerent Write protocol interface.
+  Retrieve the SMM Fault Tolerent Write protocol interface.
 
   @param[out] FtwProtocol       The interface of SMM Ftw protocol
 
@@ -514,7 +515,8 @@ GetFvbInfoByAddress (
   @param Attributes                 Attribute value of the variable found.
   @param DataSize                   Size of Data found. If size is less than the
                                     data, this value contains the required size.
-  @param Data                       Data pointer.
+  @param Data                       The buffer to return the contents of the variable. May be NULL
+                                    with a zero DataSize in order to determine the size buffer needed.
 
   @return EFI_INVALID_PARAMETER     Invalid parameter.
   @return EFI_SUCCESS               Find the specified variable.
@@ -529,7 +531,7 @@ VariableServiceGetVariable (
   IN      EFI_GUID          *VendorGuid,
   OUT     UINT32            *Attributes OPTIONAL,
   IN OUT  UINTN             *DataSize,
-  OUT     VOID              *Data
+  OUT     VOID              *Data OPTIONAL
   );
 
 /**
@@ -542,8 +544,11 @@ VariableServiceGetVariable (
   @param[in] VendorGuid     Variable Vendor Guid.
   @param[out] VariablePtr   Pointer to variable header address.
 
-  @return EFI_SUCCESS       Find the specified variable.
-  @return EFI_NOT_FOUND     Not found.
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_NOT_FOUND         The next variable was not found.
+  @retval EFI_INVALID_PARAMETER If VariableName is not an empty string, while VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER The input values of VariableName and VendorGuid are not a name and
+                                GUID of an existing variable.
 
 **/
 EFI_STATUS
@@ -561,14 +566,22 @@ VariableServiceGetNextVariableInternal (
   Caution: This function may receive untrusted input.
   This function may be invoked in SMM mode. This function will do basic validation, before parse the data.
 
-  @param VariableNameSize           Size of the variable name.
+  @param VariableNameSize           The size of the VariableName buffer. The size must be large
+                                    enough to fit input string supplied in VariableName buffer.
   @param VariableName               Pointer to variable name.
   @param VendorGuid                 Variable Vendor Guid.
 
-  @return EFI_INVALID_PARAMETER     Invalid parameter.
-  @return EFI_SUCCESS               Find the specified variable.
-  @return EFI_NOT_FOUND             Not found.
-  @return EFI_BUFFER_TO_SMALL       DataSize is too small for the result.
+  @retval EFI_SUCCESS               The function completed successfully.
+  @retval EFI_NOT_FOUND             The next variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL      The VariableNameSize is too small for the result.
+                                    VariableNameSize has been updated with the size needed to complete the request.
+  @retval EFI_INVALID_PARAMETER     VariableNameSize is NULL.
+  @retval EFI_INVALID_PARAMETER     VariableName is NULL.
+  @retval EFI_INVALID_PARAMETER     VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER     The input values of VariableName and VendorGuid are not a name and
+                                    GUID of an existing variable.
+  @retval EFI_INVALID_PARAMETER     Null-terminator is not found in the first VariableNameSize bytes of
+                                    the input VariableName buffer.
 
 **/
 EFI_STATUS

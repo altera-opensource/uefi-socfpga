@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of the build database
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,8 @@ import Common.LongFilePathOs as os
 from Common.Misc import sdict
 from Common.Misc import RealPath2
 from Common.BuildToolError import *
+from Common.DataType import *
+import collections
 
 ## PcdClassObject
 #
@@ -44,7 +46,7 @@ from Common.BuildToolError import *
 # @var Phase:                To store value for Phase, default is "DXE"
 #
 class PcdClassObject(object):
-    def __init__(self, Name = None, Guid = None, Type = None, DatumType = None, Value = None, Token = None, MaxDatumSize = None, SkuInfoList = {}, IsOverrided = False, GuidValue = None, validateranges = [], validlists = [], expressions = []):
+    def __init__(self, Name = None, Guid = None, Type = None, DatumType = None, Value = None, Token = None, MaxDatumSize = None, SkuInfoList = {}, IsOverrided = False, GuidValue = None, validateranges = [], validlists = [], expressions = [], IsDsc = False):
         self.TokenCName = Name
         self.TokenSpaceGuidCName = Guid
         self.TokenSpaceGuidValue = GuidValue
@@ -62,6 +64,9 @@ class PcdClassObject(object):
         self.validateranges = validateranges
         self.validlists = validlists
         self.expressions = expressions
+        self.DscDefaultValue = None
+        if IsDsc:
+            self.DscDefaultValue = Value
         
     ## Convert the class to a string
     #
@@ -102,6 +107,70 @@ class PcdClassObject(object):
     #
     def __hash__(self):
         return hash((self.TokenCName, self.TokenSpaceGuidCName))
+
+class StructurePcd(PcdClassObject):
+    def __init__(self, StructuredPcdIncludeFile="", Packages=None, Name=None, Guid=None, Type=None, DatumType=None, Value=None, Token=None, MaxDatumSize=None, SkuInfoList={}, IsOverrided=False, GuidValue=None, validateranges=[], validlists=[], expressions=[],default_store = TAB_DEFAULT_STORES_DEFAULT):
+        super(StructurePcd, self).__init__(Name, Guid, Type, DatumType, Value, Token, MaxDatumSize, SkuInfoList, IsOverrided, GuidValue, validateranges, validlists, expressions)
+        self.StructuredPcdIncludeFile = StructuredPcdIncludeFile
+        self.PackageDecs = Packages
+        self.DefaultStoreName = [default_store]
+        self.DefaultValues = collections.OrderedDict({})
+        self.PcdMode = None
+        self.SkuOverrideValues = collections.OrderedDict({})
+        self.FlexibleFieldName = None
+        self.StructName = None
+    def __repr__(self):
+        return self.TypeName
+
+    def AddDefaultValue (self, FieldName, Value, FileName="", LineNo=0):
+        if FieldName in self.DefaultValues:
+            del self.DefaultValues[FieldName]
+        self.DefaultValues[FieldName] = [Value.strip(), FileName, LineNo]
+        return self.DefaultValues[FieldName]
+
+    def AddOverrideValue (self, FieldName, Value, SkuName, DefaultStoreName, FileName="", LineNo=0):
+        if SkuName not in self.SkuOverrideValues:
+            self.SkuOverrideValues[SkuName] = collections.OrderedDict({})
+        if DefaultStoreName not in self.SkuOverrideValues[SkuName]:
+            self.SkuOverrideValues[SkuName][DefaultStoreName] = collections.OrderedDict({})
+        if FieldName in self.SkuOverrideValues[SkuName][DefaultStoreName]:
+            del self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName]
+        self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName] = [Value.strip(), FileName, LineNo]
+        return self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName]
+
+    def SetPcdMode (self, PcdMode):
+        self.PcdMode = PcdMode
+
+    def SetFlexibleFieldName (self, FlexibleFieldName):
+        self.FlexibleFieldName = FlexibleFieldName
+
+    def copy(self, PcdObject):
+        self.TokenCName = PcdObject.TokenCName if PcdObject.TokenCName else self.TokenCName
+        self.TokenSpaceGuidCName = PcdObject.TokenSpaceGuidCName if PcdObject.TokenSpaceGuidCName else PcdObject.TokenSpaceGuidCName
+        self.TokenSpaceGuidValue = PcdObject.TokenSpaceGuidValue if PcdObject.TokenSpaceGuidValue else self.TokenSpaceGuidValue
+        self.Type = PcdObject.Type if PcdObject.Type else self.Type
+        self.DatumType = PcdObject.DatumType if PcdObject.DatumType else self.DatumType
+        self.DefaultValue = PcdObject.DefaultValue if  PcdObject.DefaultValue else self.DefaultValue
+        self.TokenValue = PcdObject.TokenValue if PcdObject.TokenValue else self.TokenValue
+        self.MaxDatumSize = PcdObject.MaxDatumSize if PcdObject.MaxDatumSize else self.MaxDatumSize
+        self.SkuInfoList = PcdObject.SkuInfoList if PcdObject.SkuInfoList else self.SkuInfoList
+        self.Phase = PcdObject.Phase if PcdObject.Phase else self.Phase
+        self.Pending = PcdObject.Pending if PcdObject.Pending else self.Pending
+        self.IsOverrided = PcdObject.IsOverrided if PcdObject.IsOverrided else self.IsOverrided
+        self.IsFromBinaryInf = PcdObject.IsFromBinaryInf if PcdObject.IsFromBinaryInf else self.IsFromBinaryInf
+        self.IsFromDsc = PcdObject.IsFromDsc if PcdObject.IsFromDsc else self.IsFromDsc
+        self.validateranges = PcdObject.validateranges if PcdObject.validateranges else self.validateranges
+        self.validlists = PcdObject.validlists if PcdObject.validlists else self.validlists
+        self.expressions = PcdObject.expressions if PcdObject.expressions else self.expressions
+        if type(PcdObject) is StructurePcd:
+            self.StructuredPcdIncludeFile = PcdObject.StructuredPcdIncludeFile if PcdObject.StructuredPcdIncludeFile else self.StructuredPcdIncludeFile
+            self.PackageDecs = PcdObject.PackageDecs if PcdObject.PackageDecs else self.PackageDecs
+            self.DefaultValues = PcdObject.DefaultValues if PcdObject.DefaultValues else self.DefaultValues
+            self.PcdMode = PcdObject.PcdMode if PcdObject.PcdMode else self.PcdMode
+            self.DefaultFromDSC=None
+            self.SkuOverrideValues = PcdObject.SkuOverrideValues if PcdObject.SkuOverrideValues else self.SkuOverrideValues
+            self.FlexibleFieldName = PcdObject.FlexibleFieldName if PcdObject.FlexibleFieldName else self.FlexibleFieldName
+            self.StructName = PcdObject.DatumType if PcdObject.DatumType else self.StructName
 
 ## LibraryClassObject
 #

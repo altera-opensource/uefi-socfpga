@@ -1,7 +1,7 @@
 /** @file
   Header file for CD recovery PEIM
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -43,11 +43,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PEI_MEMMORY_PAGE_SIZE             0x1000
 
 //
-// Recovery file name (in root directory)
-//
-#define PEI_RECOVERY_FILE_NAME  "FVMAIN.FV"
-
-//
 // Following are defined according to ISO-9660 specification
 //
 #define PEI_CD_STANDARD_ID                      "CD001"
@@ -66,6 +61,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct {
   UINTN                           CapsuleStartLBA;
   UINTN                           CapsuleSize;
+  UINTN                           CapsuleBlockAlignedSize;
   UINTN                           IndexBlock;
   EFI_PEI_RECOVERY_BLOCK_IO_PPI   *BlockIo;
   EFI_PEI_RECOVERY_BLOCK_IO2_PPI  *BlockIo2;

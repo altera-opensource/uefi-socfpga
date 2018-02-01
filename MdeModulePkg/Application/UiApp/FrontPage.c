@@ -1,7 +1,7 @@
 /** @file
   FrontPage routines to handle the callbacks and browser calls
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -13,15 +13,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "FrontPage.h"
-#include "Language.h"
-#define MAX_STRING_LEN        200
+#include "FrontPageCustomizedUi.h"
 
-EFI_GUID  mFrontPageGuid      = FRONT_PAGE_FORMSET_GUID;
+#define MAX_STRING_LEN            200
 
-BOOLEAN   gConnectAllHappened = FALSE;
+EFI_GUID   mFrontPageGuid      = FRONT_PAGE_FORMSET_GUID;
+
 BOOLEAN   mFeaturerSwitch = TRUE;
 BOOLEAN   mResetRequired  = FALSE;
-BOOLEAN   mEnterBmm       = FALSE;
 
 EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
 CHAR8     *mLanguageString;
@@ -83,7 +82,7 @@ HII_VENDOR_DEVICE_PATH  mFrontPageHiiVendorDevicePath = {
 
 **/
 VOID
-UpdateFrontPageStrings (
+UpdateFrontPageBannerStrings (
   VOID
   );
 
@@ -153,198 +152,7 @@ FakeRouteConfig (
     return EFI_INVALID_PARAMETER;
   }
 
-  *Progress = Configuration;
-  if (!HiiIsConfigHdrMatch (Configuration, &mBootMaintGuid, mBootMaintStorageName)
-      && !HiiIsConfigHdrMatch (Configuration, &mFileExplorerGuid, mFileExplorerStorageName)) {
-    return EFI_NOT_FOUND;
-  }
-
-  *Progress = Configuration + StrLen (Configuration);
-  return EFI_SUCCESS;
-}
-
-/**
-  Create oneof options for language.
-
-**/
-VOID
-InitializeLanguage (
-  VOID
-  )
-{
-  EFI_STATUS                  Status;
-  CHAR8                       *LangCode;
-  CHAR8                       *Lang;
-  CHAR8                       *CurrentLang;
-  UINTN                       OptionCount;
-  CHAR16                      *StringBuffer;
-  EFI_HII_HANDLE              HiiHandle;
-  VOID                        *OptionsOpCodeHandle;
-  VOID                        *StartOpCodeHandle;
-  VOID                        *EndOpCodeHandle;
-  EFI_IFR_GUID_LABEL          *StartLabel;
-  EFI_IFR_GUID_LABEL          *EndLabel;    
-  EFI_HII_STRING_PROTOCOL     *HiiString;
-  UINTN                       StringSize;
-
-  Lang         = NULL;
-  StringBuffer = NULL;
-
-  //
-  // Init OpCode Handle and Allocate space for creation of UpdateData Buffer
-  //
-  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (StartOpCodeHandle != NULL);
-
-  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (EndOpCodeHandle != NULL);
-
-  OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (OptionsOpCodeHandle != NULL);
-  //
-  // Create Hii Extend Label OpCode as the start opcode
-  //
-  StartLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-  StartLabel->Number       = LABEL_SELECT_LANGUAGE;
-
-  //
-  // Create Hii Extend Label OpCode as the end opcode
-  //
-  EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-  EndLabel->Number       = LABEL_END;
-  //
-  // Collect the languages from what our current Language support is based on our VFR
-  //
-  HiiHandle = gFrontPagePrivate.HiiHandle;
-
-  GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&CurrentLang, NULL);
-
-  if (mLanguageString == NULL) {
-    //
-    // Get Support language list from variable.
-    //
-    GetEfiGlobalVariable2 (L"PlatformLangCodes", (VOID**)&mLanguageString, NULL);
-    if (mLanguageString == NULL) {
-      mLanguageString = AllocateCopyPool (
-                                 AsciiStrSize ((CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)),
-                                 (CHAR8 *) PcdGetPtr (PcdUefiVariableDefaultPlatformLangCodes)
-                                 );
-      ASSERT (mLanguageString != NULL);
-    }
-  }
-
-  if (gFrontPagePrivate.LanguageToken == NULL) {
-    //
-    // Count the language list number.
-    //  
-    LangCode      = mLanguageString;
-    Lang          = AllocatePool (AsciiStrSize (mLanguageString));
-    ASSERT (Lang != NULL);
-    OptionCount = 0;
-    while (*LangCode != 0) {
-      GetNextLanguage (&LangCode, Lang);
-      OptionCount ++;
-    }
-
-    //
-    // Allocate extra 1 as the end tag.
-    //
-    gFrontPagePrivate.LanguageToken = AllocateZeroPool ((OptionCount + 1) * sizeof (EFI_STRING_ID));
-    ASSERT (gFrontPagePrivate.LanguageToken != NULL);
-
-    Status = gBS->LocateProtocol (&gEfiHiiStringProtocolGuid, NULL, (VOID **) &HiiString);
-    ASSERT_EFI_ERROR (Status);
-
-    LangCode     = mLanguageString;
-    OptionCount  = 0;
-    while (*LangCode != 0) {
-      GetNextLanguage (&LangCode, Lang);
-
-      StringSize = 0;
-      Status = HiiString->GetString (HiiString, Lang, HiiHandle, PRINTABLE_LANGUAGE_NAME_STRING_ID, StringBuffer, &StringSize, NULL);
-      if (Status == EFI_BUFFER_TOO_SMALL) {
-        StringBuffer = AllocateZeroPool (StringSize);
-        ASSERT (StringBuffer != NULL);
-        Status = HiiString->GetString (HiiString, Lang, HiiHandle, PRINTABLE_LANGUAGE_NAME_STRING_ID, StringBuffer, &StringSize, NULL);
-        ASSERT_EFI_ERROR (Status);
-      }
-
-      if (EFI_ERROR (Status)) {
-        StringBuffer = AllocatePool (AsciiStrSize (Lang) * sizeof (CHAR16));
-        ASSERT (StringBuffer != NULL);
-        AsciiStrToUnicodeStr (Lang, StringBuffer);
-      }
-
-      ASSERT (StringBuffer != NULL);
-      gFrontPagePrivate.LanguageToken[OptionCount] = HiiSetString (HiiHandle, 0, StringBuffer, NULL);
-      FreePool (StringBuffer);
-
-      OptionCount++;
-    }
-  }
-
-  ASSERT (gFrontPagePrivate.LanguageToken != NULL);
-  LangCode     = mLanguageString;
-  OptionCount  = 0;
-  if (Lang == NULL) {
-    Lang = AllocatePool (AsciiStrSize (mLanguageString));
-    ASSERT (Lang != NULL);
-  }
-  while (*LangCode != 0) {
-    GetNextLanguage (&LangCode, Lang);
-
-    if (CurrentLang != NULL && AsciiStrCmp (Lang, CurrentLang) == 0) {
-      HiiCreateOneOfOptionOpCode (
-        OptionsOpCodeHandle,
-        gFrontPagePrivate.LanguageToken[OptionCount],
-        EFI_IFR_OPTION_DEFAULT,
-        EFI_IFR_NUMERIC_SIZE_1,
-        (UINT8) OptionCount
-        );
-    } else {
-      HiiCreateOneOfOptionOpCode (
-        OptionsOpCodeHandle,
-        gFrontPagePrivate.LanguageToken[OptionCount],
-        0,
-        EFI_IFR_NUMERIC_SIZE_1,
-        (UINT8) OptionCount
-        );
-    }
-
-    OptionCount++;
-  }
-
-  if (CurrentLang != NULL) {
-    FreePool (CurrentLang);
-  }
-  FreePool (Lang);
-
-  HiiCreateOneOfOpCode (
-    StartOpCodeHandle,
-    FRONT_PAGE_KEY_LANGUAGE,
-    0,
-    0,
-    STRING_TOKEN (STR_LANGUAGE_SELECT),
-    STRING_TOKEN (STR_LANGUAGE_SELECT_HELP),
-    EFI_IFR_FLAG_CALLBACK,
-    EFI_IFR_NUMERIC_SIZE_1,
-    OptionsOpCodeHandle,
-    NULL
-    );
-
-  Status = HiiUpdateForm (
-             HiiHandle,
-             &mFrontPageGuid,
-             FRONT_PAGE_FORM_ID,
-             StartOpCodeHandle, // LABEL_SELECT_LANGUAGE
-             EndOpCodeHandle    // LABEL_END
-             );
-
-  HiiFreeOpCodeHandle (StartOpCodeHandle);
-  HiiFreeOpCodeHandle (EndOpCodeHandle);
-  HiiFreeOpCodeHandle (OptionsOpCodeHandle);
+  return EFI_NOT_FOUND;
 }
 
 /**
@@ -376,121 +184,63 @@ FrontPageCallback (
   OUT EFI_BROWSER_ACTION_REQUEST             *ActionRequest
   )
 {
-  CHAR8                         *LangCode;
-  CHAR8                         *Lang;
-  UINTN                         Index;
-  EFI_STATUS                    Status;
+  return UiFrontPageCallbackHandler (gFrontPagePrivate.HiiHandle, Action, QuestionId, Type, Value, ActionRequest);
+}
+
+/**
+
+  Update the menus in the front page.
+
+**/
+VOID
+UpdateFrontPageForm (
+  VOID
+  )
+{
+  VOID                        *StartOpCodeHandle;
+  VOID                        *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL          *StartGuidLabel;
+  EFI_IFR_GUID_LABEL          *EndGuidLabel;
 
   //
-  //Chech whether exit from BMM and reenter frontpage,if yes,reclaim string depositories
+  // Allocate space for creation of UpdateData Buffer
   //
-  if (Action == EFI_BROWSER_ACTION_FORM_OPEN){
-    if (mEnterBmm){
-      ReclaimStringDepository();
-      mEnterBmm = FALSE;
-    }
-  }
+  StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (StartOpCodeHandle != NULL);
 
-  if (Action != EFI_BROWSER_ACTION_CHANGING && Action != EFI_BROWSER_ACTION_CHANGED) {
-    //
-    // Do nothing for other UEFI Action. Only do call back when data is changed.
-    //
-    return EFI_UNSUPPORTED;
-  }
+  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+  ASSERT (EndOpCodeHandle != NULL);
+  //
+  // Create Hii Extend Label OpCode as the start opcode
+  //
+  StartGuidLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  StartGuidLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  StartGuidLabel->Number       = LABEL_FRANTPAGE_INFORMATION;
+  //
+  // Create Hii Extend Label OpCode as the end opcode
+  //
+  EndGuidLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+  EndGuidLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+  EndGuidLabel->Number       = LABEL_END;
 
-  if (Action == EFI_BROWSER_ACTION_CHANGED) {
-    if ((Value == NULL) || (ActionRequest == NULL)) {
-      return EFI_INVALID_PARAMETER;
-    }
+  //
+  //Updata Front Page form
+  //
+  UiCustomizeFrontPage (
+    gFrontPagePrivate.HiiHandle,
+    StartOpCodeHandle
+    );
 
-    switch (QuestionId) {
-    case FRONT_PAGE_KEY_CONTINUE:
-      //
-      // This is the continue - clear the screen and return an error to get out of FrontPage loop
-      //
-      *ActionRequest = EFI_BROWSER_ACTION_REQUEST_EXIT;
-      break;
+  HiiUpdateForm (
+    gFrontPagePrivate.HiiHandle,
+    &mFrontPageGuid,
+    FRONT_PAGE_FORM_ID,
+    StartOpCodeHandle,
+    EndOpCodeHandle
+    );
 
-    case FRONT_PAGE_KEY_LANGUAGE:
-      //
-      // Allocate working buffer for RFC 4646 language in supported LanguageString.
-      //
-      Lang = AllocatePool (AsciiStrSize (mLanguageString));
-      ASSERT (Lang != NULL);  
-
-      Index = 0;
-      LangCode = mLanguageString;
-      while (*LangCode != 0) {
-        GetNextLanguage (&LangCode, Lang);
-
-        if (Index == Value->u8) {
-          break;
-        }
-
-        Index++;
-      }
-
-      if (Index == Value->u8) {
-        Status = gRT->SetVariable (
-                        L"PlatformLang",
-                        &gEfiGlobalVariableGuid,
-                        EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                        AsciiStrSize (Lang),
-                        Lang
-                        );
-        ASSERT_EFI_ERROR(Status);
-      } else {
-        ASSERT (FALSE);
-      }
-      FreePool (Lang);
-      //
-      //Current language of platform is changed,recreate oneof options for language.
-      //
-      InitializeLanguage();
-      break;
-
-    default:
-      break;
-    }
-  } else if (Action == EFI_BROWSER_ACTION_CHANGING) {
-    if (Value == NULL) {
-      return EFI_INVALID_PARAMETER;
-    }
-
-    //
-    // The first 4 entries in the Front Page are to be GUARANTEED to remain constant so IHV's can
-    // describe to their customers in documentation how to find their setup information (namely
-    // under the device manager and specific buckets)
-    //
-    switch (QuestionId) {
-    case FRONT_PAGE_KEY_BOOT_MANAGER:
-      //
-      // Boot Manager
-      //
-      EnumerateBootOptions ();
-      break;
-
-    case FRONT_PAGE_KEY_DEVICE_MANAGER:
-      //
-      // Device Manager
-      //
-      CreateDeviceManagerForm(DEVICE_MANAGER_FORM_ID);
-      break;
-
-    case FRONT_PAGE_KEY_BOOT_MAINTAIN:
-      //
-      // Boot Maintenance Manager
-      //
-      InitializeBM ();
-      mEnterBmm  = TRUE;
-      break;
-
-    default:
-      break;
-    }
-  }
-
-  return EFI_SUCCESS;
+  HiiFreeOpCodeHandle (StartOpCodeHandle);
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
 }
 
 /**
@@ -507,7 +257,6 @@ InitializeFrontPage (
   )
 {
   EFI_STATUS                  Status;
-
   //
   // Locate Hii relative protocols
   //
@@ -543,14 +292,14 @@ InitializeFrontPage (
   ASSERT (gFrontPagePrivate.HiiHandle != NULL);
 
   //
-  //Updata Front Page strings
+  //Updata Front Page banner strings
   //
-  UpdateFrontPageStrings ();
+  UpdateFrontPageBannerStrings ();
 
   //
-  // Initialize laguage options
+  // Update front page menus.
   //
-  InitializeLanguage ();
+  UpdateFrontPageForm();
 
   return Status;
 }
@@ -650,7 +399,7 @@ ConvertProcessorToString (
 
   if (Base10Exponent >= 6) {
     FreqMhz = ProcessorFrequency;
-    for (Index = 0; Index < (UINTN) (Base10Exponent - 6); Index++) {
+    for (Index = 0; Index < (UINT32) Base10Exponent - 6; Index++) {
       FreqMhz *= 10;
     }
   } else {
@@ -659,9 +408,16 @@ ConvertProcessorToString (
   DestMax = 0x20 / sizeof (CHAR16);
   StringBuffer = AllocateZeroPool (0x20);
   ASSERT (StringBuffer != NULL);
-  Index = UnicodeValueToString (StringBuffer, LEFT_JUSTIFY, FreqMhz / 1000, 3);
+  UnicodeValueToStringS (StringBuffer, sizeof (CHAR16) * DestMax, LEFT_JUSTIFY, FreqMhz / 1000, 3);
+  Index = StrnLenS (StringBuffer, DestMax);
   StrCatS (StringBuffer, DestMax, L".");
-  UnicodeValueToString (StringBuffer + Index + 1, PREFIX_ZERO, (FreqMhz % 1000) / 10, 2);
+  UnicodeValueToStringS (
+    StringBuffer + Index + 1,
+    sizeof (CHAR16) * (DestMax - (Index + 1)),
+    PREFIX_ZERO,
+    (FreqMhz % 1000) / 10,
+    2
+    );
   StrCatS (StringBuffer, DestMax, L" GHz");
   *String = (CHAR16 *) StringBuffer;
   return ;
@@ -685,7 +441,7 @@ ConvertMemorySizeToString (
 
   StringBuffer = AllocateZeroPool (0x24);
   ASSERT (StringBuffer != NULL);
-  UnicodeValueToString (StringBuffer, LEFT_JUSTIFY, MemorySize, 10);
+  UnicodeValueToStringS (StringBuffer, 0x24, LEFT_JUSTIFY, MemorySize, 10);
   StrCatS (StringBuffer, 0x24 / sizeof (CHAR16), L" MB RAM");
 
   *String = (CHAR16 *) StringBuffer;
@@ -734,7 +490,7 @@ GetOptionalStringByIndex (
     *String = GetStringById (STRING_TOKEN (STR_MISSING_STRING));
   } else {
     *String = AllocatePool (StrSize * sizeof (CHAR16));
-    AsciiStrToUnicodeStr (OptionalStrStart, *String);
+    AsciiStrToUnicodeStrS (OptionalStrStart, *String, StrSize);
   }
 
   return EFI_SUCCESS;
@@ -742,19 +498,19 @@ GetOptionalStringByIndex (
 
 
 /**
+
   Update the banner information for the Front Page based on Smbios information.
+
 **/
 VOID
-UpdateFrontPageStrings (
+UpdateFrontPageBannerStrings (
   VOID
   )
 {
   UINT8                             StrIndex;
   CHAR16                            *NewString;
   CHAR16                            *FirmwareVersionString;
-  BOOLEAN                           Find[5];
   EFI_STATUS                        Status;
-  EFI_STRING_ID                     TokenToUpdate;
   EFI_SMBIOS_HANDLE                 SmbiosHandle;
   EFI_SMBIOS_PROTOCOL               *Smbios;
   SMBIOS_TABLE_TYPE0                *Type0Record;
@@ -762,112 +518,157 @@ UpdateFrontPageStrings (
   SMBIOS_TABLE_TYPE4                *Type4Record;
   SMBIOS_TABLE_TYPE19               *Type19Record;
   EFI_SMBIOS_TABLE_HEADER           *Record;
+  UINT64                            InstalledMemory;
+  BOOLEAN                           FoundCpu;
 
-  ZeroMem (Find, sizeof (Find));
+  InstalledMemory = 0;
+  FoundCpu = 0;
 
   //
-  // Update Front Page strings
+  // Update default banner string.
   //
-  Status = gBS->LocateProtocol (
-                  &gEfiSmbiosProtocolGuid,
-                  NULL,
-                  (VOID **) &Smbios
-                  );
+  NewString = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_CUSTOMIZE_BANNER_LINE4_LEFT), NULL);
+  UiCustomizeFrontPageBanner (4, TRUE, &NewString);
+  HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_CUSTOMIZE_BANNER_LINE4_LEFT), NewString, NULL);
+  FreePool (NewString);
+
+  NewString = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_CUSTOMIZE_BANNER_LINE4_RIGHT), NULL);
+  UiCustomizeFrontPageBanner (4, FALSE, &NewString);
+  HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_CUSTOMIZE_BANNER_LINE4_RIGHT), NewString, NULL);
+  FreePool (NewString);
+
+  NewString = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_CUSTOMIZE_BANNER_LINE5_LEFT), NULL);
+  UiCustomizeFrontPageBanner (5, TRUE, &NewString);
+  HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_CUSTOMIZE_BANNER_LINE5_LEFT), NewString, NULL);
+  FreePool (NewString);
+
+  NewString = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_CUSTOMIZE_BANNER_LINE5_RIGHT), NULL);
+  UiCustomizeFrontPageBanner (5, FALSE, &NewString);
+  HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_CUSTOMIZE_BANNER_LINE5_RIGHT), NewString, NULL);
+  FreePool (NewString);
+
+  //
+  // Update Front Page banner strings base on SmBios Table.
+  //
+  Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **) &Smbios);
   if (EFI_ERROR (Status)) {
-    return ;
+    //
+    // Smbios protocol not found, get the default value.
+    //
+    NewString = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL), NULL);
+    UiCustomizeFrontPageBanner (1, TRUE, &NewString);
+    HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL), NewString, NULL);
+    FreePool (NewString);
+
+    NewString = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL), NULL);
+    UiCustomizeFrontPageBanner (2, TRUE, &NewString);
+    HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL), NewString, NULL);
+    FreePool (NewString);
+
+    NewString = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED), NULL);
+    UiCustomizeFrontPageBanner (2, FALSE, &NewString);
+    HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED), NewString, NULL);
+    FreePool (NewString);
+
+    NewString = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION), NULL);
+    UiCustomizeFrontPageBanner (3, TRUE, &NewString);
+    HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION), NewString, NULL);
+    FreePool (NewString);
+
+    NewString = HiiGetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE), NULL);
+    UiCustomizeFrontPageBanner (3, FALSE, &NewString);
+    HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE), NewString, NULL);
+    FreePool (NewString);
+
+    return;
   }
 
   SmbiosHandle = SMBIOS_HANDLE_PI_RESERVED;
-  do {
-    Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
-    if (EFI_ERROR(Status)) {
-      break;
-    }
-
-    if (Record->Type == EFI_SMBIOS_TYPE_BIOS_INFORMATION) {
+  Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
+  while (!EFI_ERROR(Status)) {
+    if (Record->Type == SMBIOS_TYPE_BIOS_INFORMATION) {
       Type0Record = (SMBIOS_TABLE_TYPE0 *) Record;
       StrIndex = Type0Record->BiosVersion;
       GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type0Record + Type0Record->Hdr.Length), StrIndex, &NewString);
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION);
+
       FirmwareVersionString = (CHAR16 *) PcdGetPtr (PcdFirmwareVersionString);
       if (*FirmwareVersionString != 0x0000 ) {
         FreePool (NewString);
         NewString = (CHAR16 *) PcdGetPtr (PcdFirmwareVersionString);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        UiCustomizeFrontPageBanner (3, TRUE, &NewString);
+        HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION), NewString, NULL);
       } else {
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        UiCustomizeFrontPageBanner (3, TRUE, &NewString);
+        HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_BIOS_VERSION), NewString, NULL);
         FreePool (NewString);
       }
-      Find[0] = TRUE;
-    }  
+    }
 
-    if (Record->Type == EFI_SMBIOS_TYPE_SYSTEM_INFORMATION) {
+    if (Record->Type == SMBIOS_TYPE_SYSTEM_INFORMATION) {
       Type1Record = (SMBIOS_TABLE_TYPE1 *) Record;
       StrIndex = Type1Record->ProductName;
       GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type1Record + Type1Record->Hdr.Length), StrIndex, &NewString);
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL);
-      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+      UiCustomizeFrontPageBanner (1, TRUE, &NewString);
+      HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_COMPUTER_MODEL), NewString, NULL);
       FreePool (NewString);
-      Find[1] = TRUE;
     }
 
-    if ((Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) && !Find[2]) {
+    if ((Record->Type == SMBIOS_TYPE_PROCESSOR_INFORMATION) && !FoundCpu) {
       Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
       //
-      // The information in the record should be only valid when the CPU Socket is populated. 
+      // The information in the record should be only valid when the CPU Socket is populated.
       //
       if ((Type4Record->Status & SMBIOS_TYPE4_CPU_SOCKET_POPULATED) == SMBIOS_TYPE4_CPU_SOCKET_POPULATED) {
         StrIndex = Type4Record->ProcessorVersion;
         GetOptionalStringByIndex ((CHAR8*)((UINT8*)Type4Record + Type4Record->Hdr.Length), StrIndex, &NewString);
-        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        UiCustomizeFrontPageBanner (2, TRUE, &NewString);
+        HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_CPU_MODEL), NewString, NULL);
         FreePool (NewString);
-        Find[2] = TRUE;
-      }
-    }    
 
-    if ((Record->Type == EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION) && !Find[3]) {
-      Type4Record = (SMBIOS_TABLE_TYPE4 *) Record;
-      //
-      // The information in the record should be only valid when the CPU Socket is populated. 
-      //
-      if ((Type4Record->Status & SMBIOS_TYPE4_CPU_SOCKET_POPULATED) == SMBIOS_TYPE4_CPU_SOCKET_POPULATED) {
         ConvertProcessorToString(Type4Record->CurrentSpeed, 6, &NewString);
-        TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED);
-        HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
+        UiCustomizeFrontPageBanner (2, FALSE, &NewString);
+        HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_CPU_SPEED), NewString, NULL);
         FreePool (NewString);
-        Find[3] = TRUE;
-      }
-    } 
 
-    if ( Record->Type == EFI_SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
-      Type19Record = (SMBIOS_TABLE_TYPE19 *) Record;
-      ConvertMemorySizeToString (
-        (UINT32)(RShiftU64((Type19Record->EndingAddress - Type19Record->StartingAddress + 1), 10)),
-        &NewString
-        );
-      TokenToUpdate = STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE);
-      HiiSetString (gFrontPagePrivate.HiiHandle, TokenToUpdate, NewString, NULL);
-      FreePool (NewString);
-      Find[4] = TRUE;  
+        FoundCpu = TRUE;
+      }
     }
-  } while ( !(Find[0] && Find[1] && Find[2] && Find[3] && Find[4]));
-  return ;
+
+    if ( Record->Type == SMBIOS_TYPE_MEMORY_ARRAY_MAPPED_ADDRESS ) {
+      Type19Record = (SMBIOS_TABLE_TYPE19 *) Record;
+      if (Type19Record->StartingAddress != 0xFFFFFFFF ) {
+        InstalledMemory += RShiftU64(Type19Record->EndingAddress -
+                                     Type19Record->StartingAddress + 1, 10);
+      } else {
+        InstalledMemory += RShiftU64(Type19Record->ExtendedEndingAddress -
+                                     Type19Record->ExtendedStartingAddress + 1, 20);
+      }
+    }
+
+    Status = Smbios->GetNext (Smbios, &SmbiosHandle, NULL, &Record, NULL);
+  }
+
+  //
+  // Now update the total installed RAM size
+  //
+  ConvertMemorySizeToString ((UINT32)InstalledMemory, &NewString );
+  UiCustomizeFrontPageBanner (3, FALSE, &NewString);
+  HiiSetString (gFrontPagePrivate.HiiHandle, STRING_TOKEN (STR_FRONT_PAGE_MEMORY_SIZE), NewString, NULL);
+  FreePool (NewString);
 }
 
 /**
   This function will change video resolution and text mode
-  according to defined setup mode or defined boot mode  
+  according to defined setup mode or defined boot mode
 
-  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode. 
+  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode.
 
   @retval  EFI_SUCCESS  Mode is changed successfully.
   @retval  Others             Mode failed to be changed.
 
 **/
 EFI_STATUS
-EFIAPI
-BdsSetConsoleMode (
+UiSetConsoleMode (
   BOOLEAN  IsSetupMode
   )
 {
@@ -887,13 +688,13 @@ BdsSetConsoleMode (
   EFI_STATUS                            Status;
   UINTN                                 Index;
   UINTN                                 CurrentColumn;
-  UINTN                                 CurrentRow;  
+  UINTN                                 CurrentRow;
 
   MaxGopMode  = 0;
   MaxTextMode = 0;
 
   //
-  // Get current video resolution and text mode 
+  // Get current video resolution and text mode
   //
   Status = gBS->HandleProtocol (
                   gST->ConsoleOutHandle,
@@ -911,7 +712,7 @@ BdsSetConsoleMode (
                   );
   if (EFI_ERROR (Status)) {
     SimpleTextOut = NULL;
-  }  
+  }
 
   if ((GraphicsOutput == NULL) || (SimpleTextOut == NULL)) {
     return EFI_UNSUPPORTED;
@@ -919,7 +720,7 @@ BdsSetConsoleMode (
 
   if (IsSetupMode) {
     //
-    // The requried resolution and text mode is setup mode.
+    // The required resolution and text mode is setup mode.
     //
     NewHorizontalResolution = mSetupHorizontalResolution;
     NewVerticalResolution   = mSetupVerticalResolution;
@@ -932,12 +733,12 @@ BdsSetConsoleMode (
     NewHorizontalResolution = mBootHorizontalResolution;
     NewVerticalResolution   = mBootVerticalResolution;
     NewColumns              = mBootTextModeColumn;
-    NewRows                 = mBootTextModeRow;   
+    NewRows                 = mBootTextModeRow;
   }
-  
+
   if (GraphicsOutput != NULL) {
     MaxGopMode  = GraphicsOutput->Mode->MaxMode;
-  } 
+  }
 
   if (SimpleTextOut != NULL) {
     MaxTextMode = SimpleTextOut->Mode->MaxMode;
@@ -975,7 +776,7 @@ BdsSetConsoleMode (
             return EFI_SUCCESS;
           } else {
             //
-            // If current text mode is different from requried text mode.  Set new video mode
+            // If current text mode is different from required text mode.  Set new video mode
             //
             for (Index = 0; Index < MaxTextMode; Index++) {
               Status = SimpleTextOut->QueryMode (SimpleTextOut, Index, &CurrentColumn, &CurrentRow);
@@ -989,8 +790,10 @@ BdsSetConsoleMode (
                   //
                   // Update text mode PCD.
                   //
-                  PcdSet32 (PcdConOutColumn, mSetupTextModeColumn);
-                  PcdSet32 (PcdConOutRow, mSetupTextModeRow);
+                  Status = PcdSet32S (PcdConOutColumn, mSetupTextModeColumn);
+                  ASSERT_EFI_ERROR (Status);
+                  Status = PcdSet32S (PcdConOutRow, mSetupTextModeRow);
+                  ASSERT_EFI_ERROR (Status);
                   FreePool (Info);
                   return EFI_SUCCESS;
                 }
@@ -998,7 +801,7 @@ BdsSetConsoleMode (
             }
             if (Index == MaxTextMode) {
               //
-              // If requried text mode is not supported, return error.
+              // If required text mode is not supported, return error.
               //
               FreePool (Info);
               return EFI_UNSUPPORTED;
@@ -1031,12 +834,15 @@ BdsSetConsoleMode (
   // Set PCD to Inform GraphicsConsole to change video resolution.
   // Set PCD to Inform Consplitter to change text mode.
   //
-  PcdSet32 (PcdVideoHorizontalResolution, NewHorizontalResolution);
-  PcdSet32 (PcdVideoVerticalResolution, NewVerticalResolution);
-  PcdSet32 (PcdConOutColumn, NewColumns);
-  PcdSet32 (PcdConOutRow, NewRows);
-  
-  
+  Status = PcdSet32S (PcdVideoHorizontalResolution, NewHorizontalResolution);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdVideoVerticalResolution, NewVerticalResolution);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdConOutColumn, NewColumns);
+  ASSERT_EFI_ERROR (Status);
+  Status = PcdSet32S (PcdConOutRow, NewRows);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Video mode is changed, so restart graphics console driver and higher level driver.
   // Reconnect graphics console driver and higher level driver.
@@ -1066,12 +872,12 @@ BdsSetConsoleMode (
 
 /**
   The user Entry Point for Application. The user code starts with this function
-  as the real entry point for the image goes into a library that calls this 
+  as the real entry point for the image goes into a library that calls this
   function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -1092,7 +898,7 @@ InitializeUserInterface (
 
   if (!mModeInitialized) {
     //
-    // After the console is ready, get current video resolution 
+    // After the console is ready, get current video resolution
     // and text mode before launching setup at first time.
     //
     Status = gBS->HandleProtocol (
@@ -1103,7 +909,7 @@ InitializeUserInterface (
     if (EFI_ERROR (Status)) {
       GraphicsOutput = NULL;
     }
-    
+
     Status = gBS->HandleProtocol (
                     gST->ConsoleOutHandle,
                     &gEfiSimpleTextOutProtocolGuid,
@@ -1111,7 +917,7 @@ InitializeUserInterface (
                     );
     if (EFI_ERROR (Status)) {
       SimpleTextOut = NULL;
-    }  
+    }
 
     if (GraphicsOutput != NULL) {
       //
@@ -1134,9 +940,9 @@ InitializeUserInterface (
 
     //
     // Get user defined text mode for setup.
-    //  
+    //
     mSetupHorizontalResolution = PcdGet32 (PcdSetupVideoHorizontalResolution);
-    mSetupVerticalResolution   = PcdGet32 (PcdSetupVideoVerticalResolution);      
+    mSetupVerticalResolution   = PcdGet32 (PcdSetupVideoVerticalResolution);
     mSetupTextModeColumn       = PcdGet32 (PcdSetupConOutColumn);
     mSetupTextModeRow          = PcdGet32 (PcdSetupConOutRow);
 
@@ -1145,19 +951,18 @@ InitializeUserInterface (
 
   gBS->SetWatchdogTimer (0x0000, 0x0000, 0x0000, NULL);
   gST->ConOut->ClearScreen (gST->ConOut);
-  
+
   //
   // Install customized fonts needed by Front Page
   //
-  
   HiiHandle = ExportFonts ();
   ASSERT (HiiHandle != NULL);
 
   InitializeStringSupport ();
 
-  BdsSetConsoleMode (TRUE);
+  UiSetConsoleMode (TRUE);
   UiEntry (FALSE);
-  BdsSetConsoleMode (FALSE);
+  UiSetConsoleMode (FALSE);
 
   UninitializeStringSupport ();
   HiiRemovePackages (HiiHandle);
@@ -1182,10 +987,19 @@ UiEntry (
   EFI_BOOT_LOGO_PROTOCOL        *BootLogo;
 
   //
-  // Indicate if the connect all has been performed before.
+  // Enter Setup page.
   //
-  if (ConnectAllHappened) {
-    gConnectAllHappened = TRUE;
+  REPORT_STATUS_CODE (
+    EFI_PROGRESS_CODE,
+    (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_PC_USER_SETUP)
+    );
+
+  //
+  // Indicate if the connect all has been performed before.
+  // If has not been performed before, do here.
+  //
+  if (!ConnectAllHappened) {
+    EfiBootManagerConnectAll ();
   }
 
   //
@@ -1202,15 +1016,9 @@ UiEntry (
   }
 
   InitializeFrontPage ();
-  InitializeDeviceManager ();
-  InitializeBootManager ();
-  InitBootMaintenance();
 
   CallFrontPage ();
 
-  FreeBMPackage ();
-  FreeBootManager ();
-  FreeDeviceManager ();
   FreeFrontPage ();
 
   if (mLanguageString != NULL) {
@@ -1222,203 +1030,6 @@ UiEntry (
   //Will leave browser, check any reset required change is applied? if yes, reset system
   //
   SetupResetReminder ();
-}
-
-/**
-  Extract device path for given HII handle and class guid.
-
-  @param Handle          The HII handle.
-
-  @retval  NULL          Fail to get the device path string.
-  @return  PathString    Get the device path string.
-
-**/
-CHAR16 *
-ExtractDevicePathFromHiiHandle (
-  IN      EFI_HII_HANDLE      Handle
-  )
-{
-  EFI_STATUS                       Status;
-  EFI_HANDLE                       DriverHandle;
-  EFI_DEVICE_PATH_PROTOCOL         *DevicePath;  
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *PathToText;
-  CHAR16                           *NewString;
-
-  ASSERT (Handle != NULL);
-
-  if (Handle == NULL) {
-    return NULL;
-  }
-
-  Status = gHiiDatabase->GetPackageListHandle (gHiiDatabase, Handle, &DriverHandle);
- if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  //
-  // Get the device path by the got Driver handle .
-  //
-  Status = gBS->HandleProtocol (DriverHandle, &gEfiDevicePathProtocolGuid, (VOID **) &DevicePath);
-  if (EFI_ERROR (Status)) {
-    return NULL;
- }
-
-  Status = gBS->LocateProtocol (
-                  &gEfiDevicePathToTextProtocolGuid,
-                  NULL,
-                  (VOID **) &PathToText
-                  );
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  //
-  // Get device path string.
-  //
-  NewString = PathToText->ConvertDevicePathToText(DevicePath, FALSE, FALSE);
-
-  return NewString;
-}
-
-/**
-  Extract the displayed formset for given HII handle and class guid.
-
-  @param Handle          The HII handle.
-  @param SetupClassGuid  The class guid specifies which form set will be displayed.
-  @param SkipCount       Skip some formsets which has processed before.
-  @param FormSetTitle    Formset title string.
-  @param FormSetHelp     Formset help string.
-  @param FormSetGuid     Formset Guid.
-
-  @retval  TRUE          The formset for given HII handle will be displayed.
-  @return  FALSE         The formset for given HII handle will not be displayed.
-
-**/
-BOOLEAN
-ExtractDisplayedHiiFormFromHiiHandle (
-  IN      EFI_HII_HANDLE      Handle,
-  IN      EFI_GUID            *SetupClassGuid,
-  IN      UINTN               SkipCount,
-  OUT     EFI_STRING_ID       *FormSetTitle,
-  OUT     EFI_STRING_ID       *FormSetHelp,
-  OUT     EFI_GUID            *FormSetGuid
-  )
-{
-  EFI_STATUS                   Status;
-  UINTN                        BufferSize;
-  EFI_HII_PACKAGE_LIST_HEADER  *HiiPackageList;
-  UINT8                        *Package;
-  UINT8                        *OpCodeData;
-  UINT32                       Offset;
-  UINT32                       Offset2;
-  UINT32                       PackageListLength;
-  EFI_HII_PACKAGE_HEADER       PackageHeader;
-  EFI_GUID                     *ClassGuid;
-  UINT8                        ClassGuidNum;
-  BOOLEAN                      FoundAndSkip;
-
-  ASSERT (Handle != NULL);
-  ASSERT (SetupClassGuid != NULL && FormSetTitle != NULL && FormSetHelp != NULL && FormSetGuid != NULL);
-
-  *FormSetTitle = 0;
-  *FormSetHelp  = 0;
-  ClassGuidNum  = 0;
-  ClassGuid     = NULL;
-  FoundAndSkip  = FALSE;
-
-  //
-  // Get HII PackageList
-  //
-  BufferSize = 0;
-  HiiPackageList = NULL;
-  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
-  //
-  // Handle is a invalid handle. Check if Handle is corrupted.
-  //
-  ASSERT (Status != EFI_NOT_FOUND);
-  //
-  // The return status should always be EFI_BUFFER_TOO_SMALL as input buffer's size is 0.
-  //
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-  
-  HiiPackageList = AllocatePool (BufferSize);
-  ASSERT (HiiPackageList != NULL);
-
-  Status = gHiiDatabase->ExportPackageLists (gHiiDatabase, Handle, &BufferSize, HiiPackageList);
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  //
-  // Get Form package from this HII package List
-  //
-  Offset = sizeof (EFI_HII_PACKAGE_LIST_HEADER);
-  PackageListLength = ReadUnaligned32 (&HiiPackageList->PackageLength);
-
-  while (Offset < PackageListLength) {
-    Package = ((UINT8 *) HiiPackageList) + Offset;
-    CopyMem (&PackageHeader, Package, sizeof (EFI_HII_PACKAGE_HEADER));
-    Offset += PackageHeader.Length;
-
-    if (PackageHeader.Type == EFI_HII_PACKAGE_FORMS) {
-      //
-      // Search FormSet Opcode in this Form Package
-      //
-      Offset2 = sizeof (EFI_HII_PACKAGE_HEADER);
-      while (Offset2 < PackageHeader.Length) {
-        OpCodeData = Package + Offset2;
-        Offset2 += ((EFI_IFR_OP_HEADER *) OpCodeData)->Length;
-
-        if (((EFI_IFR_OP_HEADER *) OpCodeData)->OpCode == EFI_IFR_FORM_SET_OP) {
-          if (((EFI_IFR_OP_HEADER *) OpCodeData)->Length > OFFSET_OF (EFI_IFR_FORM_SET, Flags)) {
-            //
-            // Find FormSet OpCode
-            //
-            ClassGuidNum = (UINT8) (((EFI_IFR_FORM_SET *) OpCodeData)->Flags & 0x3);
-            ClassGuid = (EFI_GUID *) (VOID *)(OpCodeData + sizeof (EFI_IFR_FORM_SET));
-            while (ClassGuidNum-- > 0) {
-              if (CompareGuid (SetupClassGuid, ClassGuid)) {
-                //
-                // Check whether need to skip the formset.
-                //
-                if (SkipCount != 0) {
-                  SkipCount--;
-                  FoundAndSkip = TRUE;
-                  break;
-                }
-                CopyMem (FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
-                CopyMem (FormSetHelp, &((EFI_IFR_FORM_SET *) OpCodeData)->Help, sizeof (EFI_STRING_ID));
-                CopyGuid (FormSetGuid, (CONST EFI_GUID *)(&((EFI_IFR_FORM_SET *) OpCodeData)->Guid));
-                FreePool (HiiPackageList);
-                return TRUE;
-              }
-              ClassGuid ++;
-            }
-            if (FoundAndSkip) {
-              break;
-            }
-           } else if (CompareGuid (SetupClassGuid, &gEfiHiiPlatformSetupFormsetGuid)) {
-             //
-             //  Check whether need to skip the formset.
-             //
-             if (SkipCount != 0) {
-               SkipCount--;
-               break;
-             }
-             CopyMem (FormSetTitle, &((EFI_IFR_FORM_SET *) OpCodeData)->FormSetTitle, sizeof (EFI_STRING_ID));
-             CopyMem (FormSetHelp, &((EFI_IFR_FORM_SET *) OpCodeData)->Help, sizeof (EFI_STRING_ID));
-             CopyGuid (FormSetGuid, (CONST EFI_GUID *)(&((EFI_IFR_FORM_SET *) OpCodeData)->Guid));
-             FreePool (HiiPackageList);
-             return TRUE;
-          }
-        }
-      }
-    }
-  }
-
-  FreePool (HiiPackageList);
-
-  return FALSE;
 }
 
 //
@@ -1560,39 +1171,3 @@ SetupResetReminder (
   }
 }
 
-
-/**
-  This function converts an input device structure to a Unicode string.
-
-  @param DevPath                  A pointer to the device path structure.
-
-  @return A new allocated Unicode string that represents the device path.
-
-**/
-CHAR16 *
-UiDevicePathToStr (
-  IN EFI_DEVICE_PATH_PROTOCOL     *DevPath
-  )
-{
-  EFI_STATUS                       Status;
-  CHAR16                           *ToText;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL *DevPathToText;
-
-  if (DevPath == NULL) {
-    return NULL;
-  }
-
-  Status = gBS->LocateProtocol (
-                  &gEfiDevicePathToTextProtocolGuid,
-                  NULL,
-                  (VOID **) &DevPathToText
-                  );
-  ASSERT_EFI_ERROR (Status);
-  ToText = DevPathToText->ConvertDevicePathToText (
-                            DevPath,
-                            FALSE,
-                            TRUE
-                            );
-  ASSERT (ToText != NULL);
-  return ToText;
-}

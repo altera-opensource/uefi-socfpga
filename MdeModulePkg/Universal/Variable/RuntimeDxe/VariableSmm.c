@@ -14,7 +14,7 @@
   VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(),
   SmmVariableGetStatistics() should also do validation based on its own knowledge.
 
-Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -35,7 +35,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/SmmMemLib.h>
 
 #include <Guid/SmmVariableCommon.h>
-#include <Guid/ZeroGuid.h>
 #include "Variable.h"
 
 extern VARIABLE_INFO_ENTRY                           *gVariableInfo;
@@ -200,7 +199,7 @@ ReleaseLockOnlyAtBootTime (
 }
 
 /**
-  Retrive the SMM Fault Tolerent Write protocol interface.
+  Retrieve the SMM Fault Tolerent Write protocol interface.
 
   @param[out] FtwProtocol       The interface of SMM Ftw protocol
 
@@ -229,7 +228,7 @@ GetFtwProtocol (
 
 
 /**
-  Retrive the SMM FVB protocol interface by HANDLE.
+  Retrieve the SMM FVB protocol interface by HANDLE.
 
   @param[in]  FvBlockHandle     The handle of SMM FVB protocol that provides services for
                                 reading, writing, and erasing the target block.
@@ -350,9 +349,10 @@ SmmVariableGetStatistics (
   )
 {
   VARIABLE_INFO_ENTRY                                  *VariableInfo;
-  UINTN                                                NameLength;
+  UINTN                                                NameSize;
   UINTN                                                StatisticsInfoSize;
   CHAR16                                               *InfoName;
+  UINTN                                                InfoNameMaxSize;
   EFI_GUID                                             VendorGuid;
 
   if (InfoEntry == NULL) {
@@ -364,21 +364,28 @@ SmmVariableGetStatistics (
     return EFI_UNSUPPORTED;
   }
 
-  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + StrSize (VariableInfo->Name);
+  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY);
   if (*InfoSize < StatisticsInfoSize) {
     *InfoSize = StatisticsInfoSize;
     return EFI_BUFFER_TOO_SMALL;
   }
   InfoName = (CHAR16 *)(InfoEntry + 1);
+  InfoNameMaxSize = (*InfoSize - sizeof (VARIABLE_INFO_ENTRY));
 
   CopyGuid (&VendorGuid, &InfoEntry->VendorGuid);
 
-  if (CompareGuid (&VendorGuid, &gZeroGuid)) {
+  if (IsZeroGuid (&VendorGuid)) {
     //
     // Return the first variable info
     //
+    NameSize = StrSize (VariableInfo->Name);
+    StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + NameSize;
+    if (*InfoSize < StatisticsInfoSize) {
+      *InfoSize = StatisticsInfoSize;
+      return EFI_BUFFER_TOO_SMALL;
+    }
     CopyMem (InfoEntry, VariableInfo, sizeof (VARIABLE_INFO_ENTRY));
-    CopyMem (InfoName, VariableInfo->Name, StrSize (VariableInfo->Name));
+    CopyMem (InfoName, VariableInfo->Name, NameSize);
     *InfoSize = StatisticsInfoSize;
     return EFI_SUCCESS;
   }
@@ -388,9 +395,9 @@ SmmVariableGetStatistics (
   //
   while (VariableInfo != NULL) {
     if (CompareGuid (&VariableInfo->VendorGuid, &VendorGuid)) {
-      NameLength = StrSize (VariableInfo->Name);
-      if (NameLength == StrSize (InfoName)) {
-        if (CompareMem (VariableInfo->Name, InfoName, NameLength) == 0) {
+      NameSize = StrSize (VariableInfo->Name);
+      if (NameSize <= InfoNameMaxSize) {
+        if (CompareMem (VariableInfo->Name, InfoName, NameSize) == 0) {
           //
           // Find the match one
           //
@@ -410,14 +417,15 @@ SmmVariableGetStatistics (
   //
   // Output the new variable info
   //
-  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + StrSize (VariableInfo->Name);
+  NameSize = StrSize (VariableInfo->Name);
+  StatisticsInfoSize = sizeof (VARIABLE_INFO_ENTRY) + NameSize;
   if (*InfoSize < StatisticsInfoSize) {
     *InfoSize = StatisticsInfoSize;
     return EFI_BUFFER_TOO_SMALL;
   }
 
   CopyMem (InfoEntry, VariableInfo, sizeof (VARIABLE_INFO_ENTRY));
-  CopyMem (InfoName, VariableInfo->Name, StrSize (VariableInfo->Name));
+  CopyMem (InfoName, VariableInfo->Name, NameSize);
   *InfoSize = StatisticsInfoSize;
 
   return EFI_SUCCESS;
@@ -671,6 +679,7 @@ SmmVariableHandler (
         break;
       }
       if (!mEndOfDxe) {
+        MorLockInitAtEndOfDxe ();
         mEndOfDxe = TRUE;
         VarCheckLibInitializeAtEndOfDxe (NULL);
         //
@@ -696,11 +705,10 @@ SmmVariableHandler (
       // It is covered by previous CommBuffer check
       //
 
-      if (!SmmIsBufferOutsideSmmValid ((EFI_PHYSICAL_ADDRESS)(UINTN)CommBufferSize, sizeof(UINTN))) {
-        DEBUG ((EFI_D_ERROR, "GetStatistics: SMM communication buffer in SMRAM!\n"));
-        Status = EFI_ACCESS_DENIED;
-        goto EXIT;
-      }
+      //
+      // Do not need to check CommBufferSize buffer as it should point to SMRAM
+      // that was used by SMM core to cache CommSize from SmmCommunication protocol.
+      //
 
       Status = SmmVariableGetStatistics (VariableInfo, &InfoSize);
       *CommBufferSize = InfoSize + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE;
@@ -804,6 +812,7 @@ SmmEndOfDxeCallback (
   )
 {
   DEBUG ((EFI_D_INFO, "[Variable]SMM_END_OF_DXE is signaled\n"));
+  MorLockInitAtEndOfDxe ();
   mEndOfDxe = TRUE;
   VarCheckLibInitializeAtEndOfDxe (NULL);
   //

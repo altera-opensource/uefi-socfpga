@@ -2,7 +2,7 @@
   DevicePathToText protocol as defined in the UEFI 2.0 specification.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -42,6 +42,7 @@ UefiDevicePathLibCatPrint (
 
   VA_START (Args, Fmt);
   Count = SPrintLength (Fmt, Args);
+  VA_END(Args);
 
   if ((Str->Count + (Count + 1)) * sizeof (CHAR16) > Str->Capacity) {
     Str->Capacity = (Str->Count + (Count + 1) * 2) * sizeof (CHAR16);
@@ -52,6 +53,7 @@ UefiDevicePathLibCatPrint (
                  );
     ASSERT (Str->Str != NULL);
   }
+  VA_START (Args, Fmt);
   UnicodeVSPrint (&Str->Str[Str->Count], Str->Capacity - Str->Count * sizeof (CHAR16), Fmt, Args);
   Str->Count += Count;
   
@@ -823,6 +825,37 @@ DevPathToTextSd (
 }
 
 /**
+  Converts a EMMC (Embedded MMC) device path structure to its string representative.
+
+  @param Str             The string representative of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
+VOID
+DevPathToTextEmmc (
+  IN OUT POOL_PRINT  *Str,
+  IN VOID            *DevPath,
+  IN BOOLEAN         DisplayOnly,
+  IN BOOLEAN         AllowShortcuts
+  )
+{
+  EMMC_DEVICE_PATH             *Emmc;
+
+  Emmc = DevPath;
+  UefiDevicePathLibCatPrint (
+    Str,
+    L"eMMC(0x%x)",
+    Emmc->SlotNumber
+    );
+}
+
+/**
   Converts a 1394 device path structure to its string representative.
 
   @param Str             The string representative of input device.
@@ -1585,12 +1618,12 @@ DevPathToTextBluetooth (
   UefiDevicePathLibCatPrint (
     Str,
     L"Bluetooth(%02x%02x%02x%02x%02x%02x)",
-    Bluetooth->BD_ADDR.Address[5],
-    Bluetooth->BD_ADDR.Address[4],
-    Bluetooth->BD_ADDR.Address[3],
-    Bluetooth->BD_ADDR.Address[2],
+    Bluetooth->BD_ADDR.Address[0],
     Bluetooth->BD_ADDR.Address[1],
-    Bluetooth->BD_ADDR.Address[0]
+    Bluetooth->BD_ADDR.Address[2],
+    Bluetooth->BD_ADDR.Address[3],
+    Bluetooth->BD_ADDR.Address[4],
+    Bluetooth->BD_ADDR.Address[5]
     );
 }
 
@@ -1624,6 +1657,88 @@ DevPathToTextWiFi (
   CopyMem (SSId, WiFi->SSId, 32);
 
   UefiDevicePathLibCatPrint (Str, L"Wi-Fi(%a)", SSId);
+}
+
+/**
+  Converts a Bluetooth device path structure to its string representative.
+
+  @param Str             The string representative of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
+VOID
+DevPathToTextBluetoothLE (
+  IN OUT POOL_PRINT  *Str,
+  IN VOID            *DevPath,
+  IN BOOLEAN         DisplayOnly,
+  IN BOOLEAN         AllowShortcuts
+  )
+{
+  BLUETOOTH_LE_DEVICE_PATH  *BluetoothLE;
+
+  BluetoothLE = DevPath;
+  UefiDevicePathLibCatPrint (
+    Str,
+    L"BluetoothLE(%02x%02x%02x%02x%02x%02x,0x%02x)",
+    BluetoothLE->Address.Address[0],
+    BluetoothLE->Address.Address[1],
+    BluetoothLE->Address.Address[2],
+    BluetoothLE->Address.Address[3],
+    BluetoothLE->Address.Address[4],
+    BluetoothLE->Address.Address[5],
+    BluetoothLE->Address.Type
+    );
+}
+
+/**
+  Converts a DNS device path structure to its string representative.
+
+  @param Str             The string representative of input device.
+  @param DevPath         The input device path structure.
+  @param DisplayOnly     If DisplayOnly is TRUE, then the shorter text representation
+                         of the display node is used, where applicable. If DisplayOnly
+                         is FALSE, then the longer text representation of the display node
+                         is used.
+  @param AllowShortcuts  If AllowShortcuts is TRUE, then the shortcut forms of text
+                         representation for a device node can be used, where applicable.
+
+**/
+VOID
+DevPathToTextDns (
+  IN OUT POOL_PRINT  *Str,
+  IN VOID            *DevPath,
+  IN BOOLEAN         DisplayOnly,
+  IN BOOLEAN         AllowShortcuts
+  )
+{
+  DNS_DEVICE_PATH  *DnsDevPath;
+  UINT32           DnsServerIpCount;
+  UINT32           DnsServerIpIndex;
+
+  DnsDevPath     = DevPath;
+  DnsServerIpCount = (UINT32) (DevicePathNodeLength(DnsDevPath) - sizeof (EFI_DEVICE_PATH_PROTOCOL) - sizeof (DnsDevPath->IsIPv6)) / sizeof (EFI_IP_ADDRESS);
+
+  UefiDevicePathLibCatPrint (Str, L"Dns(");
+  
+  for (DnsServerIpIndex = 0; DnsServerIpIndex < DnsServerIpCount; DnsServerIpIndex++) {
+    if (DnsDevPath->IsIPv6 == 0x00) {
+      CatIPv4Address (Str, &(DnsDevPath->DnsServerIp[DnsServerIpIndex].v4));
+    } else {
+      CatIPv6Address (Str, &(DnsDevPath->DnsServerIp[DnsServerIpIndex].v6));
+    }
+
+    if (DnsServerIpIndex < DnsServerIpCount - 1) {
+      UefiDevicePathLibCatPrint (Str, L",");
+    }
+  }
+
+  UefiDevicePathLibCatPrint (Str, L")");
 }
 
 /**
@@ -2139,6 +2254,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE mUefiDevicePathLib
   {MESSAGING_DEVICE_PATH, MSG_NVME_NAMESPACE_DP,            DevPathToTextNVMe           },
   {MESSAGING_DEVICE_PATH, MSG_UFS_DP,                       DevPathToTextUfs            },
   {MESSAGING_DEVICE_PATH, MSG_SD_DP,                        DevPathToTextSd             },
+  {MESSAGING_DEVICE_PATH, MSG_EMMC_DP,                      DevPathToTextEmmc           },
   {MESSAGING_DEVICE_PATH, MSG_1394_DP,                      DevPathToText1394           },
   {MESSAGING_DEVICE_PATH, MSG_USB_DP,                       DevPathToTextUsb            },
   {MESSAGING_DEVICE_PATH, MSG_USB_WWID_DP,                  DevPathToTextUsbWWID        },
@@ -2154,9 +2270,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE mUefiDevicePathLib
   {MESSAGING_DEVICE_PATH, MSG_VENDOR_DP,                    DevPathToTextVendor         },
   {MESSAGING_DEVICE_PATH, MSG_ISCSI_DP,                     DevPathToTextiSCSI          },
   {MESSAGING_DEVICE_PATH, MSG_VLAN_DP,                      DevPathToTextVlan           },
+  {MESSAGING_DEVICE_PATH, MSG_DNS_DP,                       DevPathToTextDns            },
   {MESSAGING_DEVICE_PATH, MSG_URI_DP,                       DevPathToTextUri            },
   {MESSAGING_DEVICE_PATH, MSG_BLUETOOTH_DP,                 DevPathToTextBluetooth      },
   {MESSAGING_DEVICE_PATH, MSG_WIFI_DP,                      DevPathToTextWiFi           },
+  {MESSAGING_DEVICE_PATH, MSG_BLUETOOTH_LE_DP,              DevPathToTextBluetoothLE    },
   {MEDIA_DEVICE_PATH,     MEDIA_HARDDRIVE_DP,               DevPathToTextHardDrive      },
   {MEDIA_DEVICE_PATH,     MEDIA_CDROM_DP,                   DevPathToTextCDROM          },
   {MEDIA_DEVICE_PATH,     MEDIA_VENDOR_DP,                  DevPathToTextVendor         },
