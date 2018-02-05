@@ -485,12 +485,8 @@ build_setup_app:
 	@$(ECHO_START) EDK2_BUILD     : $(EDK2_BUILD)$(ECHO_END)
 	@$(ECHO_START) EDK2_MACROS    : $(EDK2_MACROS)$(ECHO_END)
 	@$(ECHO_START) EDK2_TOOLCHAIN : $(EDK2_TOOLCHAIN)$(ECHO_END)
-	@$(ECHO_START) ---------------------- $(ECHO_END)
-	@$(ECHO_START) Copy HwLib from SOCEDS $(ECHO_END)
-	@$(ECHO_START) -----------------------$(ECHO_END)
 	$(REMOVE_HWLIB_INCLUDE)
 	$(REMOVE_HWLIB_SRC)
-	$(COPY_HWLIB_FROM_SOCEDS)
 
 #-----------------------------------------------------------------------------
 # Shell Scripts: build_tool

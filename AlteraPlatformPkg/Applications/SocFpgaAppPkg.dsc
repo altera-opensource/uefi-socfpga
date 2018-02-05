@@ -120,7 +120,6 @@
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
 
   TimerLib|AlteraPlatformPkg/Library/AlteraHpsTimerLib/AlteraHpsTimerLib.inf
-  HwLib|AlteraPlatformPkg/HwLib/HwLib.inf
 
 ###################################################################################################
 #
@@ -154,14 +153,6 @@
 #  EDK II native, "hello" application
   AppPkg/Applications/Hello/Hello.inf        # No LibC includes or functions.
 
-# Blinking LED application for Arria 10 Soc Dev Kit Board
-  AlteraPlatformPkg/Applications/BlinkingLED_A10SoCDevKit/BlinkingLED_A10SoCDevKit.inf
-
-# 16x2 LCD application
-  AlteraPlatformPkg/Applications/OnboardLCD_A10SoCDevKit/Lcd.inf
-
-# Accessing EEPROM using I2C Controller application
-  AlteraPlatformPkg/Applications/AccessingEEPROM_A10SoCDevKit/Eeprom.inf
 
 ##############################################################################
 #
