@@ -39,12 +39,7 @@ __RCSID("$NetBSD: flt_rounds.c,v 1.3 2006/02/25 00:58:35 wiz Exp $");
 #include <sys/types.h>
 //#include <ieeefp.h>
 
-static const int map[] = {
-  1,  /* round to nearest */
-  2,  /* round to positive infinity */
-  3,  /* round to negative infinity */
-  0   /* round to zero */
-};
+
 
 /*
  * Return the current FP rounding mode

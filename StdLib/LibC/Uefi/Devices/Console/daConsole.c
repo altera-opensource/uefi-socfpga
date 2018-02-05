@@ -10,6 +10,7 @@
   The devices status as a wide device is indicatd by _S_IWTTY being set in
   f_iflags.
 
+  Copyright (c) 2016, Daryl McDaniel. All rights reserved.<BR>
   Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
@@ -37,6 +38,7 @@
 #include  <sys/fcntl.h>
 #include  <unistd.h>
 #include  <sys/termios.h>
+#include  <Efi/SysEfi.h>
 #include  <kfile.h>
 #include  <Device/Device.h>
 #include  <Device/IIO.h>
@@ -104,33 +106,6 @@ WideTtyCvt( CHAR16 *dest, const char *buf, ssize_t n, mbstate_t *Cs)
   return i;
 }
 
-/** Close an open file.
-
-    @param[in]  filp    Pointer to the file descriptor structure for this file.
-
-    @retval   0     The file has been successfully closed.
-    @retval   -1    filp does not point to a valid console descriptor.
-**/
-static
-int
-EFIAPI
-da_ConClose(
-  IN      struct __filedes   *filp
-)
-{
-  ConInstance    *Stream;
-
-  Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
-  // Quick check to see if Stream looks reasonable
-  if(Stream->Cookie != CON_COOKIE) {    // Cookie == 'IoAb'
-    errno     = EINVAL;
-    EFIerrno = RETURN_INVALID_PARAMETER;
-    return -1;    // Looks like a bad File Descriptor pointer
-  }
-  gMD->StdIo[Stream->InstanceNum] = NULL;   // Mark the stream as closed
-  return 0;
-}
-
 /** Position the console cursor to the coordinates specified by Position.
 
     @param[in]  filp      Pointer to the file descriptor structure for this file.
@@ -188,10 +163,10 @@ da_ConSeek(
         by da_ConWrite are WIDE characters.  It is the responsibility of the
         higher-level function(s) to perform any necessary conversions.
 
-    @param[in,out]  BufferSize  Number of characters in Buffer.
+  @param[in,out]  BufferSize  Number of characters in Buffer.
   @param[in]      Buffer      The WCS string to be displayed
 
-    @return   The number of Characters written.
+  @return   The number of Characters written.
 */
 static
 ssize_t
@@ -525,7 +500,7 @@ da_ConOpen(
   wchar_t            *MPath           // Not used for console devices
   )
 {
-  ConInstance                      *Stream;
+  ConInstance    *Stream;
   UINT32          Instance;
   int             RetVal = -1;
 
@@ -553,6 +528,101 @@ da_ConOpen(
   }
   return RetVal;
 
+}
+
+/** Flush a console device's IIO buffers.
+
+    Flush the IIO Input or Output buffers associated with the specified file.
+
+    If the console is open for output, write any unwritten data in the associated
+    output buffer (stdout or stderr) to the console.
+
+    If the console is open for input, discard any remaining data
+    in the input buffer.
+
+    @param[in]    filp    Pointer to the target file's descriptor structure.
+
+    @retval     0     Always succeeds
+**/
+static
+int
+EFIAPI
+da_ConFlush(
+  struct __filedes *filp
+)
+{
+  cFIFO      *OutBuf;
+  ssize_t     NumProc;
+  int         Flags;
+
+
+    if(filp->MyFD == STDERR_FILENO) {
+      OutBuf = IIO->ErrBuf;
+    }
+    else {
+      OutBuf = IIO->OutBuf;
+    }
+
+    Flags = filp->Oflags & O_ACCMODE;   // Get the device's open mode
+    if (Flags != O_WRONLY)  {   // (Flags == O_RDONLY) || (Flags == O_RDWR)
+      // Readable so discard the contents of the input buffer
+      IIO->InBuf->Flush(IIO->InBuf, UNICODE_STRING_MAX);
+    }
+    if (Flags != O_RDONLY)  {   // (Flags == O_WRONLY) || (Flags == O_RDWR)
+      // Writable so flush the output buffer
+      // At this point, the characters to write are in OutBuf
+      // First, linearize and consume the buffer
+      NumProc = OutBuf->Read(OutBuf, gMD->UString, UNICODE_STRING_MAX-1);
+      if (NumProc > 0) {  // Optimization -- Nothing to do if no characters
+        gMD->UString[NumProc] = 0;   // Ensure that the buffer is terminated
+
+        /*  OutBuf always contains wide characters.
+            The UEFI Console (this device) always expects wide characters.
+            There is no need to handle devices that expect narrow characters
+            like the device-independent functions do.
+        */
+        // Do the actual write of the data to the console
+        (void) da_ConWrite(filp, NULL, NumProc, gMD->UString);
+        // Paranoia -- Make absolutely sure that OutBuf is empty in case fo_write
+        // wasn't able to consume everything.
+        OutBuf->Flush(OutBuf, UNICODE_STRING_MAX);
+      }
+    }
+  return 0;
+}
+
+/** Close an open file.
+
+    @param[in]  filp    Pointer to the file descriptor structure for this file.
+
+    @retval   0     The file has been successfully closed.
+    @retval   -1    filp does not point to a valid console descriptor.
+**/
+static
+int
+EFIAPI
+da_ConClose(
+  IN      struct __filedes   *filp
+)
+{
+  ConInstance    *Stream;
+
+  Stream = BASE_CR(filp->f_ops, ConInstance, Abstraction);
+  // Quick check to see if Stream looks reasonable
+  if(Stream->Cookie != CON_COOKIE) {    // Cookie == 'IoAb'
+    errno     = EINVAL;
+    EFIerrno = RETURN_INVALID_PARAMETER;
+    return -1;    // Looks like a bad File Descriptor pointer
+  }
+  // Stream and filp look OK, so continue.
+  // Flush the I/O buffers
+  (void) da_ConFlush(filp);
+
+  // Break the connection to IIO
+  filp->devdata = NULL;
+
+  gMD->StdIo[Stream->InstanceNum] = NULL;   // Mark the stream as closed
+  return 0;
 }
 
 #include  <sys/poll.h>
@@ -646,68 +716,68 @@ __Cons_construct(
     IIO = New_cIIO();
     if(IIO == NULL) {
       FreePool(ConInstanceList);
-  }
+    }
     else {
       Status = RETURN_SUCCESS;
-  for( i = 0; i < NUM_SPECIAL; ++i) {
-    // Get pointer to instance.
-    Stream = &ConInstanceList[i];
+      for( i = 0; i < NUM_SPECIAL; ++i) {
+        // Get pointer to instance.
+        Stream = &ConInstanceList[i];
 
-    Stream->Cookie      = CON_COOKIE;
-    Stream->InstanceNum = i;
-    Stream->CharState.A = 0;    // Start in the initial state
+        Stream->Cookie      = CON_COOKIE;
+        Stream->InstanceNum = i;
+        Stream->CharState.A = 0;    // Start in the initial state
 
-    switch(i) {
-      case STDIN_FILENO:
-        Stream->Dev = SystemTable->ConIn;
-        break;
-      case STDOUT_FILENO:
-        Stream->Dev = SystemTable->ConOut;
-        break;
-      case STDERR_FILENO:
-        if(SystemTable->StdErr == NULL) {
-          Stream->Dev = SystemTable->ConOut;
+        switch(i) {
+          case STDIN_FILENO:
+            Stream->Dev = SystemTable->ConIn;
+            break;
+          case STDOUT_FILENO:
+            Stream->Dev = SystemTable->ConOut;
+            break;
+          case STDERR_FILENO:
+            if(SystemTable->StdErr == NULL) {
+              Stream->Dev = SystemTable->ConOut;
+            }
+            else {
+              Stream->Dev = SystemTable->StdErr;
+            }
+            break;
+          default:
+            return RETURN_VOLUME_CORRUPTED;     // This is a "should never happen" case.
         }
-        else {
-          Stream->Dev = SystemTable->StdErr;
+
+        Stream->Abstraction.fo_close    = &da_ConClose;
+        Stream->Abstraction.fo_read     = &da_ConRead;
+        Stream->Abstraction.fo_write    = &da_ConWrite;
+        Stream->Abstraction.fo_stat     = &da_ConStat;
+        Stream->Abstraction.fo_lseek    = &da_ConSeek;
+        Stream->Abstraction.fo_fcntl    = &fnullop_fcntl;
+        Stream->Abstraction.fo_ioctl    = &da_ConIoctl;
+        Stream->Abstraction.fo_poll     = &da_ConPoll;
+        Stream->Abstraction.fo_flush    = &da_ConFlush;
+        Stream->Abstraction.fo_delete   = &fbadop_delete;
+        Stream->Abstraction.fo_mkdir    = &fbadop_mkdir;
+        Stream->Abstraction.fo_rmdir    = &fbadop_rmdir;
+        Stream->Abstraction.fo_rename   = &fbadop_rename;
+
+        Stream->NumRead     = 0;
+        Stream->NumWritten  = 0;
+        Stream->UnGetKey    = CHAR_NULL;
+
+        if(Stream->Dev == NULL) {
+          continue;                 // No device for this stream.
         }
-        break;
-      default:
-        return RETURN_VOLUME_CORRUPTED;     // This is a "should never happen" case.
-    }
-
-    Stream->Abstraction.fo_close    = &da_ConClose;
-    Stream->Abstraction.fo_read     = &da_ConRead;
-    Stream->Abstraction.fo_write    = &da_ConWrite;
-    Stream->Abstraction.fo_stat     = &da_ConStat;
-    Stream->Abstraction.fo_lseek    = &da_ConSeek;
-    Stream->Abstraction.fo_fcntl    = &fnullop_fcntl;
-    Stream->Abstraction.fo_ioctl    = &da_ConIoctl;
-    Stream->Abstraction.fo_poll     = &da_ConPoll;
-    Stream->Abstraction.fo_flush    = &fnullop_flush;
-    Stream->Abstraction.fo_delete   = &fbadop_delete;
-    Stream->Abstraction.fo_mkdir    = &fbadop_mkdir;
-    Stream->Abstraction.fo_rmdir    = &fbadop_rmdir;
-    Stream->Abstraction.fo_rename   = &fbadop_rename;
-
-    Stream->NumRead     = 0;
-    Stream->NumWritten  = 0;
-    Stream->UnGetKey    = CHAR_NULL;
-
-    if(Stream->Dev == NULL) {
-      continue;                 // No device for this stream.
-    }
-        ConNode[i] = __DevRegister(stdioNames[i], NULL, &da_ConOpen, Stream,
-                                   1, sizeof(ConInstance), stdioFlags[i]);
-    if(ConNode[i] == NULL) {
-          Status = EFIerrno;    // Grab error code that DevRegister produced.
-      break;
-    }
-    Stream->Parent = ConNode[i];
-  }
-  /* Initialize Ioctl flags until Ioctl is really implemented. */
-  TtyCooked = TRUE;
-  TtyEcho   = TRUE;
+            ConNode[i] = __DevRegister(stdioNames[i], NULL, &da_ConOpen, Stream,
+                                       1, sizeof(ConInstance), stdioFlags[i]);
+        if(ConNode[i] == NULL) {
+              Status = EFIerrno;    // Grab error code that DevRegister produced.
+          break;
+        }
+        Stream->Parent = ConNode[i];
+      }
+      /* Initialize Ioctl flags until Ioctl is really implemented. */
+      TtyCooked = TRUE;
+      TtyEcho   = TRUE;
     }
   }
   return  Status;
@@ -751,15 +821,5 @@ da_ConCntl(
   void *
   )
 {
-}
-
-static
-int
-EFIAPI
-da_ConFlush(
-  struct __filedes *filp
-  )
-{
-  return 0;
 }
 #endif  /* Not implemented for Console */
