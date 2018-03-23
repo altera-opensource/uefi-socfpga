@@ -733,14 +733,6 @@
 [Components.common]
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
-  #
-  # SEC
-  #
-  AlteraPlatformPkg/Stratix10SoCPkg/Sec/Sec.inf {
-    <LibraryClasses>
-      # Use the implementation which set the Secure bits
-      ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicSecLib.inf
-  }
 
   #
   # Pre-PEI Phase modules

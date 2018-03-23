@@ -262,7 +262,6 @@ else ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","s
   PEI_SMALLER_x1_ROM       := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)PEI.256
   PEI_FINAL_ROM            := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)PEI.ROM
   DXE_FINAL_ROM            := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)DXE.ROM
-  SEC_FINAL_ROM            := Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)SEC.ROM
 
   FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
   FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Stratix10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
@@ -516,7 +515,6 @@ ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "
 else
 	@$(CP) $(DXE_FD_FILENAME_FULLPATH) $(DXE_FINAL_ROM)
 	@$(CP) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FINAL_ROM)
-	@$(CP) $(SEC_FD_FILENAME_FULLPATH) $(SEC_FINAL_ROM)
 endif
 
 #-----------------------------------------------------------------------------
