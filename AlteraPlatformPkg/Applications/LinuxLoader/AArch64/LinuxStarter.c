@@ -224,7 +224,7 @@ BootLinuxFdt (
 
   // Try to put the kernel at the start of RAM so as to give it access to all memory.
   // If that fails fall back to try loading it within LINUX_KERNEL_MAX_OFFSET of memory start.
-  LinuxImage = SystemMemoryBase + 0x80000;
+  LinuxImage = SystemMemoryBase + 0x2000000;
   Status = BdsLoadImage (LinuxKernelDevicePath, AllocateAddress, &LinuxImage, &LinuxImageSize);
   if (EFI_ERROR (Status)) {
     // Try again but give the loader more freedom of where to put the image.
