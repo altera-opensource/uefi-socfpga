@@ -112,6 +112,11 @@
   # QSPI Clock Frequency
   gAlteraSocFpgaTokenSpaceGuid.PcdQspiClkFreq|54
 
+  # GPIO Base
+  gAlteraSocFpgaTokenSpaceGuid.PcdDWGpioBase|{0xFFC03200,0xFFC03300}
+  gAlteraSocFpgaTokenSpaceGuid.PcdDWGpioCount|{24,24}
+  gAlteraSocFpgaTokenSpaceGuid.PcdDWGpioControllerCount|2
+
   #
   # Nand will not erase/read/write if more than this defined numbers of bad block are detected
   gAlteraSocFpgaTokenSpaceGuid.PcdNandStopIfMoreThanThisNumberBadBlocks|1
@@ -795,6 +800,8 @@
   EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   AlteraPlatformPkg/Stratix10SoCPkg/Drivers/AlteraSdMmcDxe/AlteraSdMmcDxe.inf
 
+  # DW GPIO
+  AlteraPlatformPkg/Stratix10SoCPkg/Drivers/DWGpio/Gpio.inf
   #
   # Platform Specific Init for DXE phase
   #

@@ -221,3 +221,8 @@
   ## HPS EMac Interface
   gAlteraSocFpgaTokenSpaceGuid.PcdDefaultMacInterface|0|UINT32|0xFEDC0403
 
+  ## HPS DW GPIO Interface
+  gAlteraSocFpgaTokenSpaceGuid.PcdDWGpioBase|{0xFFC03200, 0xFFC03300}|VOID*|0xFEDC0501
+  gAlteraSocFpgaTokenSpaceGuid.PcdDWGpioCount|{24,24}|VOID*|0xFEDC0502
+  gAlteraSocFpgaTokenSpaceGuid.PcdDWGpioControllerCount|2|UINT32|0xFEDC0503
+

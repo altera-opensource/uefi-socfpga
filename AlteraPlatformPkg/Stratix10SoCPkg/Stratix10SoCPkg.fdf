@@ -283,6 +283,9 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
   INF AlteraPlatformPkg/Stratix10SoCPkg/Drivers/AlteraSdMmcDxe/AlteraSdMmcDxe.inf
 
   #
+  # Multimedia Card Interface
+  #
+  INF AlteraPlatformPkg/Stratix10SoCPkg/Drivers/DWGpio/Gpio.inf
   # USB support
   #
   # INF EmbeddedPkg/Drivers/Isp1761UsbDxe/Isp1761UsbDxe.inf
