@@ -554,6 +554,7 @@
   # It uses the Shell libraries.
   ArmShellCmdRunAxfLib|ArmPlatformPkg/Library/ArmShellCmdRunAxf/ArmShellCmdRunAxf.inf
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
+  ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
 
@@ -596,6 +597,7 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+  LibC|StdLib/LibC/LibC.inf
 
   #-------------------------------
   # Build Debug / Release
@@ -802,6 +804,7 @@
 
   # DW GPIO
   AlteraPlatformPkg/Stratix10SoCPkg/Drivers/DWGpio/Gpio.inf
+
   #
   # Platform Specific Init for DXE phase
   #
@@ -847,6 +850,10 @@
 
   # Standard EFI HelloWorld Application
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
+
+  # DW GPIO
+  AlteraPlatformPkg/Stratix10SoCPkg/Application/Gpio/GpioControl.inf
+
 [BuildOptions]
   #-------------------------------
   # Common
