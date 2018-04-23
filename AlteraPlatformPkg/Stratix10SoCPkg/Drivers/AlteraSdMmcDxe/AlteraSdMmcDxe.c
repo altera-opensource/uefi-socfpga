@@ -187,10 +187,10 @@ SdMmcReadBlockData (
 
     ArmEnableDataCache ();
   } else {
-    Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  //  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
     Status = ReadData(Length, Buffer);
 
-  gBS->RestoreTPL (Tpl);
+//  gBS->RestoreTPL (Tpl);
   }
   return Status;
 }
