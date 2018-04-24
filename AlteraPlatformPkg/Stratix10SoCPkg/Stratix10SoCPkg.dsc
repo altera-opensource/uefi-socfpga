@@ -214,9 +214,9 @@
   ##------------------------------------------------------------------------------
   #  Clock souce from HPS_CLK1 pin to osc1_clk to Osc1Timer0 and Osc1Timer1
   gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_Base|0xFFD00000
-  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_ClkFreqInHz|50000000
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer0_ClkFreqInHz|100000000
   gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_Base|0xFFD00100
-  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_ClkFreqInHz|50000000
+  gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_ClkFreqInHz|100000000
   gAlteraHpsTokenSpaceGuid.Pcd_Osc1Timer1_InterruptNum|116
 
   ##------------------------------------------------------------------------------
@@ -270,7 +270,7 @@
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
 
   # Arm Architectural Timer
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|24000000
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|1000000000
 
   # Trustzone Enable
   gArmTokenSpaceGuid.PcdTrustzoneSupport|TRUE
