@@ -346,6 +346,9 @@ FvNameGuid         = 5eda4200-2c5f-43cb-9da3-0baf74b1b30c
   # GPIO app Interface
   #
   INF AlteraPlatformPkg/Stratix10SoCPkg/Application/Gpio/GpioControl.inf
+  
+  # I2C
+  INF AlteraPlatformPkg/Applications/AccessingI2C/I2c.inf
 
   # Include UEFI Shell Start Up Script
   FILE FREEFORM = AF3F9E26-DDB5-4e85-B4D7-AC60A2772BC2 {

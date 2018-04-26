@@ -1,0 +1,65 @@
+##  @file
+#  A shell application that triggers I2c control.
+#
+# This application can trigger capsule update process. It can also
+# generate capsule image, or dump capsule variable information.
+#
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = I2c
+  FILE_GUID                      = CDEA6098-46DD-42F4-84A9-300D3E41D587
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+#
+
+[Sources]
+  I2cApp.c
+  AppSupport.c
+  I2c.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  AlteraPlatformPkg/AlteraPlatformPkg.dec
+  AlteraPlatformPkg/Stratix10SoCPkg/Stratix10SoCPkg.dec  
+
+[Guids]
+  gEfiGlobalVariableGuid                 ## CONSUMES   ## GUID
+  gEfiCapsuleReportGuid                  ## CONSUMES   ## GUID
+  gEfiFmpCapsuleGuid                     ## CONSUMES   ## GUID
+  gWindowsUxCapsuleGuid                  ## CONSUMES   ## GUID
+  gEfiCertTypeRsa2048Sha256Guid          ## CONSUMES   ## GUID
+  gEfiCertPkcs7Guid                      ## CONSUMES   ## GUID
+  gEfiSystemResourceTableGuid            ## CONSUMES   ## GUID
+
+[Protocols]
+  gEfiGraphicsOutputProtocolGuid         ## CONSUMES
+  gEfiFirmwareManagementProtocolGuid     ## CONSUMES
+  gEfiShellParametersProtocolGuid        ## CONSUMES
+  gEfiShellProtocolGuid                  ## CONSUMES
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  UefiApplicationEntryPoint
+  DebugLib
+  MemoryAllocationLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  PrintLib
+

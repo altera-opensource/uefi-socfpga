@@ -853,6 +853,9 @@
 
   # DW GPIO
   AlteraPlatformPkg/Stratix10SoCPkg/Application/Gpio/GpioControl.inf
+  
+  # I2C
+  AlteraPlatformPkg/Applications/AccessingI2C/I2c.inf
 
 [BuildOptions]
   #-------------------------------
