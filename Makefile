@@ -96,7 +96,7 @@ endif
 #-----------------------------------------------------------------------------
 
 # Default when user just type make
-DEFAULT_MAKE_DEVICE := a10
+DEFAULT_MAKE_DEVICE := s10
 DEFAULT_MAKE_COMPILER := gcc
 DEFAULT_MAKE_TARGET := bootloader
 
@@ -150,102 +150,7 @@ $(error ERROR: Unsupported Compiler in command-line argument COMPILER=""$(COMPIL
 endif
 
 
-# Override the default value based on command-line argument
-ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "A10"))
-  # Processor architecture which is ARM for SOCFPGA
-  export EDK2_ARCH=ARM
-
-  # DTB path as defined in .FDF
-  # (do no change, it must match the on in .FDF file)
-  FDF_LINK_DTB_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dtb
-
-  # DTS path
-  FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dts
-
-  # ENTRY_MINUS_40HEX
-  ENTRY_MINUS_40HEX := 292
-
-  # Build full path of the .FD files
-  PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
-  DXE_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(DXE_FD_FILENAME)
-  PEI_SMALLER_x1_ROM       := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)PEI.256
-  PEI_FINAL_ROM            := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)PEI.ROM
-  DXE_FINAL_ROM            := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)DXE.ROM
-
-  FILE_ArmPlatformSec        := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Sec$(PATHSEP)Sec$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformSec.dll
-  FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)PrePeiCore$(PATHSEP)PrePeiCoreMPCore$(PATHSEP)DEBUG$(PATHSEP)ArmPlatformPrePeiCore.dll
-  FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
-
-  SNR_BUILD_PEI  := $(SED_START)Build/PEI.256$(SED_END)
-  FILE_BUILD_PEI := $(mkfile_path)$(PEI_SMALLER_x1_ROM)
-
-  ENTRY_ArmPlatformSec        := $(SED_START)0x00ffe00164$(SED_END)
-  ENTRY_ArmPlatformPrePeiCore := $(SED_START)0x00ffe01164$(SED_END)
-  ENTRY_AlteraSocFpgaPeiMain  := $(SED_START)0x00ffe041ad$(SED_END)
-  # DS5 script path
-  DS5_SCRIPT_PATH            := AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.ds5
-  DS_SCRIPT                  := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)load_uefi_fw.ds
-
-  ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","bootloader" "BOOTLOADER"))
-  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dsc
-  else ifeq ("$(TARGET)$(target)$(T)$(t)",$(filter "$(TARGET)$(target)$(T)$(t)","app" "APP"))
-  export EDK2_DSC=AlteraPlatformPkg$(PATHSEP)Applications$(PATHSEP)SocFpgaAppPkg.dsc
-  EFIAPP_FILENAME_FULLPATH := Build$(PATHSEP)SocFpgaAppPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)$(EDK2_ARCH)$(PATHSEP)*.efi
-  else
-  $(error ERROR: No .DSC for unsupported TARGET="$(TARGET)$(target)$(T)$(t))"
-  endif
-
-  #-----------------------------------------------------------------------------
-  # Device Tree
-  #-----------------------------------------------------------------------------
-  # Update handoff DTB ?
-  # Check error: Same file?
-  ifeq ($(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb), $(FDF_LINK_DTB_PATH))
-    $(error ERROR: Same file (HANDOFF_DTB == default .FDF DTB) plese remove the HANDOFF_DTB arguement)
-  endif
-  ifneq ("$(wildcard $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))","")
-    # FILE_EXISTS = 1
-    export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(ECHO_END)
-    export CMD_UPDATE_HANDOFF_DTB_1=$(CP) $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb) $(FDF_LINK_DTB_PATH)
-    export CMD_UPDATE_HANDOFF_DTB_2=$(CMD_UPDATE_HANDOFF_DTB_1) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts -o $(FDF_LINK_DTS_PATH)
-    export CMD_UPDATE_HANDOFF_DTB_3=$(CMD_UPDATE_HANDOFF_DTB_2) $(NEXT_CMD) $(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
-    export CMD_UPDATE_HANDOFF_DTB=$(CMD_UPDATE_HANDOFF_DTB_3)
-  else ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
-    # FILE_EXISTS = 0
-    export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : $(FDF_LINK_DTB_PATH)$(ECHO_END)
-    export CMD_UPDATE_HANDOFF_DTB=@$(DTC) --space 16384 -I dtb $(FDF_LINK_DTB_PATH) -O dts
-  else
-    export CMD_ECHO_HANDOFF_DTB=@$(ECHO_START) HANDOFF_DTB    : ERROR! FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)$(ECHO_END)
-    export CMD_UPDATE_HANDOFF_DTB=
-    $(error ERROR: FILE NOT FOUND - $(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb))
-  endif
-
-  # If no DTB but got DTS, help to compile the DTS and copy to replace default DTB
-  ifeq ("$(HANDOFF_DTB)$(handoff_dtb)$(HANDOFFDTB)$(handoffdtb)$(DTB)$(dtb)","")
-    ifneq ("$(wildcard $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts))","")
-    # FILE_EXISTS = 1
-    export CMD_ECHO_HANDOFF_DTS=$(ECHO_START) HANDOFF_DTS    : $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
-    export CMD_COMPILE_HANDOFF_DTS_1=$(CAT_TYPE) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)
-    export CMD_COMPILE_HANDOFF_DTS_2=$(CMD_COMPILE_HANDOFF_DTS_1) $(NEXT_CMD) $(DTC) --space 16384 -I dts $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) -O dtb -o $(FDF_LINK_DTB_PATH)
-    export CMD_COMPILE_HANDOFF_DTS_3=$(CMD_COMPILE_HANDOFF_DTS_2) $(NEXT_CMD) $(CP) $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts) $(FDF_LINK_DTS_PATH)
-    export CMD_COMPILE_HANDOFF_DTS=$(CMD_COMPILE_HANDOFF_DTS_3)
-    # Make sure CMD_UPDATE_HANDOFF_DTB is clear to avoid dump DTC twice
-    export CMD_UPDATE_HANDOFF_DTB=
-    else ifeq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
-    # FILE_EXISTS = 0
-    export CMD_ECHO_HANDOFF_DTS=
-    export CMD_COMPILE_HANDOFF_DTS=
-    else
-    export CMD_ECHO_HANDOFF_DTS=
-    export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) HANDOFF_DTS    : ERROR! FILE NOT FOUND - $(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)$(ECHO_END)
-    endif
-  else
-     ifneq ("$(HANDOFF_DTS)$(handoff_dts)$(HANDOFFDTS)$(handoffdts)$(DTS)$(dts)","")
-     #export CMD_COMPILE_HANDOFF_DTS=@$(ECHO_START) ERROR! You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.  In this case HANDOFF_DTS will be ignored and only HANDOFF_DTB will be used.$(ECHO_END)
-     $(error ERROR: You cannot have both HANDOFF_DTS and HANDOFF_DTB defined.)
-     endif
-  endif
-else ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","s10" "S10"))
+ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","s10" "S10"))
   # Processor architecture which is AARCH64 for SOCFPGA
   export EDK2_ARCH=AARCH64
 
@@ -396,7 +301,6 @@ help:
 	@$(ECHO_START) OPTIONS:$(ECHO_END)
 	@$(ECHO_NEWLINE)
 	@$(ECHO_START)     DEVICE      - Device type$(ECHO_END)
-	@$(ECHO_START)                   a10 for Arria 10$(ECHO_END)
 	@$(ECHO_START)                   s10 for Stratix 10$(ECHO_END)
 	@$(ECHO_START)     COMPILER    - Compiler selection$(ECHO_END)
 	@$(ECHO_START)                   armcc for ARMCC$(ECHO_END)
@@ -422,13 +326,13 @@ help:
 	@$(ECHO_START) EXAMPLES:$(ECHO_END)
 	@$(ECHO_NEWLINE)
 	@$(ECHO_START)     make$(ECHO_END)
-	@$(ECHO_START)     make DEVICE=a10 COMPILER=gcc$(ECHO_END)
-	@$(ECHO_START)     make DEVICE=a10 COMPILER=armcc$(ECHO_END)
-	@$(ECHO_START)     make DEVICE=a10 COMPILER=armcc HANDOFF_DTB=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkgNand.dtb$(ECHO_END)
-	@$(ECHO_START)     make DEVICE=a10 COMPILER=armcc HANDOFF_DTS=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkgNand.dts$(ECHO_END)
-	@$(ECHO_START)     make fast DEVICE=a10 COMPILER=gcc$(ECHO_END)
-	@$(ECHO_START)     make fast DEVICE=a10 COMPILER=gcc HANDOFF_DTB=a10_soc_devkit_ghrd/software/bootloader/devicetree.dtb$(ECHO_END)
-	@$(ECHO_START)     make fast DEVICE=a10 COMPILER=gcc HANDOFF_DTS=a10_soc_devkit_ghrd/software/bootloader/devicetree.dts$(ECHO_END)
+	@$(ECHO_START)     make DEVICE=s10 COMPILER=gcc$(ECHO_END)
+	@$(ECHO_START)     make DEVICE=s10 COMPILER=armcc$(ECHO_END)
+	@$(ECHO_START)     make DEVICE=s10 COMPILER=armcc HANDOFF_DTB=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkgNand.dtb$(ECHO_END)
+	@$(ECHO_START)     make DEVICE=s10 COMPILER=armcc HANDOFF_DTS=AlteraPlatformPkg$(PATHSEP)Stratix10SoCPkg$(PATHSEP)Stratix10SoCPkgNand.dts$(ECHO_END)
+	@$(ECHO_START)     make fast DEVICE=s10 COMPILER=gcc$(ECHO_END)
+	@$(ECHO_START)     make fast DEVICE=s10 COMPILER=gcc HANDOFF_DTB=s10_soc_devkit_ghrd/software/bootloader/devicetree.dtb$(ECHO_END)
+	@$(ECHO_START)     make fast DEVICE=s10 COMPILER=gcc HANDOFF_DTS=s10_soc_devkit_ghrd/software/bootloader/devicetree.dts$(ECHO_END)
 	@$(ECHO_START)     make mkpimage COMPILER=gcc$(ECHO_END)
 	@$(ECHO_START)     make app$(ECHO_END)
 
@@ -507,15 +411,8 @@ build_firmware:
 # Shell Scripts: build_mkpimage
 #-----------------------------------------------------------------------------
 build_mkpimage:
-ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "A10"))
-	@$(ECHO_START) mkpimage .FD to .ROM : $(PEI_FINAL_ROM)  $(DXE_FINAL_ROM)$(ECHO_END)
-	@mkpimage --header-version $(MKPIMAGE_HEADER_VERSION) -off $(ENTRY_MINUS_40HEX) -o $(PEI_FINAL_ROM) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FD_FILENAME_FULLPATH)
-	@mkpimage --header-version $(MKPIMAGE_HEADER_VERSION) -off $(ENTRY_MINUS_40HEX) -o $(PEI_SMALLER_x1_ROM) $(PEI_FD_FILENAME_FULLPATH)
-	@$(CP) $(DXE_FD_FILENAME_FULLPATH) $(DXE_FINAL_ROM)
-else
 	@$(CP) $(DXE_FD_FILENAME_FULLPATH) $(DXE_FINAL_ROM)
 	@$(CP) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FINAL_ROM)
-endif
 
 #-----------------------------------------------------------------------------
 # Shell Scripts: build_ds_script
@@ -566,10 +463,6 @@ program_flash_using_quartus_hps_256:
 
 # list_of_makefile_self_test_command:
 # make
-# make DEVICE=A10 COMPILER=GCC
-# make DEVICE=A10 COMPILER=ARMCC
-# make device=a10 compiler=gcc
-# make device=a10 compiler=armcc
 # make DEVICE=s10
 # make DEVICE=s10 COMPILER=GCC
 # make DEVICE=S10 COMPILER=GCC
@@ -578,12 +471,4 @@ program_flash_using_quartus_hps_256:
 # make device=S10 COMPILER=GCC
 # make DEVICE=invalid COMPILER=invalid
 # make device=invalid compiler=invalid
-# make DEVICE=A10 COMPILER=GCC HANDOFF_DTS=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkgSdmmc.dts
-# make DEVICE=A10 COMPILER=GCC HANDOFF_DTB=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkgSdmmc.dtb
-# make DEVICE=A10 COMPILER=GCC HANDOFF_DTS=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkgQspi.dts
-# make DEVICE=A10 COMPILER=GCC HANDOFF_DTB=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkgQspi.dtb
-# make DEVICE=A10 COMPILER=GCC HANDOFF_DTS=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkgNand.dts
-# make DEVICE=A10 COMPILER=GCC HANDOFF_DTB=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkgNand.dtb
-# make DEVICE=A10 COMPILER=GCC HANDOFF_DTB=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkg.dtb
-# make DEVICE=A10 COMPILER=GCC HANDOFF_DTB=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkgNand.dtb HANDOFF_DTS=AlteraPlatformPkg/Arria10SoCPkg/Arria10SoCPkgNand.dts
 
