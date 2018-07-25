@@ -927,7 +927,7 @@ GetPhysicalDramSize (
                  ALT_IO48_HMC_MMR_DRAMADDRW_CFG_BANK_GROUP_ADDR_WIDTH_GET(Data32) +
                  ALT_IO48_HMC_MMR_DRAMADDRW_CFG_CS_ADDR_WIDTH_GET(Data32);
   // Calcualte total RAM size in number of bytes
-  RamSize = (1 << RamAddrWidth) * (RamExtIfIoWidth / 8);
+  RamSize = ((UINT64)1 << RamAddrWidth) * (RamExtIfIoWidth / 8);
 
   return RamSize;
 }
@@ -1033,7 +1033,7 @@ DisplayMemoryInfo (
                  ALT_IO48_HMC_MMR_DRAMADDRW_CFG_BANK_ADDR_WIDTH_GET(Data32) +
                  ALT_IO48_HMC_MMR_DRAMADDRW_CFG_BANK_GROUP_ADDR_WIDTH_GET(Data32) +
                  ALT_IO48_HMC_MMR_DRAMADDRW_CFG_CS_ADDR_WIDTH_GET(Data32);
-  RamSize = (1 << RamAddrWidth) * (RamExtIfIoWidth / 8);
+  RamSize = ((UINT64)1 << RamAddrWidth) * (RamExtIfIoWidth / 8);
   InfoPrint ("\t\t Memory Size\t\t\t: %Ld\r\n", RamSize);
 
   // Display RAM Type

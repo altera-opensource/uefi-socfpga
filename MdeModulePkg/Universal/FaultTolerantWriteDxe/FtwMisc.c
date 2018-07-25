@@ -1238,7 +1238,7 @@ InitFtwProtocol (
   // Note: Do not assume Spare Block and Work Block have same block size.
   //
   WorkSpaceLbaOffset = FtwDevice->FtwWorkSpaceLba - FtwDevice->FtwWorkBlockLba;
-  FtwDevice->FtwWorkSpaceLbaInSpare = (EFI_LBA) (((UINTN) WorkSpaceLbaOffset * FtwDevice->WorkBlockSize + FtwDevice->FtwWorkSpaceBase) / FtwDevice->SpareBlockSize);
+  FtwDevice->FtwWorkSpaceLbaInSpare = (EFI_LBA) (((UINTN) WorkSpaceLbaOffset * (EFI_LBA)FtwDevice->WorkBlockSize + FtwDevice->FtwWorkSpaceBase) / FtwDevice->SpareBlockSize);
   FtwDevice->FtwWorkSpaceBaseInSpare = ((UINTN) WorkSpaceLbaOffset * FtwDevice->WorkBlockSize + FtwDevice->FtwWorkSpaceBase) % FtwDevice->SpareBlockSize;
   DEBUG ((EFI_D_INFO, "Ftw: WorkSpaceLbaInSpare - 0x%lx, WorkSpaceBaseInSpare - 0x%x\n", FtwDevice->FtwWorkSpaceLbaInSpare, FtwDevice->FtwWorkSpaceBaseInSpare));
 
