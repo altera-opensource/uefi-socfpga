@@ -1,0 +1,52 @@
+## @file
+# I/O driver for non-discoverable devices.
+#
+# Copyright (C) 2016-2018, Linaro Ltd.
+#
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001a
+  BASE_NAME                      = NonDiscoverableDeviceDxe
+  FILE_GUID                      = 66c8ca38-4c1e-4730-8c77-6c248ad89abd
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NonDiscoverableDeviceDxeEntryPoint
+
+[Sources]
+  ComponentName.c
+  NonDiscoverableDeviceDxe.c
+  NonDiscoverableDeviceIo.c
+  NonDiscoverableDeviceIo.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEdkiiNonDiscoverableDeviceProtocolGuid       ## TO_START
+  gEfiCpuArchProtocolGuid                       ## CONSUMES
+  gEmbeddedNonDiscoverableIoProtocolGuid
+
+[Guids]
+  gEdkiiNonDiscoverableNvmeDeviceGuid       ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableSdhciDeviceGuid      ## CONSUMES ## GUID
+  gEdkiiNonDiscoverableUfsDeviceGuid        ## CONSUMES ## GUID
