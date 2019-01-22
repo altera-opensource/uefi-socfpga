@@ -264,8 +264,8 @@
   gArmTokenSpaceGuid.PcdVFPEnabled|1
 
   # System Memory (1GB)
-  gArmTokenSpaceGuid.PcdSystemMemoryBase|0x00000000
-  gArmTokenSpaceGuid.PcdSystemMemorySize|0x40000000
+  gArmTokenSpaceGuid.PcdSystemMemoryBase|0x01000000
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0x3f000000
 
   gArmTokenSpaceGuid.PcdArmUncachedMemoryMask|0x0000000040000000
 
