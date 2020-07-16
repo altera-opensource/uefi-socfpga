@@ -1375,8 +1375,102 @@ ReadFifo (
         ));
       return Status;
     }
+
+    if (Trb->DataLen && (Intsts & DW_MMC_INT_TXDR) && !Trb->Read) {
+      Status = DwMmcHcRwMmio (
+                 DevIo,
+                 DW_MMC_STATUS,
+                 TRUE,
+                 sizeof (Sts),
+                 &Sts);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "ReadFifo: failed to read STATUS, Status:%r\n",
+          Status
+          ));
+      }
+
+      while (!(DW_MMC_STS_FIFO_FULL(Sts))
+              && (Received < Trb->DataLen)
+              && (Intsts & DW_MMC_INT_TXDR)) {
+        if (Trb->UseBE) {
+          Data = SwapBytes32 (*(UINT32 *)((UINTN)Trb->Data + Descending));
+          Descending = Descending - 4;
+        } else {
+          Data = *(UINT32 *)((UINTN)Trb->Data + Ascending);
+          Ascending += 4;
+        }
+        Index += 4;
+        Received += 4;
+
+        Status = DwMmcHcRwMmio (
+                DevIo,
+                DW_MMC_FIFO_START,
+                FALSE,
+                sizeof (Data),
+                &Data
+                );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((
+            DEBUG_ERROR,
+            "ReadFifo: failed to read FIFO, Status:%r\n",
+            Status
+            ));
+          return Status;
+        }
+
+        Intsts = DW_MMC_INT_TXDR;
+        DwMmcHcRwMmio (
+                  DevIo,
+                  DW_MMC_RINTSTS,
+                  FALSE,
+                  sizeof (Intsts),
+                  &Intsts);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((
+              DEBUG_ERROR,
+              "ReadFifo: failed to clear TXDR from RINTSTS, Status:%r\n",
+              Status
+              ));
+              return Status;
+          }
+
+    	  DwMmcHcRwMmio (
+    		  DevIo,
+                  DW_MMC_RINTSTS,
+                  TRUE,
+                  sizeof (Intsts),
+                  &Intsts);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((
+              DEBUG_ERROR,
+              "ReadFifo: failed to read RINTSTS, Status:%r\n",
+              Status
+              ));
+              return Status;
+          }
+
+          Status = DwMmcHcRwMmio (
+                  DevIo,
+                  DW_MMC_STATUS,
+                  TRUE,
+                  sizeof (Sts),
+                  &Sts);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((
+              DEBUG_ERROR,
+              "ReadFifo: failed to read STATUS, Status:%r\n",
+              Status
+              ));
+            return Status;
+          }
+        }
+      continue;
+    }
+    
     if (Trb->DataLen && ((Intsts & DW_MMC_INT_RXDR) ||
-       (Intsts & DW_MMC_INT_DTO))) {
+       (Intsts & DW_MMC_INT_DTO)) && Trb->Read) {
       Status = DwMmcHcRwMmio (
                  DevIo,
                  DW_MMC_STATUS,
@@ -2000,7 +2094,7 @@ DwSdExecTrb (
   Cmd |= BIT_CMD_USE_HOLD_REG | BIT_CMD_START;
 
   if (Trb->UseFifo == TRUE) {
-    BytCnt = Packet->InTransferLength;
+    BytCnt = Trb->Read ? Packet->InTransferLength : Packet->OutTransferLength;
     Status = DwMmcHcRwMmio (
                DevIo,
                DW_MMC_BYTCNT,
@@ -2011,13 +2105,23 @@ DwSdExecTrb (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    if (Packet->InTransferLength > DW_MMC_BLOCK_SIZE) {
-      BlkSize = DW_MMC_BLOCK_SIZE;
-    } else {
-      BlkSize = Packet->InTransferLength;
+    if (Trb->Read) {
+      if (Packet->InTransferLength > DW_MMC_BLOCK_SIZE) {
+        BlkSize = DW_MMC_BLOCK_SIZE;
+      } else {
+        BlkSize = Packet->InTransferLength;
+      }
     }
+    else {
+    	if (Packet->OutTransferLength > DW_MMC_BLOCK_SIZE) {
+    	        BlkSize = DW_MMC_BLOCK_SIZE;
+    	      } else {
+    	        BlkSize = Packet->OutTransferLength;
+    	      }
+    }
+    
     Status = DwMmcHcRwMmio (
-               DevIo,
+               DevIo, 
                DW_MMC_BLKSIZ,
                FALSE,
                sizeof (BlkSize),
