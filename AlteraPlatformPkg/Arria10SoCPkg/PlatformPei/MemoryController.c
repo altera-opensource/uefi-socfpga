@@ -33,6 +33,7 @@
 // Include files
 //
 #include <AlteraPlatform.h>
+#include <Library/ArmLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
@@ -42,6 +43,7 @@
 #include <Library/TimerLib.h>
 #include "Assert.h"
 #include "MemoryController.h"
+#include "Mmu.h"
 
 #if (FixedPcdGet32(PcdDebugMsg_MemoryController) == 0)
   #define ProgressPrint(FormatString, ...)    /* do nothing */
@@ -383,6 +385,7 @@ ConfigureHmcAdaptorRegisters (
 {
   UINT32          Data32;
   UINT32          DramIoWidth;
+  VOID            *DramBase;
 
   ProgressPrint ("\t Init HMC Adaptor.\r\n");
 
@@ -452,6 +455,12 @@ ConfigureHmcAdaptorRegisters (
                      ALT_ECC_HMC_OCP_ECCCTL1_CNT_RST_SET(0) |
                      ALT_ECC_HMC_OCP_ECCCTL1_ECC_EN_SET(1));
 
+    ProgressPrint ("\t\t Scrubbing ECC\n");
+    InitMmu(TRUE);
+    DramBase = (VOID*)GetMpuWindowDramBaseAddr();
+    ZeroMem (DramBase, GetMpuWindowDramSize());
+    ProgressPrint ("\t\t Scrubbing ECC completed with\n");
+    InitMmu(FALSE);
   } else {
     // No, ECC is disabled.
     ProgressPrint ("\t\t ECC is disabled.\r\n");

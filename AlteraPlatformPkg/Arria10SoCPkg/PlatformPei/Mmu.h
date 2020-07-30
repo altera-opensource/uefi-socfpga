@@ -42,13 +42,14 @@
 VOID
 EFIAPI
 ArmPlatformGetVirtualMemoryMap (
-  IN ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap
+  IN ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap,
+  IN BOOLEAN ForceWriteThrough
   );
 
 VOID
 EFIAPI
 InitMmu (
-  VOID
+  IN BOOLEAN ForceWriteThrough
   );
 
 #endif

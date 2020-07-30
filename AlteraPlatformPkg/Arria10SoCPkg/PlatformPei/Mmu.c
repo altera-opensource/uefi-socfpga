@@ -71,7 +71,8 @@ ARM_MEMORY_REGION_DESCRIPTOR  gVirtualMemoryTable[MAX_VIRTUAL_MEMORY_MAP_DESCRIP
 VOID
 EFIAPI
 ArmPlatformGetVirtualMemoryMap (
-  IN ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap
+  IN ARM_MEMORY_REGION_DESCRIPTOR** VirtualMemoryMap,
+  IN BOOLEAN ForceWriteThrough
   )
 {
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
@@ -84,6 +85,10 @@ ArmPlatformGetVirtualMemoryMap (
     CacheAttributes = DDR_ATTRIBUTES_CACHED;
   } else {
     CacheAttributes = DDR_ATTRIBUTES_UNCACHED;
+  }
+
+  if (ForceWriteThrough) {
+    CacheAttributes = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH;
   }
 
   // Start create the Virtual Memory Map table
@@ -180,11 +185,10 @@ ArmPlatformGetVirtualMemoryMap (
 
 }
 
-
 VOID
 EFIAPI
 InitMmu (
-  VOID
+  IN BOOLEAN ForceWriteThrough
   )
 {
   ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable;
@@ -193,7 +197,7 @@ InitMmu (
   RETURN_STATUS                 Status;
 
   // Construct a Virtual Memory Map for this platform
-  ArmPlatformGetVirtualMemoryMap (&MemoryTable);
+  ArmPlatformGetVirtualMemoryMap (&MemoryTable, ForceWriteThrough);
 
   // Configure the MMU
   Status = ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);

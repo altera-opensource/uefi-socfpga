@@ -652,7 +652,7 @@ EnterDxeCoreEntryPoint (
 
     // Enable the MMU because the UEFI DXE phase's ArmPkg\Drivers\CpuDxe
     // required MMU to be enabled and filed with section translations
-    InitMmu ();
+    InitMmu (FALSE);
 
     // Update PHIT HOB to reflect the DRAM memory range instead of OCRAM
     Hob = GetHobList ();
