@@ -188,7 +188,7 @@ ArmPlatformGetVirtualMemoryMap (
 VOID
 EFIAPI
 InitMmu (
-  IN BOOLEAN ForceWriteThrough
+  IN BOOLEAN ScrubDDR
   )
 {
   ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable;
@@ -197,7 +197,10 @@ InitMmu (
   RETURN_STATUS                 Status;
 
   // Construct a Virtual Memory Map for this platform
-  ArmPlatformGetVirtualMemoryMap (&MemoryTable, ForceWriteThrough);
+  if (ScrubDDR)
+    ArmPlatformGetVirtualMemoryMap (&MemoryTable, TRUE);
+  else
+    ArmPlatformGetVirtualMemoryMap (&MemoryTable, FALSE);
 
   // Configure the MMU
   Status = ArmConfigureMmu (MemoryTable, &TranslationTableBase, &TranslationTableSize);
@@ -211,5 +214,11 @@ InitMmu (
     (UINT64)(UINTN)TranslationTableBase,
     (UINT64)(UINTN)TranslationTableBase + TranslationTableSize - 1
     );
+
+  if (ScrubDDR) {
+    ZeroMem ((VOID*)GetMpuWindowDramBaseAddr(), (UINTN)TranslationTableBase);
+    ZeroMem ((VOID*)((UINTN)GetMpuWindowDramBaseAddr() + (UINTN)TranslationTableBase + TranslationTableSize),
+      GetMpuWindowDramSize() - ((UINTN)GetMpuWindowDramBaseAddr() + (UINTN)TranslationTableBase + TranslationTableSize));
+  }
 }
 

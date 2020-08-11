@@ -456,7 +456,6 @@ ConfigureHmcAdaptorRegisters (
                      ALT_ECC_HMC_OCP_ECCCTL1_ECC_EN_SET(1));
 
     ProgressPrint ("\t\t Scrubbing ECC\n");
-    InitMmu(TRUE);
     DramBase = (VOID*)GetMpuWindowDramBaseAddr();
     ZeroMem (DramBase, GetMpuWindowDramSize());
     ProgressPrint ("\t\t Scrubbing ECC completed with\n");
