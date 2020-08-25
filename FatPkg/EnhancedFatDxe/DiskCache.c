@@ -473,7 +473,7 @@ FatInitializeDiskCache (
   DiskCache[CacheFat].BaseAddress    = Volume->FatPos;
   DiskCache[CacheFat].LimitAddress   = Volume->FatPos + Volume->FatSize;
   FatCacheSize                        = FatCacheGroupCount << DiskCache[CacheFat].PageAlignment;
-  DataCacheSize                       = FAT_DATACACHE_GROUP_COUNT << DiskCache[CacheData].PageAlignment;
+  DataCacheSize                       = (UINTN)FAT_DATACACHE_GROUP_COUNT << DiskCache[CacheData].PageAlignment;
   //
   // Allocate the Fat Cache buffer
   //
