@@ -512,7 +512,7 @@ UpdateConsolePage (
   }
 
   for (Index2 = 0; ((Index2 < TerminalMenu.MenuNumber) && \
-       (Index2 < MAX_MENU_NUMBER)); Index2++) {
+       (Index2 < MAX_MENU_NUMBER) && (Index < MAX_MENU_NUMBER)); Index2++) {
     CheckFlags          = 0;
     NewMenuEntry        = BOpt_GetMenuEntry (&TerminalMenu, Index2);
     NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
