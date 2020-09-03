@@ -304,7 +304,7 @@ FILE_ArmPlatformPrePeiCore := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSE
 FILE_AlteraSocFpgaPeiMain  := $(mkfile_path)Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)ARM$(PATHSEP)AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)PlatformPei$(PATHSEP)AlteraSocFpgaPeiMain$(PATHSEP)DEBUG$(PATHSEP)AlteraSocFpgaPeiMain.dll
 
 
-HWLIB_SOCEDS_PATH := $(SOCEDS_DEST_ROOT)$(PATHSEP)ip$(PATHSEP)altera$(PATHSEP)hps$(PATHSEP)altera_hps$(PATHSEP)hwlib$(PATHSEP)*
+HWLIB_SOCEDS_PATH := $(HWLIBS_ROOT_DIR)$(PATHSEP)armv7a$(PATHSEP)hwlib$(PATHSEP)*
 HWLIB_UEFI_PATH   := AlteraPlatformPkg$(PATHSEP)HwLib
 HWLIB_INCLUDE_PATH := $(HWLIB_UEFI_PATH)$(PATHSEP)include
 HWLIB_SRC_PATH := $(HWLIB_UEFI_PATH)$(PATHSEP)src
@@ -514,8 +514,9 @@ build_firmware:
 #-----------------------------------------------------------------------------
 build_mkpimage:
 	@$(ECHO_START) mkpimage .FD to .ROM : $(PEI_FINAL_ROM)  $(DXE_FINAL_ROM)$(ECHO_END)
-	@mkpimage --header-version $(MKPIMAGE_HEADER_VERSION) -off $(ENTRY_MINUS_40HEX) -o $(PEI_FINAL_ROM) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FD_FILENAME_FULLPATH) $(PEI_FD_FILENAME_FULLPATH)
-	@mkpimage --header-version $(MKPIMAGE_HEADER_VERSION) -off $(ENTRY_MINUS_40HEX) -o $(PEI_SMALLER_x1_ROM) $(PEI_FD_FILENAME_FULLPATH)
+	@mkimage -A arm -T socfpgaimage_v1 -C none -a $(ENTRY_MINUS_40HEX) -e $(ENTRY_MINUS_40HEX) -d $(PEI_FD_FILENAME_FULLPATH) $(PEI_FINAL_ROM)x1
+	cat $(PEI_FINAL_ROM)x1 $(PEI_FINAL_ROM)x1 $(PEI_FINAL_ROM)x1 $(PEI_FINAL_ROM)x1 > $(PEI_FINAL_ROM)
+	cat $(PEI_FINAL_ROM)x1 > $(PEI_SMALLER_x1_ROM)
 	@$(CP) $(DXE_FD_FILENAME_FULLPATH) $(DXE_FINAL_ROM)
 
 

@@ -62,7 +62,7 @@
   USE_ARM_BDS                    = FALSE
   SECURE_BOOT_ENABLE             = FALSE
   ALT_DEVICE_FAMILY              = soc_a10
-  HWLIBS_ROOT                    = $(SOCEDS_DEST_ROOT)/ip/altera/hps/altera_hps/hwlib
+  HWLIBS_ROOT                    = $(HWLIBS_ROOT_DIR)/armv7a/hwlib
 
 ################################################################################
 #
