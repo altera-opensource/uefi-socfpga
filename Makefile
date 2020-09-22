@@ -163,7 +163,7 @@ ifeq ("$(DEVICE)$(device)$(D)$(d)",$(filter "$(DEVICE)$(device)$(D)$(d)","a10" "
   FDF_LINK_DTS_PATH=AlteraPlatformPkg$(PATHSEP)Arria10SoCPkg$(PATHSEP)Arria10SoCPkg.dts
 
   # ENTRY_MINUS_40HEX
-  ENTRY_MINUS_40HEX := 292
+  ENTRY_MINUS_40HEX := 124
 
   # Build full path of the .FD files
   PEI_FD_FILENAME_FULLPATH := Build$(PATHSEP)Arria10SoCPkg$(PATHSEP)$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)$(PATHSEP)FV$(PATHSEP)$(PEI_FD_FILENAME)
