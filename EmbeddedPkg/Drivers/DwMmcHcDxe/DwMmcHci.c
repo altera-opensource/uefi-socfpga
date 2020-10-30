@@ -1337,7 +1337,7 @@ BuildDmaDescTable (
 }
 
 EFI_STATUS
-ReadFifo (
+TransferFifo (
   IN DW_MMC_HC_TRB          *Trb
   )
 {
@@ -1370,7 +1370,7 @@ ReadFifo (
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
-        "ReadFifo: failed to read RINTSTS, Status:%r\n",
+        "TransferFifo: failed to read RINTSTS, Status:%r\n",
         Status
         ));
       return Status;
@@ -1386,9 +1386,10 @@ ReadFifo (
       if (EFI_ERROR (Status)) {
         DEBUG ((
           DEBUG_ERROR,
-          "ReadFifo: failed to read STATUS, Status:%r\n",
+          "TransferFifo: failed to read STATUS, Status:%r\n",
           Status
           ));
+          return Status;
       }
 
       while (!(DW_MMC_STS_FIFO_FULL(Sts))
@@ -1414,7 +1415,7 @@ ReadFifo (
         if (EFI_ERROR (Status)) {
           DEBUG ((
             DEBUG_ERROR,
-            "ReadFifo: failed to read FIFO, Status:%r\n",
+            "TransferFifo: failed to write FIFO, Status:%r\n",
             Status
             ));
           return Status;
@@ -1430,14 +1431,14 @@ ReadFifo (
           if (EFI_ERROR (Status)) {
             DEBUG ((
               DEBUG_ERROR,
-              "ReadFifo: failed to clear TXDR from RINTSTS, Status:%r\n",
+              "TransferFifo: failed to clear TXDR from RINTSTS, Status:%r\n",
               Status
               ));
               return Status;
           }
 
-    	  DwMmcHcRwMmio (
-    		  DevIo,
+          DwMmcHcRwMmio (
+                  DevIo,
                   DW_MMC_RINTSTS,
                   TRUE,
                   sizeof (Intsts),
@@ -1445,7 +1446,7 @@ ReadFifo (
           if (EFI_ERROR (Status)) {
             DEBUG ((
               DEBUG_ERROR,
-              "ReadFifo: failed to read RINTSTS, Status:%r\n",
+              "TransferFifo: failed to read RINTSTS, Status:%r\n",
               Status
               ));
               return Status;
@@ -1460,7 +1461,7 @@ ReadFifo (
           if (EFI_ERROR (Status)) {
             DEBUG ((
               DEBUG_ERROR,
-              "ReadFifo: failed to read STATUS, Status:%r\n",
+              "TransferFifo: failed to read STATUS, Status:%r\n",
               Status
               ));
             return Status;
@@ -1468,7 +1469,7 @@ ReadFifo (
         }
       continue;
     }
-    
+
     if (Trb->DataLen && ((Intsts & DW_MMC_INT_RXDR) ||
        (Intsts & DW_MMC_INT_DTO)) && Trb->Read) {
       Status = DwMmcHcRwMmio (
@@ -1481,7 +1482,7 @@ ReadFifo (
       if (EFI_ERROR (Status)) {
         DEBUG ((
           DEBUG_ERROR,
-          "ReadFifo: failed to read STATUS, Status:%r\n",
+          "TransferFifo: failed to read STATUS, Status:%r\n",
           Status
           ));
         return Status;
@@ -1506,7 +1507,7 @@ ReadFifo (
         if (EFI_ERROR (Status)) {
           DEBUG ((
             DEBUG_ERROR,
-            "ReadFifo: failed to read FIFO, Status:%r\n",
+            "TransferFifo: failed to read FIFO, Status:%r\n",
             Status
             ));
           return Status;
@@ -1537,7 +1538,7 @@ ReadFifo (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ReadFifo: failed to write RINTSTS, Status:%r\n",
+      "TransferFifo: failed to write RINTSTS, Status:%r\n",
       Status
       ));
     return Status;
@@ -2113,15 +2114,15 @@ DwSdExecTrb (
       }
     }
     else {
-    	if (Packet->OutTransferLength > DW_MMC_BLOCK_SIZE) {
-    	        BlkSize = DW_MMC_BLOCK_SIZE;
-    	      } else {
-    	        BlkSize = Packet->OutTransferLength;
-    	      }
+      if (Packet->OutTransferLength > DW_MMC_BLOCK_SIZE) {
+        BlkSize = DW_MMC_BLOCK_SIZE;
+      } else {
+        BlkSize = Packet->OutTransferLength;
+      }
     }
-    
+
     Status = DwMmcHcRwMmio (
-               DevIo, 
+               DevIo,
                DW_MMC_BLKSIZ,
                FALSE,
                sizeof (BlkSize),
@@ -2166,7 +2167,7 @@ DwSdExecTrb (
     ErrMask |= DW_MMC_INT_DCRC;
   }
   if (Trb->UseFifo == TRUE) {
-    Status = ReadFifo (Trb);
+    Status = TransferFifo (Trb);
     if (EFI_ERROR (Status)) {
       return Status;
     }

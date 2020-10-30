@@ -156,7 +156,7 @@
 #define DW_MMC_STS_DATA_BUSY                    (1 << 9)
 #define DW_MMC_STS_FIFO_COUNT(x)                (((x) & 0x1fff) << 17)   /* Number of filled locations in FIFO */
 #define GET_STS_FIFO_COUNT(x)                   (((x) >> 17) & 0x1fff)
-#define DW_MMC_STS_FIFO_FULL(x)                 ((x) >> 3 & 1)
+#define DW_MMC_STS_FIFO_FULL(x)                 (((x) >> 3) & 1)
 
 #define DW_MMC_BMOD_SWR                         (1 << 0)         /* Software Reset */
 #define DW_MMC_BMOD_FB                          (1 << 1)         /* Fix Burst */
